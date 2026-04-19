@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Command Center - Adaptive Entry 360</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed": "#d8e2ff",
+                    "primary-container": "#1a73e8",
+                    "surface-variant": "#e3e2e6",
+                    "primary-fixed-dim": "#adc7ff",
+                    "on-primary": "#ffffff",
+                    "surface": "#faf9fd",
+                    "tertiary-fixed-dim": "#ffb691",
+                    "secondary-fixed-dim": "#afc7fb",
+                    "tertiary": "#9e4300",
+                    "inverse-primary": "#adc7ff",
+                    "surface-container": "#efedf1",
+                    "surface-tint": "#005bc0",
+                    "surface-container-low": "#f4f3f7",
+                    "tertiary-container": "#c55500",
+                    "surface-bright": "#faf9fd",
+                    "on-tertiary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "on-error": "#ffffff",
+                    "secondary": "#475e8c",
+                    "outline-variant": "#c1c6d6",
+                    "on-primary-fixed-variant": "#004493",
+                    "on-secondary-fixed-variant": "#2e4673",
+                    "inverse-on-surface": "#f1f0f4",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed": "#341100",
+                    "on-tertiary-container": "#0e0200",
+                    "on-secondary-container": "#3d5481",
+                    "on-secondary": "#ffffff",
+                    "outline": "#727785",
+                    "on-primary-container": "#ffffff",
+                    "secondary-container": "#b2c9fe",
+                    "on-background": "#1a1b1e",
+                    "surface-container-highest": "#e3e2e6",
+                    "background": "#faf9fd",
+                    "inverse-surface": "#2f3033",
+                    "primary-fixed": "#d8e2ff",
+                    "on-surface": "#1a1b1e",
+                    "surface-dim": "#dbd9dd",
+                    "on-secondary-fixed": "#001a41",
+                    "surface-container-lowest": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed": "#ffdbcb",
+                    "on-primary-fixed": "#001a41",
+                    "on-surface-variant": "#414754",
+                    "surface-container-high": "#e9e7eb",
+                    "primary": "#005bbf",
+                    "on-tertiary-fixed-variant": "#783100"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0px",
+                    "lg": "0px",
+                    "xl": "0px",
+                    "full": "0px"
+            },
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #1a1b1e;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+        }
+        .wait-ladder-step {
+            height: 8px;
+            margin-bottom: 2px;
+        }
+    </style>
+</head>
+<body class="bg-[#1a1b1e] text-white">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center w-full px-6 py-4 max-w-full docked full-width top-0 border-b-2 border-[#727785] bg-[#1a1b1e]">
+<div class="text-2xl font-black tracking-tighter text-white uppercase">Adaptive Entry 360</div>
+<nav class="hidden md:flex space-x-8">
+<a class="font-['Inter'] font-bold uppercase tracking-widest text-[14px] text-[#727785] hover:bg-[#1A73E8] hover:text-white transition-none" href="#">Dashboard</a>
+<a class="font-['Inter'] font-bold uppercase tracking-widest text-[14px] text-[#727785] hover:bg-[#1A73E8] hover:text-white transition-none" href="#">Booking</a>
+<a class="font-['Inter'] font-bold uppercase tracking-widest text-[14px] text-[#1A73E8] border-b-2 border-[#1A73E8] pb-1" href="#">Hub</a>
+<a class="font-['Inter'] font-bold uppercase tracking-widest text-[14px] text-[#727785] hover:bg-[#1A73E8] hover:text-white transition-none" href="#">Concierge</a>
+<a class="font-['Inter'] font-bold uppercase tracking-widest text-[14px] text-[#727785] hover:bg-[#1A73E8] hover:text-white transition-none" href="#">Staff</a>
+</nav>
+<div class="flex items-center space-x-6">
+<button class="bg-[#1A73E8] text-white font-bold px-4 py-2 text-sm uppercase transition-none hover:bg-white hover:text-[#1A73E8]">Emergency Reset</button>
+<span class="material-symbols-outlined text-[#727785] cursor-pointer">settings</span>
+<span class="material-symbols-outlined text-[#727785] cursor-pointer">account_circle</span>
+</div>
+</header>
+<div class="flex h-[calc(100vh-74px)] overflow-hidden">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-[74px] h-screen flex flex-col z-40 docked h-full w-64 border-r-2 border-[#45474f] bg-[#121212]">
+<div class="p-6 border-b border-[#45474f]">
+<div class="text-[10px] uppercase tracking-widest text-[#727785] font-bold">System Alpha-01</div>
+<div class="text-lg font-black uppercase tracking-tight">Command Center</div>
+</div>
+<nav class="flex-1">
+<div class="bg-[#1A73E8] text-white font-bold p-4 border-l-4 border-white flex items-center gap-4">
+<span class="material-symbols-outlined">monitor_heart</span>
+<span class="font-['Inter'] font-semibold text-[12px] uppercase">Live Feed</span>
+</div>
+<div class="text-white p-4 border-b border-[#c1c6d6]/20 flex items-center gap-4 hover:bg-[#2a2a2a] cursor-pointer">
+<span class="material-symbols-outlined">calendar_view_month</span>
+<span class="font-['Inter'] font-semibold text-[12px] uppercase">Slot Control</span>
+</div>
+<div class="text-white p-4 border-b border-[#c1c6d6]/20 flex items-center gap-4 hover:bg-[#2a2a2a] cursor-pointer">
+<span class="material-symbols-outlined">confirmation_number</span>
+<span class="font-['Inter'] font-semibold text-[12px] uppercase">Ticket Ledger</span>
+</div>
+<div class="text-white p-4 border-b border-[#c1c6d6]/20 flex items-center gap-4 hover:bg-[#2a2a2a] cursor-pointer">
+<span class="material-symbols-outlined">mic</span>
+<span class="font-['Inter'] font-semibold text-[12px] uppercase">Voice Command</span>
+</div>
+<div class="text-white p-4 border-b border-[#c1c6d6]/20 flex items-center gap-4 hover:bg-[#2a2a2a] cursor-pointer">
+<span class="material-symbols-outlined">security</span>
+<span class="font-['Inter'] font-semibold text-[12px] uppercase text-[#4d94ff]">Gate Ops</span>
+</div>
+<div class="text-white p-4 border-b border-[#c1c6d6]/20 flex items-center gap-4 hover:bg-[#2a2a2a] cursor-pointer">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="font-['Inter'] font-semibold text-[12px] uppercase">Matrix View</span>
+</div>
+</nav>
+<div class="p-4 bg-[#1a1b1e]">
+<button class="w-full bg-error text-white font-bold py-3 uppercase text-xs tracking-tighter">Terminal Shutdown</button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 flex-1 overflow-y-auto p-8 pb-16">
+<!-- Top Dashboard Stats -->
+<div class="grid grid-cols-12 gap-0 border-2 border-outline mb-8">
+<!-- Large Counter -->
+<div class="col-span-12 md:col-span-5 p-8 border-r-2 border-outline bg-surface-container-lowest/5">
+<div class="label-sm uppercase tracking-[0.2em] text-[#727785] font-black mb-2">Throughput Efficiency</div>
+<div class="flex items-baseline gap-4">
+<span class="text-7xl md:text-8xl font-black tracking-tighter text-[#4d94ff]">142</span>
+<span class="text-2xl font-bold uppercase tracking-widest text-white">SCANS/MIN</span>
+</div>
+<div class="mt-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-[#4d94ff]" style="font-variation-settings: 'FILL' 1;">trending_up</span>
+<span class="font-bold text-sm">+12.4% vs L-HOUR</span>
+</div>
+</div>
+<!-- Projected Burst Graph (Strict 2D) -->
+<div class="col-span-12 md:col-span-7 p-8 flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<div class="label-sm uppercase tracking-[0.2em] text-[#727785] font-black">Projected Burst Cycle</div>
+<div class="text-xs font-mono text-[#4d94ff]">T-MINUS 14:00</div>
+</div>
+<div class="relative h-32 w-full mt-4 border-b border-l border-[#727785]">
+<!-- Simple Vectorized CSS Line Graph Representation -->
+<svg class="absolute inset-0 w-full h-full" preserveaspectratio="none" viewbox="0 0 100 100">
+<path d="M0,80 L10,75 L20,85 L30,40 L40,45 L50,10 L60,15 L70,30 L80,5 L90,20 L100,0" fill="none" stroke="#4d94ff" stroke-width="2" vector-effect="non-scaling-stroke"></path>
+<!-- Baseline -->
+<line stroke="#727785" stroke-dasharray="2,2" stroke-width="0.5" x1="0" x2="100" y1="50" y2="50"></line>
+</svg>
+</div>
+<div class="flex justify-between mt-2 text-[10px] font-mono text-[#727785] uppercase">
+<span>14:00</span>
+<span>14:15</span>
+<span>14:30</span>
+<span>14:45</span>
+<span>15:00</span>
+</div>
+</div>
+</div>
+<!-- Wait-Time Ladders Grid -->
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+<!-- Gate 1-12 Ladder Loop -->
+<div class="border-2 border-[#4d94ff] p-4 bg-[#1a1b1e]">
+<div class="flex justify-between items-center mb-4">
+<span class="text-xl font-black">G-01</span>
+<span class="text-[10px] font-mono bg-[#4d94ff] text-white px-1">ACTIVE</span>
+</div>
+<div class="flex flex-col-reverse h-48">
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]/20"></div>
+<div class="wait-ladder-step bg-[#4d94ff]/20"></div>
+<div class="wait-ladder-step bg-[#4d94ff]/20"></div>
+<div class="wait-ladder-step bg-[#4d94ff]/20"></div>
+<div class="wait-ladder-step bg-[#4d94ff]/20"></div>
+<div class="wait-ladder-step bg-[#4d94ff]/20"></div>
+</div>
+<div class="mt-4 text-center">
+<div class="text-xs text-[#727785] font-bold uppercase">Wait Time</div>
+<div class="text-2xl font-black tracking-tight">04:12</div>
+</div>
+</div>
+<div class="border-2 border-outline p-4 bg-[#1a1b1e]">
+<div class="flex justify-between items-center mb-4">
+<span class="text-xl font-black text-[#727785]">G-02</span>
+<span class="text-[10px] font-mono bg-[#727785] text-white px-1">IDLE</span>
+</div>
+<div class="flex flex-col-reverse h-48 opacity-30">
+<div class="wait-ladder-step bg-white"></div>
+<div class="wait-ladder-step bg-white/20"></div>
+<div class="wait-ladder-step bg-white/20"></div>
+<!-- ... rest of ladder ... -->
+</div>
+<div class="mt-4 text-center">
+<div class="text-xs text-[#727785] font-bold uppercase">Wait Time</div>
+<div class="text-2xl font-black tracking-tight text-[#727785]">--:--</div>
+</div>
+</div>
+<div class="border-2 border-error p-4 bg-[#1a1b1e]">
+<div class="flex justify-between items-center mb-4">
+<span class="text-xl font-black">G-03</span>
+<span class="text-[10px] font-mono bg-error text-white px-1">CRITICAL</span>
+</div>
+<div class="flex flex-col-reverse h-48">
+<div class="wait-ladder-step bg-error"></div>
+<div class="wait-ladder-step bg-error"></div>
+<div class="wait-ladder-step bg-error"></div>
+<div class="wait-ladder-step bg-error"></div>
+<div class="wait-ladder-step bg-error"></div>
+<div class="wait-ladder-step bg-error"></div>
+<div class="wait-ladder-step bg-error"></div>
+<div class="wait-ladder-step bg-error"></div>
+<div class="wait-ladder-step bg-error"></div>
+<div class="wait-ladder-step bg-error"></div>
+<div class="wait-ladder-step bg-error"></div>
+<div class="wait-ladder-step bg-error"></div>
+</div>
+<div class="mt-4 text-center">
+<div class="text-xs text-[#727785] font-bold uppercase">Wait Time</div>
+<div class="text-2xl font-black tracking-tight text-error">12:45</div>
+</div>
+</div>
+<div class="border-2 border-[#4d94ff] p-4 bg-[#1a1b1e]">
+<div class="flex justify-between items-center mb-4">
+<span class="text-xl font-black">G-04</span>
+<span class="text-[10px] font-mono bg-[#4d94ff] text-white px-1">ACTIVE</span>
+</div>
+<div class="flex flex-col-reverse h-48">
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]/20"></div>
+<div class="wait-ladder-step bg-[#4d94ff]/20"></div>
+</div>
+<div class="mt-4 text-center">
+<div class="text-xs text-[#727785] font-bold uppercase">Wait Time</div>
+<div class="text-2xl font-black tracking-tight">02:30</div>
+</div>
+</div>
+<div class="border-2 border-[#4d94ff] p-4 bg-[#1a1b1e]">
+<div class="flex justify-between items-center mb-4">
+<span class="text-xl font-black">G-05</span>
+<span class="text-[10px] font-mono bg-[#4d94ff] text-white px-1">ACTIVE</span>
+</div>
+<div class="flex flex-col-reverse h-48">
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]/20"></div>
+</div>
+<div class="mt-4 text-center">
+<div class="text-xs text-[#727785] font-bold uppercase">Wait Time</div>
+<div class="text-2xl font-black tracking-tight">01:15</div>
+</div>
+</div>
+<div class="border-2 border-[#4d94ff] p-4 bg-[#1a1b1e]">
+<div class="flex justify-between items-center mb-4">
+<span class="text-xl font-black">G-06</span>
+<span class="text-[10px] font-mono bg-[#4d94ff] text-white px-1">ACTIVE</span>
+</div>
+<div class="flex flex-col-reverse h-48">
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]/20"></div>
+</div>
+<div class="mt-4 text-center">
+<div class="text-xs text-[#727785] font-bold uppercase">Wait Time</div>
+<div class="text-2xl font-black tracking-tight">03:02</div>
+</div>
+</div>
+<!-- Gate Row 2 (Gates 7-12) -->
+<div class="border-2 border-[#4d94ff] p-4 bg-[#1a1b1e]">
+<div class="flex justify-between items-center mb-4">
+<span class="text-xl font-black">G-07</span>
+<span class="text-[10px] font-mono bg-[#4d94ff] text-white px-1">ACTIVE</span>
+</div>
+<div class="flex flex-col-reverse h-48">
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+</div>
+<div class="mt-4 text-center">
+<div class="text-xs text-[#727785] font-bold uppercase">Wait Time</div>
+<div class="text-2xl font-black tracking-tight">00:54</div>
+</div>
+</div>
+<div class="border-2 border-[#4d94ff] p-4 bg-[#1a1b1e]">
+<div class="flex justify-between items-center mb-4">
+<span class="text-xl font-black">G-08</span>
+<span class="text-[10px] font-mono bg-[#4d94ff] text-white px-1">ACTIVE</span>
+</div>
+<div class="flex flex-col-reverse h-48">
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+</div>
+<div class="mt-4 text-center">
+<div class="text-xs text-[#727785] font-bold uppercase">Wait Time</div>
+<div class="text-2xl font-black tracking-tight">02:11</div>
+</div>
+</div>
+<div class="border-2 border-outline p-4 bg-[#1a1b1e]">
+<div class="flex justify-between items-center mb-4">
+<span class="text-xl font-black text-[#727785]">G-09</span>
+<span class="text-[10px] font-mono bg-[#727785] text-white px-1">OFFLINE</span>
+</div>
+<div class="flex flex-col-reverse h-48 opacity-10">
+<div class="wait-ladder-step bg-white"></div>
+</div>
+<div class="mt-4 text-center">
+<div class="text-xs text-[#727785] font-bold uppercase">Wait Time</div>
+<div class="text-2xl font-black tracking-tight text-[#727785]">--:--</div>
+</div>
+</div>
+<div class="border-2 border-[#4d94ff] p-4 bg-[#1a1b1e]">
+<div class="flex justify-between items-center mb-4">
+<span class="text-xl font-black">G-10</span>
+<span class="text-[10px] font-mono bg-[#4d94ff] text-white px-1">ACTIVE</span>
+</div>
+<div class="flex flex-col-reverse h-48">
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+</div>
+<div class="mt-4 text-center">
+<div class="text-xs text-[#727785] font-bold uppercase">Wait Time</div>
+<div class="text-2xl font-black tracking-tight">04:00</div>
+</div>
+</div>
+<div class="border-2 border-[#4d94ff] p-4 bg-[#1a1b1e]">
+<div class="flex justify-between items-center mb-4">
+<span class="text-xl font-black">G-11</span>
+<span class="text-[10px] font-mono bg-[#4d94ff] text-white px-1">ACTIVE</span>
+</div>
+<div class="flex flex-col-reverse h-48">
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]/20"></div>
+</div>
+<div class="mt-4 text-center">
+<div class="text-xs text-[#727785] font-bold uppercase">Wait Time</div>
+<div class="text-2xl font-black tracking-tight">00:42</div>
+</div>
+</div>
+<div class="border-2 border-[#4d94ff] p-4 bg-[#1a1b1e]">
+<div class="flex justify-between items-center mb-4">
+<span class="text-xl font-black">G-12</span>
+<span class="text-[10px] font-mono bg-[#4d94ff] text-white px-1">ACTIVE</span>
+</div>
+<div class="flex flex-col-reverse h-48">
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]"></div>
+<div class="wait-ladder-step bg-[#4d94ff]/20"></div>
+</div>
+<div class="mt-4 text-center">
+<div class="text-xs text-[#727785] font-bold uppercase">Wait Time</div>
+<div class="text-2xl font-black tracking-tight">02:15</div>
+</div>
+</div>
+</div>
+<!-- Detail Feed (Asymmetric Layout) -->
+<div class="mt-8 grid grid-cols-12 gap-8">
+<div class="col-span-12 lg:col-span-8 border-t-4 border-white pt-6">
+<div class="text-2xl font-black uppercase mb-4 tracking-tighter">System Anomalies &amp; Logs</div>
+<div class="space-y-4">
+<div class="flex items-center gap-6 p-4 border-l-4 border-error bg-error/5">
+<span class="font-mono text-error font-bold text-sm">14:02:11</span>
+<span class="flex-1 font-bold">GATE-03 OVER CAPACITY: RE-ROUTING ENABLED</span>
+<span class="label-md uppercase font-black text-error">Resolved</span>
+</div>
+<div class="flex items-center gap-6 p-4 border-l-4 border-[#4d94ff] bg-[#4d94ff]/5">
+<span class="font-mono text-[#4d94ff] font-bold text-sm">13:58:45</span>
+<span class="flex-1 font-bold">STAFF ROTATION: ZONE B COMPLETED</span>
+<span class="label-md uppercase font-black text-[#4d94ff]">Logged</span>
+</div>
+<div class="flex items-center gap-6 p-4 border-l-4 border-white bg-white/5">
+<span class="font-mono text-white/60 font-bold text-sm">13:45:22</span>
+<span class="flex-1 font-bold">SYSTEM BROADCAST: ALL GATES SYNCED</span>
+<span class="label-md uppercase font-black text-white/60">Info</span>
+</div>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-4 bg-white text-[#1a1b1e] p-6 border-b-8 border-[#4d94ff]">
+<div class="text-xs uppercase font-black tracking-[0.2em] mb-4">Staff Directory</div>
+<ul class="space-y-6">
+<li class="flex items-center gap-4">
+<div class="w-10 h-10 bg-[#1a1b1e] text-white flex items-center justify-center font-black">JS</div>
+<div>
+<div class="font-black uppercase text-sm">John Sterling</div>
+<div class="text-[10px] font-bold opacity-60">Supervisor | Gates 1-6</div>
+</div>
+</li>
+<li class="flex items-center gap-4">
+<div class="w-10 h-10 bg-[#1a1b1e] text-white flex items-center justify-center font-black">AM</div>
+<div>
+<div class="font-black uppercase text-sm">Aria Mendoza</div>
+<div class="text-[10px] font-bold opacity-60">Logistics | Gates 7-12</div>
+</div>
+</li>
+<li class="flex items-center gap-4">
+<div class="w-10 h-10 bg-[#1a1b1e] text-white flex items-center justify-center font-black">RK</div>
+<div>
+<div class="font-black uppercase text-sm">Ryan Khol</div>
+<div class="text-[10px] font-bold opacity-60">Security | Matrix View</div>
+</div>
+</li>
+</ul>
+<button class="mt-8 w-full border-2 border-[#1a1b1e] py-2 font-black uppercase text-xs hover:bg-[#1a1b1e] hover:text-white transition-none">Broadcast To All</button>
+</div>
+</div>
+</main>
+</div>
+<!-- BottomNavBar (Mobile Only) -->
+<footer class="fixed bottom-0 left-0 w-full bg-surface border-t border-outline-variant px-6 py-2 flex justify-between items-center z-50 hidden lg:flex rounded-none">
+<div class="text-[10px] font-bold uppercase tracking-[0.1em] text-on-surface-variant font-['Inter']">
+    SYNC STATUS: LIVE
+  </div>
+<div class="text-[10px] font-bold uppercase tracking-[0.1em] text-on-surface-variant font-['Inter']">
+    REFRESHED: 10:42 AM
+  </div>
+</footer><nav class="fixed bottom-0 left-0 w-full h-16 flex justify-around items-center z-50 lg:hidden border-t-2 border-[#1a1b1e] bg-black">
+<div class="flex flex-col items-center justify-center py-2 h-full text-[#f4f3f7] hover:invert transition-none">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-['Inter'] font-black text-[10px] uppercase">Dashboard</span>
+</div>
+<div class="flex flex-col items-center justify-center py-2 h-full text-[#f4f3f7] hover:invert transition-none">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="font-['Inter'] font-black text-[10px] uppercase">Concierge</span>
+</div>
+<div class="bg-[#1A73E8] text-white flex flex-col items-center justify-center py-2 h-full px-4">
+<span class="material-symbols-outlined">warning</span>
+<span class="font-['Inter'] font-black text-[10px] uppercase">Alerts</span>
+</div>
+<div class="flex flex-col items-center justify-center py-2 h-full text-[#f4f3f7] hover:invert transition-none">
+<span class="material-symbols-outlined">view_quilt</span>
+<span class="font-['Inter'] font-black text-[10px] uppercase">Matrix</span>
+</div>
+</nav>
+</body></html>

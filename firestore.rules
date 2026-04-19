@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Hot path: gate pressure from Vertex aggregator / admin SDK (clients read only)
+    match /gateLogistics/{gateId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Emergency mesh: clients read; writes only via Cloud Functions (Admin SDK bypasses rules)
+    match /globalEvents/{docId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+  }
+}

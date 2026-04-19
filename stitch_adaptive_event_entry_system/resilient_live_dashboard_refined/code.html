@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Adaptive Entry 360 - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed": "#d8e2ff",
+                    "primary-container": "#1a73e8",
+                    "surface-variant": "#e3e2e6",
+                    "primary-fixed-dim": "#adc7ff",
+                    "on-primary": "#ffffff",
+                    "surface": "#faf9fd",
+                    "tertiary-fixed-dim": "#ffb691",
+                    "secondary-fixed-dim": "#afc7fb",
+                    "tertiary": "#9e4300",
+                    "inverse-primary": "#adc7ff",
+                    "surface-container": "#efedf1",
+                    "surface-tint": "#005bc0",
+                    "surface-container-low": "#f4f3f7",
+                    "tertiary-container": "#c55500",
+                    "surface-bright": "#faf9fd",
+                    "on-tertiary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "on-error": "#ffffff",
+                    "secondary": "#475e8c",
+                    "outline-variant": "#c1c6d6",
+                    "on-primary-fixed-variant": "#004493",
+                    "on-secondary-fixed-variant": "#2e4673",
+                    "inverse-on-surface": "#f1f0f4",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed": "#341100",
+                    "on-tertiary-container": "#0e0200",
+                    "on-secondary-container": "#3d5481",
+                    "on-secondary": "#ffffff",
+                    "outline": "#727785",
+                    "on-primary-container": "#ffffff",
+                    "secondary-container": "#b2c9fe",
+                    "on-background": "#1a1b1e",
+                    "surface-container-highest": "#e3e2e6",
+                    "background": "#faf9fd",
+                    "inverse-surface": "#2f3033",
+                    "primary-fixed": "#d8e2ff",
+                    "on-surface": "#1a1b1e",
+                    "surface-dim": "#dbd9dd",
+                    "on-secondary-fixed": "#001a41",
+                    "surface-container-lowest": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed": "#ffdbcb",
+                    "on-primary-fixed": "#001a41",
+                    "on-surface-variant": "#414754",
+                    "surface-container-high": "#e9e7eb",
+                    "primary": "#005bbf",
+                    "on-tertiary-fixed-variant": "#783100"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0px",
+                    "lg": "0px",
+                    "xl": "0px",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-[#faf9fd] dark:bg-[#1a1b1e] border-b-2 border-[#727785] dark:border-[#c1c6d6] flex justify-between items-center w-full px-6 py-4 max-w-full z-50">
+<div class="text-2xl font-black tracking-tighter text-[#1a1b1e] dark:text-white uppercase">
+        Adaptive Entry 360
+    </div>
+<!-- Desktop Nav -->
+<div class="hidden md:flex gap-8 items-center h-full">
+<a class="font-['Inter'] font-bold uppercase tracking-widest text-[14px] text-[#1A73E8] border-b-2 border-[#1A73E8] pb-1" href="#">Dashboard</a>
+<a class="font-['Inter'] font-bold uppercase tracking-widest text-[14px] text-[#727785] dark:text-[#c1c6d6] hover:text-[#1a1b1e]" href="#">Booking</a>
+<a class="font-['Inter'] font-bold uppercase tracking-widest text-[14px] text-[#727785] dark:text-[#c1c6d6] hover:text-[#1a1b1e]" href="#">Hub</a>
+<a class="font-['Inter'] font-bold uppercase tracking-widest text-[14px] text-[#727785] dark:text-[#c1c6d6] hover:text-[#1a1b1e]" href="#">Concierge</a>
+<a class="font-['Inter'] font-bold uppercase tracking-widest text-[14px] text-[#727785] dark:text-[#c1c6d6] hover:text-[#1a1b1e]" href="#">Staff</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="font-['Inter'] font-bold uppercase tracking-widest text-[12px] border-2 border-primary px-4 py-2 hover:bg-[#1A73E8] hover:text-white transition-none">
+            Emergency Reset
+        </button>
+<div class="flex gap-2">
+<span class="material-symbols-outlined text-[#727785] cursor-pointer">settings</span>
+<span class="material-symbols-outlined text-[#727785] cursor-pointer">account_circle</span>
+</div>
+</div>
+</nav>
+<main class="flex-grow flex flex-col md:flex-row relative">
+<!-- Side Navigation (Web) -->
+<aside class="hidden md:flex fixed left-0 top-[74px] h-[calc(100vh-74px-32px)] w-64 bg-[#f4f3f7] dark:bg-[#121212] border-r-2 border-[#727785] dark:border-[#45474f] flex-col z-40">
+<div class="p-6 border-b border-[#c1c6d6]/20">
+<div class="font-['Inter'] font-semibold text-[12px] uppercase text-[#727785]">Command Center</div>
+<div class="text-[10px] text-[#727785]/70">System Alpha-01</div>
+</div>
+<nav class="flex-grow">
+<div class="bg-[#1A73E8] text-white font-bold p-4 border-l-4 border-white flex items-center gap-4">
+<span class="material-symbols-outlined">monitor_heart</span>
+<span class="font-['Inter'] font-semibold text-[12px] uppercase">Live Feed</span>
+</div>
+<div class="text-[#1a1b1e] dark:text-white p-4 border-b border-[#c1c6d6]/20 flex items-center gap-4 hover:bg-[#e3e2e6] cursor-pointer">
+<span class="material-symbols-outlined">calendar_view_month</span>
+<span class="font-['Inter'] font-semibold text-[12px] uppercase">Slot Control</span>
+</div>
+<div class="text-[#1a1b1e] dark:text-white p-4 border-b border-[#c1c6d6]/20 flex items-center gap-4 hover:bg-[#e3e2e6] cursor-pointer">
+<span class="material-symbols-outlined">confirmation_number</span>
+<span class="font-['Inter'] font-semibold text-[12px] uppercase">Ticket Ledger</span>
+</div>
+<div class="text-[#1a1b1e] dark:text-white p-4 border-b border-[#c1c6d6]/20 flex items-center gap-4 hover:bg-[#e3e2e6] cursor-pointer">
+<span class="material-symbols-outlined">mic</span>
+<span class="font-['Inter'] font-semibold text-[12px] uppercase">Voice Command</span>
+</div>
+<div class="text-[#1a1b1e] dark:text-white p-4 border-b border-[#c1c6d6]/20 flex items-center gap-4 hover:bg-[#e3e2e6] cursor-pointer">
+<span class="material-symbols-outlined">security</span>
+<span class="font-['Inter'] font-semibold text-[12px] uppercase">Gate Ops</span>
+</div>
+<div class="text-[#1a1b1e] dark:text-white p-4 border-b border-[#c1c6d6]/20 flex items-center gap-4 hover:bg-[#e3e2e6] cursor-pointer">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="font-['Inter'] font-semibold text-[12px] uppercase">Matrix View</span>
+</div>
+</nav>
+<div class="p-4 bg-error text-white font-bold uppercase text-[12px] text-center cursor-pointer">
+            Terminal Shutdown
+        </div>
+</aside>
+<!-- Main Content Area -->
+<div class="flex-grow md:ml-64 flex flex-col h-[calc(100vh-74px-32px)]">
+<!-- Map Container (Top portion) -->
+<section class="flex-grow w-full bg-surface relative overflow-hidden flex items-center justify-center border-b-2 border-outline">
+<!-- OFFLINE Label -->
+<div class="absolute top-6 right-6 z-10 bg-on-background text-surface border border-outline px-6 py-2">
+<span class="font-black tracking-widest text-lg uppercase font-headline">OFFLINE</span>
+</div>
+<!-- Minimalist Map Mockup -->
+<div class="w-full h-full p-8 md:p-12">
+<svg class="w-full h-full" viewbox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+<!-- Background Grid -->
+<pattern height="40" id="grid" patternunits="userSpaceOnUse" width="40">
+<path d="M 40 0 L 0 0 0 40" fill="none" stroke="#c1c6d6" stroke-dasharray="2,2" stroke-width="0.5"></path>
+</pattern>
+<rect fill="url(#grid)" height="100%" width="100%"></rect>
+<!-- Site Pathways (outline-variant) -->
+<path d="M50 50 L750 50 L750 350 L50 350 Z" fill="none" stroke="#c1c6d6" stroke-width="8"></path>
+<path d="M200 50 L200 350 M400 50 L400 350 M600 50 L600 350" fill="none" stroke="#c1c6d6" stroke-width="4"></path>
+<path d="M50 200 L750 200" fill="none" stroke="#c1c6d6" stroke-width="4"></path>
+<!-- Active Route (primary) -->
+<path d="M70 330 L180 330 L180 220 L380 220 L380 70" fill="none" stroke="#005bbf" stroke-linecap="square" stroke-linejoin="miter" stroke-width="12"></path>
+<!-- Location Markers -->
+<rect fill="#005bbf" height="40" width="40" x="360" y="50"></rect> <!-- Destination -->
+<circle cx="70" cy="330" fill="#1a1b1e" r="10"></circle> <!-- Current Pos -->
+<!-- Technical Callouts -->
+<text class="uppercase" fill="#1a1b1e" font-family="Inter" font-size="12" font-weight="900" x="360" y="40">GATE 2 ENTRY</text>
+<text class="uppercase" fill="#1a1b1e" font-family="Inter" font-size="12" font-weight="900" x="60" y="360">CURRENT POSITION</text>
+</svg>
+</div>
+</section>
+<!-- Status & Route Card (Anchored Bottom) -->
+<section class="w-full flex flex-col md:flex-row bg-surface-container-low border-t border-outline-variant">
+<!-- The Primary Smart Route Card -->
+<div class="flex-grow bg-surface-container-lowest border-l-[4px] border-primary p-8 flex flex-col justify-center">
+<div class="mb-4 flex flex-wrap gap-4 items-center">
+<span class="bg-primary text-white text-[10px] font-black px-2 py-1 tracking-widest uppercase">System Operational</span>
+</div>
+<h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-on-surface leading-tight tracking-tighter mb-4 font-headline uppercase">
+                    GATE 2 STATUS: <span class="text-primary">CLEAR</span>
+</h1>
+<!-- Crowd Pressure Progress Bar -->
+<div class="mb-6 max-w-2xl">
+<div class="flex justify-between items-end mb-1">
+<span class="text-[10px] font-black uppercase text-outline tracking-widest">Crowd Pressure</span>
+<span class="text-[12px] font-bold text-on-surface">12%</span>
+</div>
+<div class="w-full h-3 bg-surface-container-high border border-outline-variant">
+<div class="bg-primary h-full w-[12%]"></div>
+</div>
+</div>
+<div class="flex items-end gap-4">
+<div class="text-lg md:text-2xl font-bold text-outline uppercase tracking-widest">
+                        ESTIMATED WALK: <span class="text-on-surface">6 MIN</span>
+</div>
+<div class="flex-grow border-b-2 border-outline-variant mb-2 border-dashed"></div>
+</div>
+</div>
+<!-- Secondary Data Grid -->
+<div class="md:w-1/4 grid grid-cols-1 border-l border-outline-variant">
+<div class="bg-surface-container-highest p-6 flex flex-col justify-between border-b border-outline-variant">
+<div class="text-[10px] font-black uppercase text-outline tracking-widest">Current Load</div>
+<div class="text-3xl font-black uppercase">Low</div>
+</div>
+<div class="bg-surface-container-highest p-6 flex flex-col justify-between">
+<div class="text-[10px] font-black uppercase text-outline tracking-widest">Next Entry Slot</div>
+<div class="text-3xl font-black uppercase">14:30 HRS</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- System Metadata Footer -->
+<footer class="h-8 bg-surface border-t border-outline-variant px-6 flex justify-between items-center z-50">
+<div class="text-[10px] font-label font-bold uppercase tracking-[0.1em] text-on-surface">
+        Sync Status: Live
+    </div>
+<div class="text-[10px] font-label font-bold uppercase tracking-[0.1em] text-outline">
+        Refreshed: 10:42 AM
+    </div>
+</footer>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="lg:hidden fixed bottom-8 left-0 w-full h-16 flex justify-around items-center z-50 bg-white dark:bg-black border-t-2 border-[#1a1b1e] dark:border-[#f4f3f7]">
+<div class="bg-[#1A73E8] text-white flex flex-col items-center justify-center py-2 h-full w-1/4">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-['Inter'] font-black text-[10px] uppercase">Dashboard</span>
+</div>
+<div class="text-[#1a1b1e] dark:text-[#f4f3f7] flex flex-col items-center justify-center py-2 h-full w-1/4 hover:invert transition-none cursor-pointer">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="font-['Inter'] font-black text-[10px] uppercase">Concierge</span>
+</div>
+<div class="text-[#1a1b1e] dark:text-[#f4f3f7] flex flex-col items-center justify-center py-2 h-full w-1/4 hover:invert transition-none cursor-pointer">
+<span class="material-symbols-outlined">warning</span>
+<span class="font-['Inter'] font-black text-[10px] uppercase">Alerts</span>
+</div>
+<div class="text-[#1a1b1e] dark:text-[#f4f3f7] flex flex-col items-center justify-center py-2 h-full w-1/4 hover:invert transition-none cursor-pointer">
+<span class="material-symbols-outlined">view_quilt</span>
+<span class="font-['Inter'] font-black text-[10px] uppercase">Matrix</span>
+</div>
+</nav>
+<!-- FAB -->
+<button class="fixed bottom-28 right-6 md:bottom-20 md:right-10 bg-primary text-white w-16 h-16 flex items-center justify-center shadow-none border-2 border-on-background z-50 hover:bg-on-primary-fixed-variant active:scale-95 transition-none">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">directions</span>
+</button>
+</body></html>

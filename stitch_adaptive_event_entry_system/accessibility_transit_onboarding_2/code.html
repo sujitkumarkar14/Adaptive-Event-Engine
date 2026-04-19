@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ACCESS - Onboarding</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#001a41",
+                    "on-surface-variant": "#414754",
+                    "on-secondary-fixed": "#001a41",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-container": "#c55500",
+                    "surface": "#faf9fd",
+                    "inverse-primary": "#adc7ff",
+                    "primary": "#005bbf",
+                    "on-secondary-fixed-variant": "#2e4673",
+                    "secondary-container": "#b2c9fe",
+                    "on-secondary": "#ffffff",
+                    "tertiary": "#9e4300",
+                    "outline-variant": "#c1c6d6",
+                    "primary-container": "#1a73e8",
+                    "on-tertiary-fixed-variant": "#783100",
+                    "tertiary-fixed-dim": "#ffb691",
+                    "tertiary-fixed": "#ffdbcb",
+                    "secondary": "#475e8c",
+                    "on-error-container": "#93000a",
+                    "surface-container": "#efedf1",
+                    "primary-fixed-dim": "#adc7ff",
+                    "inverse-on-surface": "#f1f0f4",
+                    "surface-container-high": "#e9e7eb",
+                    "outline": "#727785",
+                    "on-tertiary-container": "#0e0200",
+                    "surface-dim": "#dbd9dd",
+                    "on-tertiary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "surface-bright": "#faf9fd",
+                    "surface-tint": "#005bc0",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed-dim": "#afc7fb",
+                    "on-primary-fixed-variant": "#004493",
+                    "background": "#faf9fd",
+                    "surface-container-low": "#f4f3f7",
+                    "error": "#ba1a1a",
+                    "primary-fixed": "#d8e2ff",
+                    "on-surface": "#1a1b1e",
+                    "inverse-surface": "#2f3033",
+                    "on-error": "#ffffff",
+                    "on-tertiary-fixed": "#341100",
+                    "on-primary-container": "#ffffff",
+                    "surface-container-highest": "#e3e2e6",
+                    "on-secondary-container": "#3d5481",
+                    "surface-variant": "#e3e2e6",
+                    "on-background": "#1a1b1e",
+                    "secondary-fixed": "#d8e2ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0px",
+                    "lg": "0px",
+                    "xl": "0px",
+                    "full": "0px"
+            },
+            "spacing": {},
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #ffffff; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Strict 0px override for the design system */
+        * { border-radius: 0px !important; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- TopNavBar Implementation from JSON -->
+<header class="bg-[#faf9fd] dark:bg-[#1a1b1e] border-b-2 border-[#727785] flex justify-between items-center w-full px-6 py-4 h-16 fixed top-0 z-50">
+<div class="text-xl font-black text-[#1a1b1e] dark:text-[#faf9fd] tracking-widest font-['Inter'] uppercase">
+            ACCESS
+        </div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#727785] cursor-pointer" data-icon="account_circle">account_circle</span>
+<span class="material-symbols-outlined text-[#727785] cursor-pointer" data-icon="settings">settings</span>
+</div>
+</header>
+<main class="pt-24 pb-12 px-6 max-w-lg mx-auto min-h-screen flex flex-col">
+<!-- Hero Branding Section -->
+<section class="mb-12">
+<h1 class="text-5xl font-black tracking-tighter uppercase mb-4 leading-none">
+                Travel <br/> Defined.
+            </h1>
+<p class="text-on-surface-variant font-body text-lg leading-relaxed max-w-[80%]">
+                Configure your transit environment for high-performance accessibility.
+            </p>
+</section>
+<!-- Transport Mode Segmented Control -->
+<section class="mb-10">
+<label class="font-['Inter'] font-bold uppercase tracking-widest text-xs text-outline mb-4 block">
+                Transport Mode
+            </label>
+<div class="grid grid-cols-3 border-2 border-outline-variant">
+<button class="py-4 flex flex-col items-center gap-2 border-r-2 border-outline-variant bg-primary-container text-on-primary-container font-bold">
+<span class="material-symbols-outlined" data-icon="directions_car">directions_car</span>
+<span class="text-[10px] tracking-widest uppercase">Car</span>
+</button>
+<button class="py-4 flex flex-col items-center gap-2 border-r-2 border-outline-variant text-on-surface hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined" data-icon="subway">subway</span>
+<span class="text-[10px] tracking-widest uppercase">Metro</span>
+</button>
+<button class="py-4 flex flex-col items-center gap-2 text-on-surface hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined" data-icon="airport_shuttle">airport_shuttle</span>
+<span class="text-[10px] tracking-widest uppercase">Shuttle</span>
+</button>
+</div>
+</section>
+<!-- Accessibility Preferences Toggle List -->
+<section class="mb-12 space-y-4">
+<label class="font-['Inter'] font-bold uppercase tracking-widest text-xs text-outline mb-2 block">
+                Accessibility Preferences
+            </label>
+<!-- Preference Item 1 -->
+<div class="flex items-center justify-between p-5 bg-surface-container-lowest border-l-4 border-primary-container">
+<div class="flex flex-col">
+<span class="font-bold text-sm uppercase tracking-tight">Step-free access</span>
+<span class="text-xs text-on-surface-variant">Prioritize elevators and ramps</span>
+</div>
+<div class="w-12 h-6 bg-primary-container relative flex items-center px-1">
+<div class="w-4 h-4 bg-white"></div>
+</div>
+</div>
+<!-- Preference Item 2 -->
+<div class="flex items-center justify-between p-5 bg-surface-container-lowest border-l-4 border-outline-variant">
+<div class="flex flex-col">
+<span class="font-bold text-sm uppercase tracking-tight">Low-sensory environments</span>
+<span class="text-xs text-on-surface-variant">Routes with reduced noise and light</span>
+</div>
+<div class="w-12 h-6 bg-outline-variant relative flex items-center px-1">
+<div class="w-4 h-4 bg-white"></div>
+</div>
+</div>
+<!-- Preference Item 3 -->
+<div class="flex items-center justify-between p-5 bg-surface-container-lowest border-l-4 border-outline-variant">
+<div class="flex flex-col">
+<span class="font-bold text-sm uppercase tracking-tight">Visual aid support</span>
+<span class="text-xs text-on-surface-variant">High-contrast UI and audio cues</span>
+</div>
+<div class="w-12 h-6 bg-outline-variant relative flex items-center px-1">
+<div class="w-4 h-4 bg-white"></div>
+</div>
+</div>
+</section>
+<!-- Visual Anchor Image -->
+<div class="w-full h-48 mb-12 border-2 border-outline-variant overflow-hidden">
+<img alt="Clean public transport interior" class="w-full h-full object-cover grayscale brightness-110" data-alt="Minimalist architectural shot of a bright modern transit station with sharp geometric lines and high contrast black and white tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAG7gMqh_b3DNv8ZzCapvwhCS-7auNnYXGM-lXKRDJUQOEKTIuLpKTrDCS35Tesss-jcnczzRnaTxHLlOWJXRP-1I7zWH3e67rzndiLUgJ0TJObxpaDZKAJRh1THcr6OmM6Cx6vykRL2r8B0ItonE14vQ_q-0UxFKCROHc7yFtC6brLMVjqCq5TDIodzu1mrP02N9TfY13yZDCUcf8SlttwzPn5St_24ntR9iIHl92RoGlmXFUPb75pSEznhQ9O_G_Spa9ss9wkvKzN"/>
+</div>
+<!-- Primary CTA -->
+<div class="mt-auto">
+<button class="w-full bg-[#1A73E8] text-white py-5 font-black uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-3 active:scale-[0.98] transition-transform">
+                Initialize System
+                <span class="material-symbols-outlined text-lg" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<button class="w-full py-4 text-outline font-bold uppercase tracking-widest text-[10px] mt-2">
+                Skip configuration
+            </button>
+</div>
+</main>
+<!-- SideNavBar (Hidden on mobile per Platform & Layout rule, but defined for desktop logic) -->
+<nav class="hidden md:flex fixed left-0 top-0 h-full w-72 bg-[#faf9fd] dark:bg-[#1a1b1e] border-r-2 border-[#727785] flex-col pt-8 z-40">
+<div class="px-8 mb-12">
+<div class="text-2xl font-black mb-1 uppercase tracking-tighter">Attendee Portal</div>
+<div class="text-[10px] font-bold text-primary-container tracking-widest uppercase">System Status: Active</div>
+</div>
+<div class="flex flex-col grow">
+<a class="bg-[#1A73E8] text-white font-bold p-4 uppercase tracking-widest text-xs flex items-center gap-4" href="#">
+<span class="material-symbols-outlined" data-icon="directions_bus">directions_bus</span>
+                Transit
+            </a>
+<a class="text-[#1a1b1e] dark:text-[#faf9fd] p-4 border-b border-[#c1c6d6] uppercase tracking-widest text-xs flex items-center gap-4 hover:bg-[#f4f3f7]" href="#">
+<span class="material-symbols-outlined" data-icon="accessibility_new">accessibility_new</span>
+                Accessibility
+            </a>
+<a class="text-[#1a1b1e] dark:text-[#faf9fd] p-4 border-b border-[#c1c6d6] uppercase tracking-widest text-xs flex items-center gap-4 hover:bg-[#f4f3f7]" href="#">
+<span class="material-symbols-outlined" data-icon="qr_code">qr_code</span>
+                Event Pass
+            </a>
+<a class="text-[#1a1b1e] dark:text-[#faf9fd] p-4 border-b border-[#c1c6d6] uppercase tracking-widest text-xs flex items-center gap-4 hover:bg-[#f4f3f7]" href="#">
+<span class="material-symbols-outlined" data-icon="info">info</span>
+                Information
+            </a>
+</div>
+<div class="p-6">
+<button class="w-full border-2 border-error text-error py-3 font-bold uppercase tracking-widest text-[10px]">
+                Emergency Assistance
+            </button>
+</div>
+</nav>
+<!-- Bottom Navigation for Mobile -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-surface border-t-2 border-outline-variant grid grid-cols-4 h-16 z-50">
+<button class="flex flex-col items-center justify-center text-primary-container">
+<span class="material-symbols-outlined" data-icon="directions_bus" style="font-variation-settings: 'FILL' 1;">directions_bus</span>
+<span class="text-[8px] uppercase font-bold mt-1">Transit</span>
+</button>
+<button class="flex flex-col items-center justify-center text-outline">
+<span class="material-symbols-outlined" data-icon="accessibility_new">accessibility_new</span>
+<span class="text-[8px] uppercase font-bold mt-1">Access</span>
+</button>
+<button class="flex flex-col items-center justify-center text-outline">
+<span class="material-symbols-outlined" data-icon="qr_code">qr_code</span>
+<span class="text-[8px] uppercase font-bold mt-1">Pass</span>
+</button>
+<button class="flex flex-col items-center justify-center text-outline">
+<span class="material-symbols-outlined" data-icon="info">info</span>
+<span class="text-[8px] uppercase font-bold mt-1">Info</span>
+</button>
+</nav>
+</body></html>

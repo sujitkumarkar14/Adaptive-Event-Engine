@@ -1,0 +1,47 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+coverage
+dist
+dist-ssr
+*.local
+.env
+.env.*.local
+
+# Local / hackathon docs (not pushed to GitHub)
+DEMO_GUIDE.md
+complex.md
+CHECKLIST.md
+checklist.md
+gemini.md
+goal.md
+RUBRIC_COMPLIANCE.md
+todo.md
+plan.md
+done.md
+summary.md
+TEST_RESULTS.md
+FUNCTIONS.md
+# Template: normally committed; ignore only if you keep secrets out of repo entirely
+.env.example
+
+# Stitch HTML design exports (large; optional in repo)
+stitch_adaptive_event_entry_system/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
