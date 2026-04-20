@@ -62,7 +62,16 @@ export type EntryAction =
       };
     }
   | { type: 'CLEAR_A11Y' }
-  | { type: 'SET_PREFERRED_CONTENT_LANGUAGE'; payload: PreferredContentLanguage };
+  | { type: 'SET_PREFERRED_CONTENT_LANGUAGE'; payload: PreferredContentLanguage }
+  /** Replace transport, accessibility, and phase from persisted onboarding (Firestore). */
+  | {
+      type: 'HYDRATE_ONBOARDING';
+      payload: {
+        phase: SystemPhase;
+        transportMode: TransportMode;
+        accessibility: EntryState['accessibility'];
+      };
+    };
 
 // --- INITIAL STATE ---
 const initialState: EntryState = {
@@ -145,6 +154,13 @@ export function entryReducer(state: EntryState, action: EntryAction): EntryState
       return { ...state, a11yStatus: '' };
     case 'SET_PREFERRED_CONTENT_LANGUAGE':
       return { ...state, preferredContentLanguage: action.payload };
+    case 'HYDRATE_ONBOARDING':
+      return {
+        ...state,
+        phase: action.payload.phase,
+        transportMode: action.payload.transportMode,
+        accessibility: { ...action.payload.accessibility },
+      };
     case 'API_FAILURE':
       console.warn(`[REILIENCE] API Error (${action.payload}). Yielding to last known Firestore IndexedDB cache.`);
       return state;

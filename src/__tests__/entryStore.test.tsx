@@ -154,4 +154,19 @@ describe('entryReducer', () => {
     expect(activeRoutingState.phase).toBe('IN_JOURNEY');
     expect(activeRoutingState.stepFreeRequired).toBe(true);
   });
+
+  it('HYDRATE_ONBOARDING replaces transport, accessibility, and phase', () => {
+    const s = createTestEntryState();
+    const next = entryReducer(s, {
+      type: 'HYDRATE_ONBOARDING',
+      payload: {
+        phase: 'IN_JOURNEY',
+        transportMode: 'Metro',
+        accessibility: { stepFree: true, lowSensory: false, visualAid: true },
+      },
+    });
+    expect(next.phase).toBe('IN_JOURNEY');
+    expect(next.transportMode).toBe('Metro');
+    expect(next.accessibility).toEqual({ stepFree: true, lowSensory: false, visualAid: true });
+  });
 });

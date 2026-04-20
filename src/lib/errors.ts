@@ -1,5 +1,9 @@
 import { FirebaseError } from 'firebase/app';
 
+/** Shown when the backend cannot complete booking (e.g. datastore unreachable) — no infra names in copy. */
+export const BOOKING_VENUE_UNAVAILABLE_COPY =
+  'Slots temporarily unavailable for this venue. Please try again later.';
+
 /**
  * Maps Firebase Callable / HTTPS errors to user-safe strings (no stack traces or backend internals).
  */
@@ -12,6 +16,8 @@ export function getHttpsCallableUserMessage(error: unknown): string {
         return 'You do not have permission for this action.';
       case 'functions/invalid-argument':
         return 'That request could not be processed.';
+      case 'functions/failed-precondition':
+        return 'This time slot is not available for booking. Choose another time.';
       case 'functions/resource-exhausted':
       case 'functions/aborted':
         return 'This slot is no longer available. Choose another time.';
@@ -19,7 +25,7 @@ export function getHttpsCallableUserMessage(error: unknown): string {
       case 'functions/deadline-exceeded':
         return 'Service is temporarily unavailable. Try again shortly.';
       case 'functions/internal':
-        return 'Booking could not be completed right now. Please try again in a few minutes or pick another time slot.';
+        return BOOKING_VENUE_UNAVAILABLE_COPY;
       case 'functions/unknown':
       default:
         return 'Something went wrong. Please try again.';

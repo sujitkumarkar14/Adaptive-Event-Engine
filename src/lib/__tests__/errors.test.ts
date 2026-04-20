@@ -14,6 +14,9 @@ describe('getHttpsCallableUserMessage', () => {
       getHttpsCallableUserMessage(new FirebaseError('functions/invalid-argument', 'x'))
     ).toMatch(/could not be processed/i);
     expect(
+      getHttpsCallableUserMessage(new FirebaseError('functions/failed-precondition', 'x'))
+    ).toMatch(/not available for booking/i);
+    expect(
       getHttpsCallableUserMessage(new FirebaseError('functions/resource-exhausted', 'x'))
     ).toMatch(/slot|time/i);
     expect(
@@ -27,7 +30,8 @@ describe('getHttpsCallableUserMessage', () => {
     ).toMatch(/unavailable/i);
     const internalMsg = getHttpsCallableUserMessage(new FirebaseError('functions/internal', 'secret'));
     expect(internalMsg).not.toContain('secret');
-    expect(internalMsg).not.toMatch(/spanner|Spanner|\.sql|gateLogistics/i);
+    expect(internalMsg).not.toMatch(/spanner|Spanner|\.sql|gateLogistics|firestore|Firestore/i);
+    expect(internalMsg).toMatch(/temporarily unavailable for this venue/i);
     expect(getHttpsCallableUserMessage(new FirebaseError('functions/unknown', 'x'))).toMatch(/try again/i);
   });
 

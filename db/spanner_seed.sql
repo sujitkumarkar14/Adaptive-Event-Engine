@@ -1,4 +1,5 @@
--- Seed ArrivalWindows for demo booking (slot ids must match `Booking.tsx` and `reserveEntrySlot`).
+-- Seed ArrivalWindows for demo booking (slot ids must match `Booking.tsx` time slot ids and `DEFAULT_BOOKING_GATE_ID`).
+-- Without these rows, the callable returns a safe failed-precondition to the client (no Spanner names in UI).
 -- Run against database entry-routing-db after schema deploy. Adjust timestamps for your event.
 
 INSERT INTO ArrivalWindows (slot_id, gate_id, window_start, window_end, max_capacity, capacity_reserved, last_modified)

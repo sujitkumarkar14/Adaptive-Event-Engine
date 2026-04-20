@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isSlotAvailable, reservationOutcome } from "../bookingCapacity";
+import { evaluateArrivalWindowRow, isSlotAvailable, reservationOutcome } from "../bookingCapacity";
 
 describe("booking capacity logic (mirrors Spanner reservation checks)", () => {
     it("allows reservation when under capacity", () => {
@@ -16,5 +16,20 @@ describe("booking capacity logic (mirrors Spanner reservation checks)", () => {
     it("rejects invalid rows", () => {
         expect(reservationOutcome(-1, 10)).toBe("invalid");
         expect(reservationOutcome(0, -1)).toBe("invalid");
+    });
+
+    it("evaluateArrivalWindowRow: empty rows means no_slot", () => {
+        expect(evaluateArrivalWindowRow([])).toEqual({ ok: false, reason: "no_slot" });
+    });
+
+    it("evaluateArrivalWindowRow: capacity_exhausted when at max", () => {
+        expect(evaluateArrivalWindowRow([{ capacity_reserved: 100, max_capacity: 100 }])).toEqual({
+            ok: false,
+            reason: "capacity_exhausted",
+        });
+    });
+
+    it("evaluateArrivalWindowRow: ok when under capacity", () => {
+        expect(evaluateArrivalWindowRow([{ capacity_reserved: 0, max_capacity: 500 }])).toEqual({ ok: true });
     });
 });

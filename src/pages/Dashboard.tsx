@@ -545,19 +545,26 @@ export const Dashboard = () => {
         </div>
       </StarkCard>
 
-      <StarkCard title="ARCORE GEOSPATIAL ANCHOR" subtitle="Awaiting Camera Permissions">
-        <div className="flex justify-between items-center mt-2 relative">
-          <div className="text-xs font-mono text-outline-variant space-y-1">
-            <p>&gt; YAW/PITCH DATA PENDING</p>
-            <p>&gt; LAT: 34.0522, LNG: -118.2437</p>
-          </div>
-          <StarkButton variant="tertiary" className="text-xs tracking-widest">
-            Mock AR Overlay
+      <StarkCard title="Venue AR (preview)" subtitle="Not available in this web build">
+        <div className="flex flex-col gap-3 mt-2">
+          <p className="text-xs font-bold text-on-surface-variant normal-case tracking-normal leading-relaxed">
+            Geospatial AR preview is not enabled in the browser. Walking guidance uses the map below.
+          </p>
+          <p className="text-[10px] font-mono text-outline-variant">
+            Reference origin (routing demo): {VENUE_DEMO_ORIGIN.lat.toFixed(4)}, {VENUE_DEMO_ORIGIN.lng.toFixed(4)}
+          </p>
+          <StarkButton variant="tertiary" className="text-xs tracking-widest self-start" type="button" disabled>
+            Preview unavailable
           </StarkButton>
         </div>
       </StarkCard>
 
-      <StarkCard title="CURRENT STATUS" subtitle="In Transit to Venue" />
+      <StarkCard title="CURRENT STATUS" subtitle="Journey phase">
+        <p className="mt-4 text-lg font-black uppercase tracking-widest text-on-surface">{state.phase.replace(/_/g, ' ')}</p>
+        <p className="mt-2 text-xs font-bold text-on-surface-variant normal-case tracking-normal">
+          {state.transportMode ? `Transport: ${state.transportMode}` : 'Transport not set'}
+        </p>
+      </StarkCard>
 
       <StarkCard title="Wayfinding" subtitle="Walking route — Maps Routes API">
         <div
@@ -646,8 +653,15 @@ export const Dashboard = () => {
         >
           {role === 'vip' ? (
             <>
-              <StarkCard title="Lounge Capacity" subtitle="Presidential level — suite cluster">
-                <span className="text-2xl font-black text-[#E6C200]">64%</span>
+              <StarkCard title="Lounge capacity" subtitle="Same venue signal as gate pressure">
+                <span className="text-2xl font-black text-[#E6C200]">
+                  {state.gatePressurePercent != null ? `${Math.round(state.gatePressurePercent)}%` : '—'}
+                </span>
+                {state.gatePressurePercent == null ? (
+                  <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-outline leading-snug">
+                    Waiting for live gate feed
+                  </p>
+                ) : null}
               </StarkCard>
               <StarkCard title="Express Route" subtitle="Presidential Suite">
                 <span className="text-2xl font-black text-[#E6C200]" aria-live="polite">
@@ -683,7 +697,7 @@ export const Dashboard = () => {
 
       <div className="mt-auto pt-8 border-t-[1px] border-outline-variant space-y-4">
         <label className="font-['Inter'] font-bold uppercase tracking-widest text-[10px] text-outline block">
-          Simulator Controls
+          Demo / QA controls
         </label>
         <div className="flex gap-4">
           <StarkButton

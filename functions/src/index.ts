@@ -32,6 +32,7 @@ import {
     VertexAggregatorBodySchema,
 } from "./validation";
 import { enforceHttpRateLimit } from "./httpRateLimit";
+import { evaluateArrivalWindowRow, type ArrivalWindowRow } from "./bookingCapacity";
 import { isRoutingPolicyRoleAllowed } from "./routingPolicyAuth";
 import { sanitizeHttpErrorDetail } from "./sanitizeHttpError";
 
@@ -134,11 +135,14 @@ export const reserveEntrySlot = functions.https.onCall({ secrets: [mapsPlatformK
                 params: { slotId }
             });
 
-            if (!rows.length) {
-                throw new Error("CAPACITY_EXHAUSTED");
-            }
-            const first = rows[0] as { capacity_reserved: number; max_capacity: number };
-            if (first.capacity_reserved >= first.max_capacity) {
+            const evaluation = evaluateArrivalWindowRow(rows as ArrivalWindowRow[]);
+            if (!evaluation.ok) {
+                if (evaluation.reason === "no_slot") {
+                    throw new functions.https.HttpsError(
+                        "failed-precondition",
+                        "This time slot is not available for booking."
+                    );
+                }
                 throw new Error("CAPACITY_EXHAUSTED");
             }
 
@@ -149,6 +153,7 @@ export const reserveEntrySlot = functions.https.onCall({ secrets: [mapsPlatformK
 
             await transaction.commit();
         });
+        const transactionId = `slot-${slotId}-${Date.now().toString(36)}`;
         logAuditJson({
             severity: "INFO",
             action: "SLOT_RESERVATION_SUCCESS",
@@ -156,8 +161,15 @@ export const reserveEntrySlot = functions.https.onCall({ secrets: [mapsPlatformK
             gateId,
             uid,
         });
-        return { status: "SUCCESS", message: "Slot reserved via Cloud Spanner." };
+        return {
+            status: "SUCCESS",
+            message: "Slot reserved.",
+            transactionId
+        };
     } catch (e: any) {
+        if (e instanceof functions.https.HttpsError) {
+            throw e;
+        }
         if (e?.message === "CAPACITY_EXHAUSTED") {
             logAuditJson({
                 severity: "NOTICE",
