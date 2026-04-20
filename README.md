@@ -55,7 +55,7 @@ For human reviewers, add PNG/WebP captures under **`docs/screenshots/`** and des
 | **Crowd movement** | Gate pressure in `gateLogistics`, smart reroute FCM (`smart_reroute`), map/ETA helpers, egress-oriented copy in emergency flows. |
 | **Waiting times** | Spanner-backed slot reservation path, gate ETA matrix (`getGateEtasMatrix`), congestion nudges when pressure crosses thresholds. |
 | **Real-time coordination** | Firestore listeners, FCM topics (`emergency`, `smart_reroute`), staff `routingPolicy/live` via **`updateRoutingPolicyLive`** callable, global emergency doc + broadcast. |
-| **Seamless / inclusive experience** | Offline-tolerant Firestore cache, translation hook, TTS for alerts, skip links + semantic regions, automated axe regression on key screens. |
+| **Seamless and Enjoyable Experience** | **PWA:** `public/manifest.json` declares installability and theme; production **`src/main.tsx`** registers **`/sw.js`** so repeat visits load from cache. **FCM:** `firebase-messaging-sw.js` coordinates push with the app shell. Offline-tolerant Firestore cache, translation hook, TTS for alerts, skip links + semantic regions, and automated axe regression on key screens reduce friction end-to-end. |
 
 The implementation leans **operations + attendee guidance** (staff tools + attendee dashboard). Keep demos and README tied to **visitor outcomes** (shorter walks, clearer egress, fewer surprises), not only control-room features.
 

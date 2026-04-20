@@ -31,7 +31,7 @@ export default {
         "primary-fixed-dim": "#adc7ff",
         "inverse-on-surface": "#f1f0f4",
         "surface-container-high": "#e9e7eb",
-        "outline": "#727785",
+        "outline": "#5c6370",
         "on-tertiary-container": "#0e0200",
         "surface-dim": "#dbd9dd",
         "on-tertiary": "#ffffff",

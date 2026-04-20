@@ -70,4 +70,59 @@ describe('calculateOptimalPath', () => {
     expect(em!.durationSeconds).toBe(360);
     expect(em!.distanceMeters).toBe(890);
   });
+
+  it('returns null when HTTPS callable rejects (non-mock path)', async () => {
+    vi.resetModules();
+    vi.doMock('../../lib/routingEnv', () => ({
+      isRoutingMockEnabled: () => false,
+    }));
+    vi.doMock('../../lib/firebase', () => ({ functions: {} }));
+    vi.doMock('firebase/functions', () => ({
+      httpsCallable:
+        () =>
+        async () => {
+          throw new Error('callable_unavailable');
+        },
+    }));
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const { calculateOptimalPath: calcHttps } = await import('../routing');
+    const r = await calcHttps({
+      originLat: 1,
+      originLng: 2,
+      destinationGate: 'GATE_A',
+      stepFreeRequired: false,
+    });
+    expect(r).toBeNull();
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  it('returns callable payload when HTTPS succeeds', async () => {
+    vi.resetModules();
+    vi.doMock('../../lib/routingEnv', () => ({
+      isRoutingMockEnabled: () => false,
+    }));
+    vi.doMock('../../lib/firebase', () => ({ functions: {} }));
+    vi.doMock('firebase/functions', () => ({
+      httpsCallable:
+        () =>
+        async () => ({
+          data: {
+            routeId: 'https-1',
+            pathNodes: [{ lat: 1, lng: 2 }],
+            perimeterToSeatTime: '8 mins',
+            status: 'OK',
+          },
+        }),
+    }));
+    const { calculateOptimalPath: calcOk } = await import('../routing');
+    const r = await calcOk({
+      originLat: 1,
+      originLng: 2,
+      destinationGate: 'GATE_A',
+      stepFreeRequired: false,
+    });
+    expect(r?.status).toBe('OK');
+    expect(r?.routeId).toBe('https-1');
+  });
 });

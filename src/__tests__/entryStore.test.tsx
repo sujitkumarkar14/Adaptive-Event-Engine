@@ -1,6 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
-import { entryReducer } from '../store/entryStore';
+import { entryReducer, type EntryState, type EntryAction } from '../store/entryStore';
 import { createTestEntryState } from './fixtures/entryStateFixture';
+
+function partialState(p: Partial<EntryState>): EntryState {
+  return createTestEntryState(p);
+}
 
 describe('entryReducer', () => {
   it('UPDATE_GATE_PRESSURE sets pressure, gate id, sync timestamps, and a11y copy', () => {
@@ -98,13 +102,13 @@ describe('entryReducer', () => {
   });
 
   it('forces phase transition to EMERGENCY upon TRIGGER_EMERGENCY', () => {
-    const initialState = {
+    const initialState = partialState({
       phase: 'PRE_EVENT',
       isOnline: true,
       fastPassActive: false,
-    };
+    });
 
-    const emergencyState = entryReducer(initialState as any, { type: 'TRIGGER_EMERGENCY' });
+    const emergencyState = entryReducer(initialState, { type: 'TRIGGER_EMERGENCY' });
     expect(emergencyState.phase).toBe('EMERGENCY');
 
     const lockedState = entryReducer(emergencyState, { type: 'SET_PHASE', payload: 'ARRIVAL' });
@@ -112,38 +116,38 @@ describe('entryReducer', () => {
   });
 
   it('retains previous state upon API_FAILURE', () => {
-    const initialState = {
+    const initialState = partialState({
       phase: 'IN_JOURNEY',
       isOnline: true,
       fastPassActive: true,
-    };
+    });
 
-    const postFailureState = entryReducer(initialState as any, { type: 'API_FAILURE', payload: '502 Vertex AI' });
+    const postFailureState = entryReducer(initialState, { type: 'API_FAILURE', payload: '502 Vertex AI' });
 
     expect(postFailureState.phase).toBe('IN_JOURNEY');
     expect(postFailureState.fastPassActive).toBe(true);
   });
 
   it('SET_NETWORK_STATUS toggles isOnline', () => {
-    const initialState = {
+    const initialState = partialState({
       phase: 'ARRIVAL',
       isOnline: true,
       fastPassActive: false,
-    };
+    });
 
-    const offlineState = entryReducer(initialState as any, { type: 'SET_NETWORK_STATUS', payload: false });
+    const offlineState = entryReducer(initialState, { type: 'SET_NETWORK_STATUS', payload: false });
     expect(offlineState.isOnline).toBe(false);
   });
 
   it('respects stepFreeRequired with TOGGLE_STEP_FREE and SET_PHASE', () => {
-    const initialState = {
+    const initialState = partialState({
       phase: 'PRE_EVENT',
       isOnline: true,
       fastPassActive: false,
       stepFreeRequired: false,
-    };
+    });
 
-    const toggledAccessibilityState = entryReducer(initialState as any, { type: 'TOGGLE_STEP_FREE', payload: true });
+    const toggledAccessibilityState = entryReducer(initialState, { type: 'TOGGLE_STEP_FREE', payload: true });
     expect(toggledAccessibilityState.stepFreeRequired).toBe(true);
 
     const activeRoutingState = entryReducer(toggledAccessibilityState, {
@@ -192,5 +196,11 @@ describe('entryReducer', () => {
     expect(s.demoSeatSection).toBe('L4-200');
     s = entryReducer(s, { type: 'CLEAR_DEMO_CONTEXT' });
     expect(s.demoSeatSection).toBeNull();
+  });
+
+  it('reducer default branch returns previous state for unknown action type', () => {
+    const s = createTestEntryState();
+    const forged = { type: '__unknown_action__', payload: null } as unknown as EntryAction;
+    expect(entryReducer(s, forged)).toBe(s);
   });
 });

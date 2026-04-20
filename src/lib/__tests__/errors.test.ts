@@ -78,6 +78,9 @@ describe('getLoginAuthErrorMessage', () => {
     expect(getLoginAuthErrorMessage(new FirebaseError('auth/unknown-code', 'x'))).toMatch(/unknown-code/);
     expect(getLoginAuthErrorMessage(new FirebaseError('auth/internal-error', 'x'))).toMatch(/Anonymous|Identity Toolkit/i);
     expect(getLoginAuthErrorMessage(new FirebaseError('auth/web-storage-unsupported', 'x'))).toMatch(/storage/i);
+    expect(getLoginAuthErrorMessage(new FirebaseError('auth/admin-restricted-operation', 'x'))).toMatch(
+      /project settings/i
+    );
   });
 
   it('returns generic copy for non-Firebase errors', () => {

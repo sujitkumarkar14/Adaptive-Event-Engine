@@ -45,4 +45,17 @@ describe('onboardingPreferences', () => {
     expect(h.phase).toBe('IN_JOURNEY');
     expect(h.transportMode).toBeNull();
   });
+
+  it('parseOnboardingFromUserData returns null when journeyPhase is invalid', () => {
+    expect(
+      parseOnboardingFromUserData({
+        onboarding: {
+          transportMode: 'Car',
+          accessibility: { stepFree: false, lowSensory: false, visualAid: false },
+          journeyPhase: 'NOT_A_PHASE',
+          onboardingCompleted: true,
+        } as Record<string, unknown>,
+      })
+    ).toBeNull();
+  });
 });

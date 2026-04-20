@@ -90,7 +90,7 @@ function AppShell() {
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-inverse-surface focus:text-inverse-on-surface focus:font-black focus:uppercase focus:tracking-widest top-0 left-0"
       >
-        Skip to primary content
+        Skip to main content
       </a>
 
       {!isLogin && <TopNavBar />}

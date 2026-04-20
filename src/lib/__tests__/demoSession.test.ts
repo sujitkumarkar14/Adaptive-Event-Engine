@@ -45,4 +45,9 @@ describe('demoSession', () => {
     writeDemoSession('evt-2');
     expect(readDemoSeatSection()).toBeNull();
   });
+
+  it('writeDemoSeatSection trims surrounding whitespace', () => {
+    writeDemoSeatSection('  L9-9  ');
+    expect(readDemoSeatSection()).toBe('L9-9');
+  });
 });

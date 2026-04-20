@@ -1,60 +1,50 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { doc, onSnapshot } from 'firebase/firestore';
+import React, { useMemo } from 'react';
 import { StarkCard, StarkButton } from '../components/common/StarkComponents';
 import { StadiumVenueMapSvg } from '../components/venue/StadiumVenueMapSvg';
-import { db } from '../lib/firebase';
 import { useEntryStore } from '../store/entryStore';
-import { DEFAULT_DEMO_EVENT_ID } from '../lib/demoConstants';
-import { parseDemoSeatLevel } from '../lib/seatSectionMap';
 import {
-  mergeFacilityStatus,
-  parseFirestoreFacilityData,
-  packAmenitiesNearGate,
-  sortWashroomsForUi,
+  facilityStatusToneClass,
+  formatFacilityStatusLiveText,
   verticalStatusLabel,
-  inferNearGateFromStore,
 } from '../lib/demoVenueFacilityModel';
-import type { FacilityStatusDoc } from '../lib/demoVenueFacilityModel';
 import { useNavigate } from 'react-router-dom';
+import { useVenueLogistics } from '../hooks/useVenueLogistics';
+import { VENUE_MAP_DOM_IDS } from '../constants/venueMap';
 
 export const VenueMap = () => {
   const navigate = useNavigate();
   const { state } = useEntryStore();
-  const eventId = state.demoEventId ?? DEFAULT_DEMO_EVENT_ID;
-  const [live, setLive] = useState<FacilityStatusDoc>(() => mergeFacilityStatus(null));
+  const { live, emergencyActive, tier, nearGate, pack, washSorted, seatSection } = useVenueLogistics(state);
 
-  useEffect(() => {
-    if (!state.demoMode) {
-      setLive(mergeFacilityStatus(null));
-      return;
-    }
-    const ref = doc(db, 'demoEvents', eventId, 'facilityStatus', 'live');
-    const unsub = onSnapshot(
-      ref,
-      (snap) => {
-        const parsed = parseFirestoreFacilityData(snap.data());
-        setLive(mergeFacilityStatus(parsed));
-      },
-      () => setLive(mergeFacilityStatus(null))
-    );
-    return () => unsub();
-  }, [state.demoMode, eventId]);
-
-  const seatSection = state.demoSeatSection;
-  const tier = useMemo(() => (seatSection ? parseDemoSeatLevel(seatSection) : null), [seatSection]);
-
-  const nearGate = inferNearGateFromStore(state.gatePressureGateId, state.currentLocalGate);
-  const pack = packAmenitiesNearGate(nearGate, live);
-  const washSorted = pack ? sortWashroomsForUi(pack.washrooms) : [];
+  const facilityAnnouncement = useMemo(
+    () => formatFacilityStatusLiveText(live, { emergencyActive }),
+    [live, emergencyActive]
+  );
 
   return (
-    <section className="flex flex-col h-full max-w-5xl" aria-labelledby="venue-map-heading">
+    <section className="flex flex-col h-full max-w-5xl" aria-labelledby={VENUE_MAP_DOM_IDS.heading}>
       <div className="mb-6">
-        <h1 id="venue-map-heading" className="text-4xl font-black tracking-tighter uppercase mb-2">
+        <h1
+          id={VENUE_MAP_DOM_IDS.heading}
+          className="text-4xl font-black tracking-tighter uppercase mb-2"
+          aria-describedby={VENUE_MAP_DOM_IDS.summary}
+        >
           Venue map
         </h1>
-        <p className="text-on-surface-variant font-bold text-xs tracking-widest uppercase">
+        <p
+          id={VENUE_MAP_DOM_IDS.summary}
+          className="text-on-surface-variant font-bold text-xs tracking-widest uppercase"
+        >
           Corridors, washrooms, vending, escalators &amp; lifts — {state.demoMode ? 'live facility status' : 'defaults'}
+        </p>
+        <p
+          id={VENUE_MAP_DOM_IDS.facilityStatusLive}
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          className="sr-only"
+        >
+          {facilityAnnouncement}
         </p>
         {seatSection ? (
           <p className="mt-2 text-sm font-bold text-on-surface">
@@ -91,33 +81,27 @@ export const VenueMap = () => {
           <StarkCard title="Vertical transport" subtitle="Escalators &amp; elevators by Gate A">
             <div className="mt-4 space-y-3 text-sm font-bold">
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-outline mb-1">Escalators</p>
-                <ul className="space-y-1 normal-case">
+                <p className="text-[10px] uppercase tracking-widest text-outline mb-1" id="venue-esc-heading">
+                  Escalators
+                </p>
+                <ul className="space-y-1 normal-case" aria-labelledby="venue-esc-heading">
                   {pack.escalators.map(({ node, status }) => (
                     <li key={node.id} className="flex justify-between">
                       <span>Escalator {node.label}</span>
-                      <span
-                        className={
-                          status === 'jammed' ? 'text-error' : status === 'reduced' ? 'text-tertiary' : 'text-secondary'
-                        }
-                      >
-                        {verticalStatusLabel(status)}
-                      </span>
+                      <span className={facilityStatusToneClass(status)}>{verticalStatusLabel(status)}</span>
                     </li>
                   ))}
                 </ul>
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-outline mb-1">Elevators</p>
-                <ul className="space-y-1 normal-case">
+                <p className="text-[10px] uppercase tracking-widest text-outline mb-1" id="venue-el-heading">
+                  Elevators
+                </p>
+                <ul className="space-y-1 normal-case" aria-labelledby="venue-el-heading">
                   {pack.elevators.map(({ node, status }) => (
                     <li key={node.id} className="flex justify-between">
                       <span>Elevator {node.label}</span>
-                      <span
-                        className={
-                          status === 'jammed' ? 'text-error' : status === 'reduced' ? 'text-tertiary' : 'text-secondary'
-                        }
-                      >
+                      <span className={facilityStatusToneClass(status)}>
                         {verticalStatusLabel(status)}
                       </span>
                     </li>
@@ -138,7 +122,12 @@ export const VenueMap = () => {
       ) : null}
 
       <div className="mt-auto pt-6 border-t border-outline-variant">
-        <StarkButton variant="secondary" type="button" onClick={() => navigate('/dashboard')}>
+        <StarkButton
+          variant="secondary"
+          type="button"
+          onClick={() => navigate('/dashboard')}
+          aria-label="Return to live journey dashboard"
+        >
           Back to dashboard
         </StarkButton>
       </div>

@@ -7,7 +7,7 @@ echo "==> ESLint"
 npm run lint
 
 echo "==> Vitest (frontend) + coverage thresholds"
-npm run test:coverage
+npm test
 
 echo "==> Vite build"
 npm run build

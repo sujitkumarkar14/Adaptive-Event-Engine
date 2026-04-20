@@ -35,6 +35,13 @@ import { enforceHttpRateLimit } from "./httpRateLimit";
 import { evaluateArrivalWindowRow, type ArrivalWindowRow } from "./bookingCapacity";
 import { isRoutingPolicyRoleAllowed } from "./routingPolicyAuth";
 import { sanitizeHttpErrorDetail } from "./sanitizeHttpError";
+import { errorMessageOrEmpty, stringifyCaught } from "./unknownError";
+
+/**
+ * Cloud Functions entry: HTTPS + callable surfaces, Firestore triggers, and optional Cloud Spanner booking.
+ * Inputs are validated with Zod (`validation.ts`); side effects are audited with structured JSON logs.
+ * Complexity is dominated by `reserveEntrySlot` (transactional read/update) and Firestore merge paths in triggers.
+ */
 
 admin.initializeApp();
 
@@ -166,11 +173,11 @@ export const reserveEntrySlot = functions.https.onCall({ secrets: [mapsPlatformK
             message: "Slot reserved.",
             transactionId
         };
-    } catch (e: any) {
+    } catch (e: unknown) {
         if (e instanceof functions.https.HttpsError) {
             throw e;
         }
-        if (e?.message === "CAPACITY_EXHAUSTED") {
+        if (errorMessageOrEmpty(e) === "CAPACITY_EXHAUSTED") {
             logAuditJson({
                 severity: "NOTICE",
                 action: "SLOT_RESERVATION_CAPACITY_EXHAUSTED",
@@ -375,11 +382,11 @@ export const calculateOptimalPath = functions.https.onCall(
                 status: "ROUTES_API_OK",
                 priority: prio,
             };
-        } catch (e: any) {
+        } catch (e: unknown) {
             logAuditJson({
                 severity: "ERROR",
                 action: "ROUTES_API_FAILURE",
-                message: String(e?.message ?? e),
+                message: stringifyCaught(e),
                 destinationGate: gate,
                 uid: request.auth.uid,
             });
@@ -440,11 +447,11 @@ export const searchNearbyAmenities = functions.https.onCall(
             });
 
             return result;
-        } catch (e: any) {
+        } catch (e: unknown) {
             logAuditJson({
                 severity: "ERROR",
                 action: "PLACES_API_FAILURE",
-                message: String(e?.message ?? e),
+                message: stringifyCaught(e),
                 uid: request.auth.uid,
             });
             functions.logger.error("[searchNearbyAmenities] Places API error", e);
@@ -546,12 +553,12 @@ export const getGateEtasMatrix = functions.https.onCall({ secrets: [mapsPlatform
             originLng: oLng,
         });
         return { rankings, mode: "distance_matrix" as const };
-    } catch (e: any) {
+    } catch (e: unknown) {
         logAuditJson({
             severity: "ERROR",
             category: "MATRIX_RANKING",
             action: "GATE_ETA_MATRIX_FAILURE",
-            message: String(e?.message ?? e),
+            message: stringifyCaught(e),
             uid: request.auth.uid,
         });
         throw new functions.https.HttpsError("internal", "Unable to compute gate rankings.");
@@ -609,12 +616,12 @@ export const translateAlert = functions.https.onCall({ secrets: [translationApiK
             target: tgt,
         });
         return { translatedText, mode: "translate_api" as const };
-    } catch (e: any) {
+    } catch (e: unknown) {
         logAuditJson({
             severity: "ERROR",
             category: "A11Y_TRANSLATION",
             action: "TRANSLATE_ALERT_FAILURE",
-            message: String(e?.message ?? e),
+            message: stringifyCaught(e),
             uid: request.auth.uid,
         });
         throw new functions.https.HttpsError("internal", "Translation failed.");
@@ -635,7 +642,7 @@ const ROUTING_POLICY_MERGE_KEYS = new Set([
 /**
  * Staff/ops: merge `routingPolicy/live` (clients cannot write Firestore directly — rules deny writes).
  * Production: Firebase Auth custom claim `role` must be `staff` or `admin`.
- * Emulator: any authenticated user (local demo without claims).
+ * Emulator: authenticated users may merge when custom claims are absent (local demo).
  */
 export const updateRoutingPolicyLive = functions.https.onCall(async (request) => {
     if (!request.auth) {
@@ -701,11 +708,11 @@ export const registerFcmTopics = functions.https.onCall(async (request) => {
             );
         logAuditJson({ severity: "INFO", category: "TARGETED_NUDGE", action: "FCM_TOPIC_SUBSCRIBE", uid: request.auth.uid });
         return { ok: true, topics: ["emergency", "smart_reroute"] as const };
-    } catch (e: any) {
+    } catch (e: unknown) {
         logAuditJson({
             severity: "ERROR",
             action: "FCM_TOPIC_SUBSCRIBE_FAILURE",
-            message: String(e?.message ?? e),
+            message: stringifyCaught(e),
             uid: request.auth.uid,
         });
         throw new functions.https.HttpsError("internal", "Unable to subscribe to FCM topics.");
@@ -827,17 +834,17 @@ export const onGatePressureChange = onDocumentUpdated(
                         failureCount,
                     });
                 }
-            } catch (nudgeErr: any) {
+            } catch (nudgeErr: unknown) {
                 logAuditJson({
                     severity: "ERROR",
                     category: "TARGETED_NUDGE",
                     action: "SEGMENTED_CONGESTION_NUDGE_FAILURE",
                     gateId: fromG,
-                    message: String(nudgeErr?.message ?? nudgeErr),
+                    message: stringifyCaught(nudgeErr),
                 });
                 functions.logger.error("[onGatePressureChange] segmented FCM failed", nudgeErr);
             }
-        } catch (e: any) {
+        } catch (e: unknown) {
             functions.logger.error("[onGatePressureChange] Firestore merge failed", e);
         }
     }
@@ -871,7 +878,7 @@ export const onRoutingPolicyRerouteNotify = onDocumentUpdated(
                 source: after?.autoTriggered === true ? "auto" : "staff",
             });
             logAuditJson({ severity: "INFO", action: "FCM_SMART_REROUTE_SENT", source: after?.autoTriggered ? "auto" : "staff" });
-        } catch (e: any) {
+        } catch (e: unknown) {
             functions.logger.error("[onRoutingPolicyRerouteNotify] FCM send failed", e);
         }
     }
@@ -1033,12 +1040,12 @@ export const vertexAggregator = onRequest(
             });
 
             res.status(200).json({ status: "ok", gateId, pressurePercent });
-        } catch (e: any) {
+        } catch (e: unknown) {
             logAuditJson({
                 severity: "ERROR",
                 action: "VERTEX_INGEST_FIRESTORE_FAILURE",
                 gateId,
-                message: String(e?.message ?? e),
+                message: stringifyCaught(e),
             });
             functions.logger.error("[vertexAggregator] Firestore write failed", e);
             res.status(500).json({ error: "firestore_write_failed" });
@@ -1115,7 +1122,7 @@ export const broadcastEmergency = onRequest(
         try {
             await sendEmergencyTopicMessage({ type: evType, location: evLoc });
             functions.logger.info(`[AUDIT] broadcastEmergency FCM topic=emergency dispatched`);
-        } catch (fe: any) {
+        } catch (fe: unknown) {
             functions.logger.warn("[broadcastEmergency] FCM topic send failed (Firestore still applied)", fe);
         }
 

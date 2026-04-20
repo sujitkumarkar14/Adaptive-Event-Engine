@@ -11,6 +11,12 @@ createRoot(document.getElementById('root')!).render(
 
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    void navigator.serviceWorker.register('/sw.js').catch(() => undefined);
+    const register = () => void navigator.serviceWorker.register('/sw.js').catch(() => undefined);
+    const ric = typeof window !== 'undefined' ? window.requestIdleCallback : undefined;
+    if (typeof ric === 'function') {
+      ric(register, { timeout: 3000 });
+    } else {
+      setTimeout(register, 0);
+    }
   });
 }

@@ -5,10 +5,13 @@ import {
   washroomVacant,
   verticalIsBlocked,
   verticalStatusLabel,
+  facilityStatusToneClass,
   packAmenitiesNearGate,
   sortWashroomsForUi,
   inferNearGateFromStore,
   parseFirestoreFacilityData,
+  parseFirestoreFacilityLive,
+  formatFacilityStatusLiveText,
 } from '../demoVenueFacilityModel';
 
 describe('mergeFacilityStatus', () => {
@@ -48,6 +51,18 @@ describe('verticalStatusLabel', () => {
     expect(verticalStatusLabel('available')).toMatch(/available/i);
     expect(verticalStatusLabel('jammed')).toMatch(/jammed/i);
     expect(verticalStatusLabel('reduced')).toMatch(/reduced/i);
+  });
+
+  it('falls back for unexpected input', () => {
+    expect(verticalStatusLabel('not-a-status' as never)).toMatch(/unknown/i);
+  });
+});
+
+describe('facilityStatusToneClass', () => {
+  it('maps each status to a distinct tone', () => {
+    expect(facilityStatusToneClass('jammed')).toBe('text-error');
+    expect(facilityStatusToneClass('reduced')).toBe('text-tertiary');
+    expect(facilityStatusToneClass('available')).toBe('text-secondary');
   });
 });
 
@@ -112,5 +127,24 @@ describe('inferNearGateFromStore', () => {
 
   it('uses gate pressure id when it matches a layout gate', () => {
     expect(inferNearGateFromStore('GATE_EAST', null)).toBe('GATE_EAST');
+  });
+});
+
+describe('parseFirestoreFacilityLive', () => {
+  it('detects emergency broadcast flags on the same doc', () => {
+    const r = parseFirestoreFacilityLive({
+      emergencyActive: true,
+      escalators: { 'E-131': 'available' },
+    });
+    expect(r.emergencyActive).toBe(true);
+    expect(r.doc?.escalators?.['E-131']).toBe('available');
+  });
+});
+
+describe('formatFacilityStatusLiveText', () => {
+  it('prepends emergency copy when flagged', () => {
+    const t = formatFacilityStatusLiveText(DEFAULT_FACILITY_STATUS, { emergencyActive: true });
+    expect(t).toMatch(/Venue emergency signal active/);
+    expect(t).toMatch(/Escalator 131/);
   });
 });

@@ -421,6 +421,7 @@ export const Dashboard = () => {
         <a
           href="/venue-map"
           className="mt-4 inline-flex min-h-[48px] w-full sm:w-auto items-center justify-center px-6 py-3 border-2 border-black font-black uppercase tracking-widest text-xs bg-black text-white hover:bg-on-surface-variant focus:outline-none focus-visible:ring-4 focus-visible:ring-black focus-visible:ring-offset-2 no-underline"
+          aria-label="Open venue map: corridors, washrooms, escalators, and facility status"
         >
           Open venue map
         </a>

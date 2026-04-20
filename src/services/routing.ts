@@ -2,12 +2,12 @@ import { functions } from '../lib/firebase';
 import { httpsCallable } from 'firebase/functions';
 import { devLog, devWarn } from '../lib/debug';
 import { PARKING_LOT_ORIGIN } from '../lib/constants';
+import { isRoutingMockEnabled } from '../lib/routingEnv';
 
 /**
  * When `VITE_USE_ROUTING_MOCK` is not `"false"`, use the local mock geometry.
  * Set `VITE_USE_ROUTING_MOCK=false` in production to call `calculateOptimalPath` (HTTPS callable).
  */
-const USE_ROUTING_MOCK = import.meta.env.VITE_USE_ROUTING_MOCK !== 'false';
 
 /** Matches callable `calculateOptimalPath` + Routes priority mesh. */
 export type RoutePriority = 'standard' | 'vip' | 'emergency';
@@ -51,7 +51,7 @@ function mockLineForPriority(p: RoutePriority | undefined): string {
  */
 export const calculateOptimalPath = async (req: RoutingRequest): Promise<RoutingResponse | null> => {
 
-    if (USE_ROUTING_MOCK) {
+    if (isRoutingMockEnabled()) {
         const pr: RoutePriority = req.priority ?? 'standard';
         const exitMode = Boolean(req.returnToVehicle);
         devLog(

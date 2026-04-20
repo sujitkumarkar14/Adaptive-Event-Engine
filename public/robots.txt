@@ -1,0 +1,3 @@
+# Adaptive Entry 360 — venue entry & coordination demo (see README.md).
+User-agent: *
+Allow: /

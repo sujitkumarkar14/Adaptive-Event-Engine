@@ -18,9 +18,13 @@ export function getWebBluetoothBlockReason(): string | null {
  * Edge Proxy: BLE Beacon Proximity Matcher
  * Triggers dispatch notifications seamlessly during 0kbps offline states.
  */
+type NavigatorWithBluetooth = Navigator & {
+    bluetooth?: { requestDevice: (opts: { filters: { services: number[] }[] }) => Promise<{ id: string }> };
+};
+
 export const detectBeaconProximity = async (onDetected: (deviceId: string) => void) => {
     try {
-        const _nav = navigator as any;
+        const _nav = navigator as NavigatorWithBluetooth;
 
         if (!_nav.bluetooth) {
             console.warn("Web Bluetooth API not supported on this physical terminal.");

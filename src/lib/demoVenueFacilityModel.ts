@@ -1,3 +1,11 @@
+/**
+ * Demo venue facility graph: washrooms, escalators, elevators, and merge rules for Firestore `facilityStatus/live`.
+ *
+ * **Inputs:** Typed layout nodes from `demoVenueLayout`, partial Firestore payloads via `parseFirestoreFacilityData`.
+ * **Complexity:** `mergeFacilityStatus` is **O(keys)** over the three maps; UI helpers are **O(n log n)** for washroom sort.
+ *
+ * @module demoVenueFacilityModel
+ */
 import type { DemoEscalatorNode, DemoElevatorNode, DemoGateZone, DemoVendingNode, DemoWashroomNode } from './demoVenueLayout';
 import {
   DEMO_ELEVATORS,
@@ -93,6 +101,13 @@ export function verticalIsBlocked(s: VerticalStatus): boolean {
   return s === 'jammed';
 }
 
+/** Tailwind tone classes for status text in attendee UI (consistent across lists). */
+export function facilityStatusToneClass(status: VerticalStatus): string {
+  if (status === 'jammed') return 'text-error';
+  if (status === 'reduced') return 'text-tertiary';
+  return 'text-secondary';
+}
+
 export type AmenityNearGatePack = {
   gate: DemoGateZone;
   washrooms: Array<{ node: DemoWashroomNode; occupied: boolean; vacant: boolean }>;
@@ -155,13 +170,13 @@ export function parseFirestoreFacilityData(raw: unknown): Partial<FacilityStatus
   const washrooms: FacilityStatusDoc['washrooms'] = {};
   const escalators: FacilityStatusDoc['escalators'] = {};
   const elevators: FacilityStatusDoc['elevators'] = {};
-  let any = false;
+  let hasParsedFields = false;
 
   if (o.washrooms && typeof o.washrooms === 'object') {
     for (const [k, v] of Object.entries(o.washrooms as Record<string, unknown>)) {
       if (v && typeof v === 'object' && typeof (v as { occupied?: unknown }).occupied === 'boolean') {
         washrooms[k] = { occupied: (v as { occupied: boolean }).occupied };
-        any = true;
+        hasParsedFields = true;
       }
     }
   }
@@ -169,7 +184,7 @@ export function parseFirestoreFacilityData(raw: unknown): Partial<FacilityStatus
     for (const [k, v] of Object.entries(o.escalators as Record<string, unknown>)) {
       if (v === 'available' || v === 'reduced' || v === 'jammed') {
         escalators[k] = v;
-        any = true;
+        hasParsedFields = true;
       }
     }
   }
@@ -177,11 +192,48 @@ export function parseFirestoreFacilityData(raw: unknown): Partial<FacilityStatus
     for (const [k, v] of Object.entries(o.elevators as Record<string, unknown>)) {
       if (v === 'available' || v === 'reduced' || v === 'jammed') {
         elevators[k] = v;
-        any = true;
+        hasParsedFields = true;
       }
     }
   }
 
-  if (!any) return null;
+  if (!hasParsedFields) return null;
   return { washrooms, escalators, elevators };
+}
+
+function readEmergencyBroadcastFlag(raw: unknown): boolean {
+  if (!raw || typeof raw !== 'object') return false;
+  const o = raw as Record<string, unknown>;
+  return (
+    o.emergencyActive === true ||
+    o.emergencyBroadcast === true ||
+    o.emergency === true ||
+    o.facilityEmergency === true
+  );
+}
+
+/** Normalizes facility doc plus optional operational/emergency flags used for `aria-live` copy. */
+export function parseFirestoreFacilityLive(raw: unknown): {
+  doc: Partial<FacilityStatusDoc> | null;
+  emergencyActive: boolean;
+} {
+  return {
+    doc: parseFirestoreFacilityData(raw),
+    emergencyActive: readEmergencyBroadcastFlag(raw),
+  };
+}
+
+/** Compact, screen-reader-oriented summary of merged facility data (Gate A escalators + optional emergency). */
+export function formatFacilityStatusLiveText(
+  status: FacilityStatusDoc,
+  options?: { emergencyActive?: boolean }
+): string {
+  const parts: string[] = [];
+  if (options?.emergencyActive) {
+    parts.push('Venue emergency signal active. Follow staff instructions.');
+  }
+  const e131 = verticalStatusLabel(status.escalators['E-131'] ?? 'available');
+  const e145 = verticalStatusLabel(status.escalators['E-145'] ?? 'available');
+  parts.push(`Escalator 131: ${e131}. Escalator 145: ${e145}.`);
+  return parts.join(' ');
 }

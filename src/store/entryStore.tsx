@@ -1,3 +1,11 @@
+/**
+ * Global entry journey state: `useReducer` store for phase, accessibility, demo session, gate pressure, and booking.
+ *
+ * **Inputs:** Dispatched `EntryAction` unions; demo hydration reads `demoSession` once at init.
+ * **Complexity:** Reducer cases are **O(1)** per action; context consumers re-render when state reference changes.
+ *
+ * @module entryStore
+ */
 import React, { createContext, useReducer, useContext, ReactNode } from 'react';
 import { readDemoSession, readDemoSeatSection } from '../lib/demoSession';
 

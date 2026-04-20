@@ -22,8 +22,16 @@ export function useAppOrchestration(user: User | null) {
   useEffect(() => {
     let cancelled = false;
     initRemoteConfig().finally(() => {
-      if (!cancelled) {
-        dispatch({ type: 'SET_LAST_SYNC', payload: new Date() });
+      const applySync = () => {
+        if (!cancelled) {
+          dispatch({ type: 'SET_LAST_SYNC', payload: new Date() });
+        }
+      };
+      const ric = typeof window !== 'undefined' ? window.requestIdleCallback : undefined;
+      if (typeof ric === 'function') {
+        ric(applySync, { timeout: 2000 });
+      } else {
+        void Promise.resolve().then(() => setTimeout(applySync, 0));
       }
     });
     return () => {

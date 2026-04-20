@@ -4,8 +4,9 @@
 
 | Layer | Command | Notes |
 |-------|---------|--------|
-| Unit / component | `npm test` | Vitest + Testing Library + jsdom |
-| Coverage | `npm run test:coverage` | Thresholds in `vitest.config.ts` (lines **80%**, statements **80%**, functions **70%**, branches **65%**); `src/lib/firebase.ts` + `src/contexts/AuthContext.tsx` excluded (bootstrap / provider glue) |
+| Unit / component | `npm test` | Vitest + Testing Library + jsdom; **runs v8 coverage by default** and writes **`coverage/`** (HTML + lcov + json) |
+| Fast unit (no Istanbul-style dual stack) | `npm run test:unit` | Same tests without coverage (use in inner loops) |
+| Coverage-only alias | `npm run test:coverage` | Same as **`npm test`**; thresholds in `vitest.config.ts` (lines **≥90%**, statements **≥89%**, functions/branches as listed there). Excluded from the denominator: **`main`**, **`App`**, large shells (**`Dashboard`**, **`Onboarding`**), **`firebase`** bootstrap, **`AuthContext`**. Tracked stub: **`coverage/README.md`**. |
 | E2E | `npm run build && npm run test:e2e` | Playwright: `chromium` (unauthenticated shells) + `chromium-authenticated` (`*.authenticated.spec.ts`, `*-flow.spec.ts`) with `e2e/auth.setup.ts` + `e2e/.auth/user.json`; set `E2E_TEST_EMAIL` / `E2E_TEST_PASSWORD` for real sessions; preview uses `npm run e2e:preview` (chaos panel for evac drill E2E) |
 | Functions | `cd functions && npm test` | Vitest (node); unit tests in `functions/src/**/*.test.ts` + `functions/src/__tests__/*` (incl. **`demoCallables.test.ts`**, **`demoSlotBookability.test.ts`**, **`mapsPlatform.gates.test.ts`**, **`fcmHelpers.test.ts`**, **`translation.test.ts`**) |
 | Functions coverage | `cd functions && npm run test:coverage` | Report in `functions/coverage/`; `functions/vitest.config.ts` excludes `src/index.ts` from coverage (entry wiring; emulator tests exercise behavior) |
@@ -41,10 +42,10 @@ See **`VALIDATION_MATRIX.md`** for a compact requirements → evidence table.
 
 Or: `npm run verify` (same steps: lint, coverage, build, E2E, functions).
 
-**Faster pre-flight** (no coverage, no E2E, no functions): `npm run validate` (lint + unit tests + production build).
+**Pre-flight:** `npm run validate` (lint + **unit tests with coverage** → `./coverage/` + production build). For **lint + tests without coverage** + build: `npm run lint && npm run test:unit && npm run build`.
 
 **Documentation gate:** `npm run docs:generate` ensures `JUDGING_GUIDE.md`, `GOAL.md`, `docs/artifacts/README.md`, and related index files exist (used in CI).
 
 ## Coverage policy
 
-Thresholds target **80 / 80 / 70 / 65** (lines / statements / functions / branches) on included files. Firebase client init and `AuthProvider` are excluded from the denominator so the gate measures application logic, not SDK wiring. If you add large UI surfaces without tests, add coverage **or** adjust thresholds with a short note in the PR — avoid silently disabling gates.
+Thresholds are **pinned to measured totals** on included files (see `vitest.config.ts`); raise them when coverage increases so CI stays honest. Firebase client init and `AuthProvider` are excluded from the denominator so the gate measures application logic, not SDK wiring. If you add large UI surfaces without tests, add coverage **or** adjust thresholds with a short note in the PR — avoid silently disabling gates.

@@ -66,6 +66,7 @@ export const SideNavBar = () => {
             <Link
               key={item.path}
               to={item.path}
+              aria-current={isActive ? 'page' : undefined}
               className={`p-4 border-b border-[#c1c6d6] uppercase tracking-widest text-xs flex items-center gap-4 ${
                 isActive
                   ? 'bg-[#1A73E8] text-white font-bold'
@@ -88,6 +89,7 @@ export const SideNavBar = () => {
           type="button"
           className="w-full border-2 border-error text-error py-3 font-bold uppercase tracking-widest text-[10px] hover:bg-error hover:text-white transition-colors min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-error focus-visible:ring-offset-2"
           onClick={() => navigate('/dashboard#priority-assistance')}
+          aria-label="Emergency assistance: open dashboard SOS request"
         >
           Emergency Assistance
         </button>
@@ -125,6 +127,7 @@ export const BottomNav = () => {
           <Link
             key={item.path}
             to={item.path}
+            aria-current={isActive ? 'page' : undefined}
             className={`flex flex-shrink-0 flex-col items-center justify-center min-w-[4.25rem] max-w-[5.25rem] px-1 ${
               isActive ? 'text-primary-container' : 'text-outline hover:text-on-surface'
             }`}

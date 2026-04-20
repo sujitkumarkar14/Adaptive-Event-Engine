@@ -17,4 +17,9 @@ describe('polyline', () => {
     expect(b.minX).toBeLessThanOrEqual(b.maxX);
     expect(b.minY).toBeLessThanOrEqual(b.maxY);
   });
+
+  it('returns default bounds for empty coordinates', () => {
+    const b = boundsOfCoordinates([]);
+    expect(b).toEqual({ minX: 0, maxX: 1, minY: 0, maxY: 1 });
+  });
 });
