@@ -14,6 +14,8 @@
 | **`PERFORMANCE.md`** | Bundles, strategies, targets |
 | **`TESTING.md`** | Commands, CI, coverage policy |
 | **`PROBLEM_ALIGNMENT.md`** | Challenge dimensions → features |
+| **`GOAL.md`** | Mission + problem-statement → code map (alignment / scoring traceability) |
+| **`JUDGING_GUIDE.md`** | Rubric-style evidence map for reviewers (code, security, tests, a11y, Google services) |
 | **`GOOGLE_SERVICES.md`** | Service × purpose table |
 | **`CONTRIBUTING.md`** | Dev workflow |
 | **`DECISIONS.md`** | Lightweight ADRs |
@@ -30,6 +32,8 @@
 - **Firestore security rules** + **callable** role checks for `routingPolicy`
 - **vitest-axe** on key screens
 - **Firebase** persistent local cache (multi-tab) for offline-friendly reads
+- **Pre-flight:** `npm run validate` (lint, unit tests, production build)
+- **Doc index check:** `npm run docs:generate` (verifies core docs + `docs/artifacts/README.md`)
 - **One-shot verify:** `npm run verify` or `./scripts/verify.sh` (lint, coverage, build, E2E, functions)
 - **Bundle snapshot:** `npm run perf:report`
 - **Local perf artifact:** `npm run bench:perf` writes **`artifacts/perf-summary.json`** (synthetic micro-benchmarks; see **`PERFORMANCE.md`**)

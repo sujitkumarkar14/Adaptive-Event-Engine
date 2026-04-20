@@ -28,6 +28,9 @@ dist-ssr
 !PERFORMANCE.md
 !TESTING.md
 !PROBLEM_ALIGNMENT.md
+!GOAL.md
+!JUDGING_GUIDE.md
+!gemini.md
 !GOOGLE_SERVICES.md
 !CONTRIBUTING.md
 !DECISIONS.md
@@ -36,6 +39,7 @@ dist-ssr
 !SECURITY_RUNBOOK.md
 !follow-up-changes.md
 !docs/accessibility-audit.md
+!docs/artifacts/README.md
 !docs/screenshots/README.md
 
 # Perf artifact: ignore directory except checked-in summary
@@ -64,4 +68,3 @@ e2e/.auth/
 
 # Cloud Functions build output (rebuilt on deploy)
 functions/lib/
-.env.example

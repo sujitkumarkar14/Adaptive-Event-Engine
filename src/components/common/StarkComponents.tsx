@@ -19,7 +19,8 @@ export const StarkButton: React.FC<StarkButtonProps> = ({
   disabled,
   ...props 
 }) => {
-  const baseClasses = "py-4 px-6 font-black uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-3 active:scale-[0.98] transition-all duration-150 relative";
+  const baseClasses =
+    "min-h-[44px] min-w-[44px] py-4 px-6 font-black uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-3 active:scale-[0.98] transition-all duration-150 relative";
   const widthClass = fullWidth ? "w-full" : "";
   
   const { state } = useEntryStore();
@@ -72,7 +73,7 @@ export const StarkInput: React.FC<StarkInputProps> = ({ label, className = '', .
       <input 
         id={inputId}
         aria-label={label}
-        className="w-full bg-surface-container-lowest text-on-surface p-4 border-b border-outline-variant focus:outline-none focus:border-b-2 focus:border-primary transition-all placeholder:text-outline-variant text-sm font-bold tracking-wide"
+        className="min-h-[44px] w-full bg-surface-container-lowest text-on-surface p-4 border-b border-outline-variant focus:outline-none focus:border-b-2 focus:border-primary transition-all placeholder:text-outline-variant text-sm font-bold tracking-wide"
         onKeyDown={(e) => {
           if (e.key === 'Escape') {
             e.currentTarget.blur();

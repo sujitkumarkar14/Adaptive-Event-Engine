@@ -10,6 +10,7 @@
 | Functions | `cd functions && npm test` | Vitest (node), Zod + rate limit + auth helpers + `functions/src/__tests__` integration-style suites |
 | Functions + emulators (optional) | `npm run test:emulator` | `firebase emulators:exec` + `RUN_EMULATOR_TESTS=1` (see `functions/src/__tests__/emulator.integration.test.ts`) |
 | Callable load snapshot | `npm run test:load` | Writes `artifacts/load-test-results.json` (configure `LOAD_TEST_URL` / `LOAD_TEST_CONCURRENCY`) |
+| k6 (optional, shell) | `BASE_URL=http://127.0.0.1:4173 k6 run tests/load/k6-venue-spike.js` | Parallel GETs to `/login` after `npm run preview`; install [k6](https://k6.io/docs/getting-started/installation/). Does not replace Firebase/Functions stress tests. |
 | Functions build | `cd functions && npm run build` | `tsc` |
 
 ## Product dimensions → tests
@@ -18,7 +19,7 @@
 |-------------|----------------|
 | **Crowd movement** | Dashboard reroute + gate matrix tests (`Dashboard.*.test.tsx`), E2E: `e2e/crowd-movement-reroute.spec.ts`, `e2e/high-congestion-reroute.spec.ts` |
 | **Waiting times** | Booking flow tests (`Booking.test.tsx`, `Booking.emergency.spec.tsx`), E2E: `e2e/waiting-time-booking.spec.ts` |
-| **Real-time coordination** | Staff dashboard + routing policy tests, `useAppOrchestration` / integration tests, E2E: `e2e/real-time-coordination.spec.ts`, Functions HTTP/callable validation |
+| **Real-time coordination** | Staff dashboard + routing policy tests, `useAppOrchestration` / integration tests, E2E: `e2e/real-time-coordination.spec.ts`, `e2e/emergency-coordination.spec.ts` (auth shells), Functions HTTP/callable validation |
 | **Accessibility** | `vitest-axe`; `a11y.focus-management`, `a11y.keyboard-full-flow`, `a11y.full-keyboard-journey`, `a11y.dynamic-content-announcement`, `a11y.dynamic-stress`, `a11y.screen-reader-flow`, `a11y.focus-recovery`; audit notes **`docs/accessibility-audit.md`** |
 | **Offline / sync** | `src/__tests__/offline-network.integration.spec.tsx`, E2E: `e2e/offline-recovery-flow.spec.ts`, `e2e/offline-then-reconnect-sync.spec.ts` |
 | **Concurrency / consistency (shell)** | `e2e/multi-user-state-consistency.spec.ts`, `e2e/rapid-reroute-updates.spec.ts`, `e2e/concurrent-booking-conflict.spec.ts`, semantic `e2e/crowd-movement-consistency.spec.ts`, `e2e/waiting-time-capacity-enforcement.spec.ts`, `e2e/real-time-coordination-under-load.spec.ts` |
@@ -38,6 +39,10 @@ See **`VALIDATION_MATRIX.md`** for a compact requirements → evidence table.
 ```
 
 Or: `npm run verify` (same steps: lint, coverage, build, E2E, functions).
+
+**Faster pre-flight** (no coverage, no E2E, no functions): `npm run validate` (lint + unit tests + production build).
+
+**Documentation gate:** `npm run docs:generate` ensures `JUDGING_GUIDE.md`, `GOAL.md`, `docs/artifacts/README.md`, and related index files exist (used in CI).
 
 ## Coverage policy
 

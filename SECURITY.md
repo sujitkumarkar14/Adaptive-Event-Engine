@@ -19,6 +19,12 @@ Operational rotation, App Check rollout, and incident steps: **`SECURITY_RUNBOOK
 ## Secrets
 
 - Vertex ingest, emergency broadcast, maps, translation: **Secret Manager** / `defineSecret`; never commit real values.
+- **`.env.example`** in the repo is an **empty template** only (no real keys). Copy to **`.env`** locally; **`.env`** stays gitignored. If you ever committed a real `.env`, rotate all exposed keys and use `git filter-repo` or support tooling to purge history; optional scan: [TruffleHog](https://github.com/trufflesecurity/trufflehog) or similar.
+
+## Least privilege (deploy)
+
+- Prefer a **dedicated service account** for Cloud Functions / CI deploy with only the roles needed (Firestore, Secret Accessor, FCM, etc.) rather than the default Compute Engine default account.
+- **App Check:** enforce for callable/HTTP surfaces in production after clients register; see **`SECURITY_RUNBOOK.md`** and App Check init in `src/lib/firebase.ts`.
 
 ## HTTP responses
 

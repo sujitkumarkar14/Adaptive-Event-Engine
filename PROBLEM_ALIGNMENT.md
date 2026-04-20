@@ -21,6 +21,12 @@ Maps the venue challenge to concrete features in this repository (same dimension
 
 ## 4. Seamless and enjoyable experience
 
+**Enjoyable experience is achieved not through gamification, but through the reduction of cognitive load**—ensuring attendees never have to guess where to go or how long they will wait. Clear routing, wait transparency, and consistent “Stark” UI copy reduce decision fatigue in noisy venues.
+
+**Real-time coordination** (Firestore listeners + FCM) **reduces the stress of dead zones** in large venues: when policy or density changes, attendees and staff see coordinated updates instead of stale assumptions—supporting a calmer flow even during peak congestion.
+
+Supporting mechanics:
+
 - Offline-tolerant **Firestore cache**; **translation** hook; **TTS** for critical alerts.
 - **Accessibility:** skip link, landmarks, reduced-motion support, axe regression tests.
 - **Concierge** / onboarding surfaces for guided flows.

@@ -18,6 +18,9 @@ Maps product and engineering expectations to **files, tests, and automation** in
 | **Concurrency snapshot (simulated)** | `artifacts/concurrency-summary.json`, `scripts/benchmark-concurrency.mjs` | `npm run bench:concurrency` |
 | **Scale simulation (illustrative)** | `artifacts/scale-simulation.json`, `scripts/write-scale-simulation.mjs` | `npm run bench:scale` |
 | **HTTP load snapshot (callable)** | `artifacts/load-test-results.json`, `scripts/load-test.mjs` | `npm run test:load` |
+| **k6 SPA spike (optional shell)** | `tests/load/k6-venue-spike.js` | `BASE_URL=… k6 run tests/load/k6-venue-spike.js` (after `npm run preview`) |
+| **Problem-statement alignment** | **`GOAL.md`**, **`PROBLEM_ALIGNMENT.md`**, **`JUDGING_GUIDE.md`** | Doc review; `npm run docs:generate` |
+| **Pre-flight (lint + unit + build)** | `package.json` → `validate` | `npm run validate` |
 | **Resilience / retries** | `RESILIENCE.md`, `functions/src/retry.ts`, `functions/src/__tests__/retry-logic.test.ts` | `cd functions && npm test` |
 | **Booking capacity logic** | `functions/src/bookingCapacity.ts`, `functions/src/__tests__/booking-capacity-logic.test.ts` | `cd functions && npm test` |
 | **Deep E2E shells** | `e2e/multi-user-state-consistency.spec.ts`, `e2e/rapid-reroute-updates.spec.ts`, `e2e/concurrent-booking-conflict.spec.ts`, `e2e/backend-failure-recovery.spec.ts`, `e2e/offline-then-reconnect-sync.spec.ts`, plus semantic `e2e/crowd-movement-consistency.spec.ts`, etc. | `npm run build && npm run test:e2e` |
