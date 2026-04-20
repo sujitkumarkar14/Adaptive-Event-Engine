@@ -57,6 +57,10 @@ service cloud.firestore {
         allow read: if request.auth != null;
         allow write: if false;
       }
+      match /facilityStatus/{docId} {
+        allow read: if request.auth != null;
+        allow write: if false;
+      }
     }
   }
 }

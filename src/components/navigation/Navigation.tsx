@@ -21,6 +21,7 @@ const ATTENDEE_NAV_ITEMS: NavItem[] = [
   { name: 'Booking', shortName: 'Book', icon: 'schedule', path: '/booking' },
   { name: 'Event Pass', shortName: 'Pass', icon: 'qr_code', path: '/vouchers' },
   { name: 'Dashboard', shortName: 'Dash', icon: 'dashboard', path: '/dashboard' },
+  { name: 'Venue map', shortName: 'Map', icon: 'stadium', path: '/venue-map' },
   { name: 'Concierge', shortName: 'Help', icon: 'support_agent', path: '/concierge' },
 ];
 

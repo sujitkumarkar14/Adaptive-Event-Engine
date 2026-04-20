@@ -182,4 +182,15 @@ describe('entryReducer', () => {
     expect(s.demoMode).toBe(false);
     expect(s.demoEventId).toBeNull();
   });
+
+  it('SET_DEMO_SEAT_SECTION stores ticket section and CLEAR_DEMO_CONTEXT clears it', () => {
+    let s = createTestEntryState({
+      demoMode: true,
+      demoEventId: 'evt',
+    });
+    s = entryReducer(s, { type: 'SET_DEMO_SEAT_SECTION', payload: 'L4-200' });
+    expect(s.demoSeatSection).toBe('L4-200');
+    s = entryReducer(s, { type: 'CLEAR_DEMO_CONTEXT' });
+    expect(s.demoSeatSection).toBeNull();
+  });
 });

@@ -1,6 +1,12 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { readDemoSession, writeDemoSession, clearDemoSession } from '../demoSession';
-import { DEFAULT_DEMO_EVENT_ID } from '../demoConstants';
+import {
+  readDemoSession,
+  writeDemoSession,
+  clearDemoSession,
+  readDemoSeatSection,
+  writeDemoSeatSection,
+} from '../demoSession';
+import { DEFAULT_DEMO_EVENT_ID, DEMO_SEAT_SECTION_KEY } from '../demoConstants';
 
 describe('demoSession', () => {
   beforeEach(() => {
@@ -25,5 +31,18 @@ describe('demoSession', () => {
     writeDemoSession();
     clearDemoSession();
     expect(readDemoSession().demoMode).toBe(false);
+  });
+
+  it('writeDemoSeatSection and readDemoSeatSection round-trip', () => {
+    writeDemoSeatSection('L3-101');
+    expect(readDemoSeatSection()).toBe('L3-101');
+    writeDemoSeatSection(null);
+    expect(readDemoSeatSection()).toBeNull();
+  });
+
+  it('writeDemoSession clears stored seat section', () => {
+    sessionStorage.setItem(DEMO_SEAT_SECTION_KEY, 'L2-050');
+    writeDemoSession('evt-2');
+    expect(readDemoSeatSection()).toBeNull();
   });
 });

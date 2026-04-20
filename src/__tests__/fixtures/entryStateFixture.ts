@@ -23,6 +23,7 @@ export function createTestEntryState(overrides?: Partial<EntryState>): EntryStat
     preferredContentLanguage: 'en',
     demoMode: false,
     demoEventId: null,
+    demoSeatSection: null,
     ...overrides,
   };
 }

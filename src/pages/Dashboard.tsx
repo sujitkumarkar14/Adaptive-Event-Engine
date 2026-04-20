@@ -413,6 +413,19 @@ export const Dashboard = () => {
 
       <ChaosController />
 
+      <StarkCard title="Venue map" subtitle="Corridors, amenities, escalators &amp; lifts">
+        <p className="mt-4 text-sm font-bold text-on-surface-variant normal-case tracking-normal leading-relaxed">
+          Full schematic: Gate A cluster, washroom occupancy, vending, escalators 131 / 145, elevators 41 / 43 / 56,
+          and your seat tier after demo check-in.
+        </p>
+        <a
+          href="/venue-map"
+          className="mt-4 inline-flex min-h-[48px] w-full sm:w-auto items-center justify-center px-6 py-3 border-2 border-black font-black uppercase tracking-widest text-xs bg-black text-white hover:bg-on-surface-variant focus:outline-none focus-visible:ring-4 focus-visible:ring-black focus-visible:ring-offset-2 no-underline"
+        >
+          Open venue map
+        </a>
+      </StarkCard>
+
       {globalEmergencyActive ? (
         <div
           role="alert"

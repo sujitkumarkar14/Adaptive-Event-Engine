@@ -13,3 +13,5 @@ export const NARENDRA_MODI_STADIUM = {
 
 export const DEMO_SESSION_FLAG_KEY = 'ae360_demo_mode';
 export const DEMO_EVENT_ID_KEY = 'ae360_demo_event_id';
+/** Session-only seat label from demo check-in (e.g. L3-124) for venue map. */
+export const DEMO_SEAT_SECTION_KEY = 'ae360_demo_seat_section';

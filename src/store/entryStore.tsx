@@ -1,5 +1,5 @@
 import React, { createContext, useReducer, useContext, ReactNode } from 'react';
-import { readDemoSession } from '../lib/demoSession';
+import { readDemoSession, readDemoSeatSection } from '../lib/demoSession';
 
 // --- STATE MACHINE TYPES ---
 export type SystemPhase = 'PRE_EVENT' | 'IN_JOURNEY' | 'ARRIVAL' | 'EMERGENCY';
@@ -40,6 +40,8 @@ export interface EntryState {
   demoMode: boolean;
   /** Firestore `demoEvents/{demoEventId}` when in demo mode. */
   demoEventId: string | null;
+  /** Demo check-in ticket section (e.g. L3-124) for venue map — session-backed. */
+  demoSeatSection: string | null;
 }
 
 export type EntryAction =
@@ -78,7 +80,8 @@ export type EntryAction =
       };
     }
   | { type: 'SET_DEMO_CONTEXT'; payload: { demoMode: boolean; demoEventId: string | null } }
-  | { type: 'CLEAR_DEMO_CONTEXT' };
+  | { type: 'CLEAR_DEMO_CONTEXT' }
+  | { type: 'SET_DEMO_SEAT_SECTION'; payload: string | null };
 
 // --- INITIAL STATE ---
 const initialState: EntryState = {
@@ -106,6 +109,7 @@ const initialState: EntryState = {
   preferredContentLanguage: 'en',
   demoMode: false,
   demoEventId: null,
+  demoSeatSection: null,
 };
 
 // --- REDUCER (The Matrix Logic) ---
@@ -177,7 +181,9 @@ export function entryReducer(state: EntryState, action: EntryAction): EntryState
         demoEventId: action.payload.demoEventId,
       };
     case 'CLEAR_DEMO_CONTEXT':
-      return { ...state, demoMode: false, demoEventId: null };
+      return { ...state, demoMode: false, demoEventId: null, demoSeatSection: null };
+    case 'SET_DEMO_SEAT_SECTION':
+      return { ...state, demoSeatSection: action.payload };
     case 'API_FAILURE':
       console.warn(`[REILIENCE] API Error (${action.payload}). Yielding to last known Firestore IndexedDB cache.`);
       return state;
@@ -199,8 +205,9 @@ interface EntryProviderProps {
 function initEntryState(): EntryState {
   if (typeof window === 'undefined') return initialState;
   const d = readDemoSession();
+  const seat = readDemoSeatSection();
   if (d.demoMode && d.demoEventId) {
-    return { ...initialState, demoMode: true, demoEventId: d.demoEventId };
+    return { ...initialState, demoMode: true, demoEventId: d.demoEventId, demoSeatSection: seat };
   }
   return initialState;
 }

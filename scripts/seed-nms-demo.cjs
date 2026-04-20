@@ -148,8 +148,25 @@ function main() {
       attendeeProgressApprox: 0.42,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
+    const facilityRef = db.collection('demoEvents').doc(EVENT_ID).collection('facilityStatus').doc('live');
+    metaBatch.set(facilityRef, {
+      washrooms: {
+        'WR-A-01': { occupied: false },
+        'WR-A-02': { occupied: true },
+      },
+      escalators: {
+        'E-131': 'available',
+        'E-145': 'jammed',
+      },
+      elevators: {
+        'EV-41': 'jammed',
+        'EV-43': 'available',
+        'EV-56': 'available',
+      },
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
     await metaBatch.commit();
-    console.log('Event, gates, slots, aggregates written.');
+    console.log('Event, gates, slots, aggregates, facility status written.');
 
     const rand = mulberry32(0xae3600de);
     let written = 0;

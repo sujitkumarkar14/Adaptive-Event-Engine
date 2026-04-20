@@ -4,6 +4,7 @@ import { StarkButton, StarkInput, StarkCard } from '../components/common/StarkCo
 import { functions } from '../lib/firebase';
 import { useNavigate } from 'react-router-dom';
 import { DEFAULT_DEMO_EVENT_ID } from '../lib/demoConstants';
+import { writeDemoSeatSection } from '../lib/demoSession';
 import { StadiumSeatFinderSvg } from '../components/demo/StadiumSeatFinderSvg';
 import { useEntryStore } from '../store/entryStore';
 import { getHttpsCallableUserMessage } from '../lib/errors';
@@ -24,7 +25,7 @@ type AttendeePayload = {
 
 export const CheckIn = () => {
   const navigate = useNavigate();
-  const { state } = useEntryStore();
+  const { state, dispatch } = useEntryStore();
   const eventId = state.demoEventId ?? DEFAULT_DEMO_EVENT_ID;
   const [ticket, setTicket] = useState('');
   const [loading, setLoading] = useState(false);
@@ -45,6 +46,8 @@ export const CheckIn = () => {
         return;
       }
       setFound(data.attendee);
+      dispatch({ type: 'SET_DEMO_SEAT_SECTION', payload: data.attendee.seatSection });
+      writeDemoSeatSection(data.attendee.seatSection);
     } catch (e: unknown) {
       setError(getHttpsCallableUserMessage(e));
     } finally {

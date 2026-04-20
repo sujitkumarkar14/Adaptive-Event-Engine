@@ -18,6 +18,7 @@ const Booking = React.lazy(() => import('./pages/Booking'));
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const Vouchers = React.lazy(() => import('./pages/Vouchers'));
 const Concierge = React.lazy(() => import('./pages/Concierge'));
+const VenueMap = React.lazy(() => import('./pages/VenueMap'));
 const TrafficMatrix = React.lazy(() =>
   import('./pages/CommandDashboards').then((module) => ({ default: module.TrafficCommand }))
 );
@@ -153,6 +154,16 @@ function AppShell() {
                 <ProtectedRoute>
                   <PageErrorBoundary>
                     <Concierge />
+                  </PageErrorBoundary>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/venue-map"
+              element={
+                <ProtectedRoute>
+                  <PageErrorBoundary>
+                    <VenueMap />
                   </PageErrorBoundary>
                 </ProtectedRoute>
               }
