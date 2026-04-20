@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { StarkCard, StarkButton } from '../common/StarkComponents';
 import { fetchConcourseCopilotTip } from '../../lib/maps';
 import { useEntryStore } from '../../store/entryStore';
 import { translateAlertText, type AlertLang } from '../../services/translationClient';
-
-const DEFAULT_LAT = 33.9538;
-const DEFAULT_LNG = -118.3384;
+import { VENUE_DEMO_ORIGIN } from '../../lib/constants';
+import { NARENDRA_MODI_STADIUM } from '../../lib/demoConstants';
 
 const LANG_LABEL: Record<AlertLang, string> = {
   en: 'English',
@@ -39,13 +38,21 @@ export const ConcourseCopilotCard = ({
 
   const wheelchair = state.accessibility.stepFree || state.stepFreeRequired;
 
+  const { latitude, longitude } = useMemo(
+    () =>
+      state.demoMode
+        ? { latitude: NARENDRA_MODI_STADIUM.venueLat, longitude: NARENDRA_MODI_STADIUM.venueLng }
+        : { latitude: VENUE_DEMO_ORIGIN.lat, longitude: VENUE_DEMO_ORIGIN.lng },
+    [state.demoMode]
+  );
+
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setErr(null);
     void fetchConcourseCopilotTip({
-      latitude: DEFAULT_LAT,
-      longitude: DEFAULT_LNG,
+      latitude,
+      longitude,
       wheelchairAccessibleOnly: wheelchair,
     })
       .then((res) => {
@@ -74,7 +81,7 @@ export const ConcourseCopilotCard = ({
     return () => {
       cancelled = true;
     };
-  }, [wheelchair, liveOccupancyPercent]);
+  }, [wheelchair, liveOccupancyPercent, latitude, longitude]);
 
   useEffect(() => {
     let cancelled = false;

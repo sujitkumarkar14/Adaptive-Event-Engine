@@ -63,5 +63,6 @@ describe('CheckIn', () => {
       expect(screen.getByText(/Demo Guest/i)).toBeInTheDocument();
     });
     expect(screen.getByText(/GATE_NORTH/i)).toBeInTheDocument();
+    expect(screen.getByText(/your tier L1/i)).toBeInTheDocument();
   });
 });

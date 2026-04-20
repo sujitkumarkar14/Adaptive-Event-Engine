@@ -2,6 +2,7 @@
 /**
  * Seeds `demoEvents/narendra-modi-stadium-demo` with event metadata, gates, slots,
  * aggregates/live gate pressure, and synthetic attendees (default 2000).
+ * Slot times and booking window use **today’s date in Asia/Kolkata** (re-seed to move the demo day).
  *
  * Prerequisites: Application Default Credentials with Firestore write access
  *   export GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json
@@ -54,15 +55,37 @@ function main() {
   const baseLat = 23.0913;
   const baseLng = 72.5977;
 
-  // Fixed calendar day for repeatable judge scripts (UTC).
-  const bookingWindowStart = new Date('2026-06-01T04:00:00.000Z');
-  const bookingWindowEnd = new Date('2026-06-01T14:00:00.000Z');
-  const matchStartTime = new Date('2026-06-01T14:30:00.000Z');
+  // Demo “event evening” is anchored to today’s calendar date in Asia/Kolkata (stadium local time).
+  // Re-run this script to refresh slots for a new day. Slots: 25 min long, 5 min gap (starts every 30 min),
+  // 16:00 IST → 02:00 IST next calendar day (10 hours of ingress windows).
+  const kolkataYmd = () =>
+    new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+  /** Parse YYYY-MM-DD as a wall-clock instant in IST (+05:30). */
+  const atIST = (ymd, hour, minute) => {
+    const [y, mo, d] = ymd.split('-').map((x) => parseInt(x, 10));
+    const pad = (n) => String(n).padStart(2, '0');
+    return new Date(`${y}-${pad(mo)}-${pad(d)}T${pad(hour)}:${pad(minute)}:00+05:30`);
+  };
+
+  const eventYmd = kolkataYmd();
+  const bookingWindowStart = atIST(eventYmd, 0, 0);
+  const firstSlotStart = atIST(eventYmd, 16, 0);
+  const eveningEnd = new Date(firstSlotStart.getTime() + 10 * 60 * 60 * 1000); // 02:00 IST next day
+  const bookingWindowEnd = eveningEnd;
+
+  const SLOT_MS = 25 * 60 * 1000;
+  const STEP_MS = 30 * 60 * 1000;
+  const matchStartTime = new Date(eveningEnd.getTime() + 30 * 60 * 1000);
 
   const batchSlots = [];
-  for (let i = 0; i < 8; i++) {
-    const start = new Date(matchStartTime.getTime() - (8 - i) * 30 * 60 * 1000);
-    const end = new Date(start.getTime() + 25 * 60 * 1000);
+  let i = 0;
+  for (
+    let t = firstSlotStart.getTime();
+    t + SLOT_MS <= eveningEnd.getTime();
+    t += STEP_MS
+  ) {
+    const start = new Date(t);
+    const end = new Date(t + SLOT_MS);
     const slotId = `slot-${String(i + 1).padStart(2, '0')}`;
     batchSlots.push({
       id: slotId,
@@ -72,11 +95,12 @@ function main() {
         startTime: admin.firestore.Timestamp.fromDate(start),
         endTime: admin.firestore.Timestamp.fromDate(end),
         capacityTotal: 400,
-        capacityRemaining: Math.max(0, 320 - i * 12),
+        capacityRemaining: Math.max(10, 320 - (i % 8) * 12),
         defaultGate: GATES[i % GATES.length],
         order: i,
       },
     });
+    i++;
   }
 
   const eventRef = db.collection('demoEvents').doc(EVENT_ID);
@@ -91,6 +115,9 @@ function main() {
   }));
 
   async function run() {
+    console.log(
+      `Demo event day (Asia/Kolkata): ${eventYmd}; ${batchSlots.length} slots (16:00–02:00 IST, 25 min windows); booking open until end of ingress night.`
+    );
     const metaBatch = db.batch();
     metaBatch.set(eventRef, {
       venueName: 'Narendra Modi Stadium',

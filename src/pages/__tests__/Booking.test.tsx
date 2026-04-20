@@ -48,6 +48,7 @@ vi.mock('firebase/firestore', async (importOriginal) => {
               data: () => ({
                 startTime: { toDate: () => new Date(2030, 5, 1, 14, 0, 0, 0) },
                 endTime: { toDate: () => new Date(2030, 5, 1, 14, 15, 0, 0) },
+                capacityTotal: 400,
                 capacityRemaining: 10,
                 defaultGate: 'GATE_NORTH',
               }),
@@ -156,6 +157,7 @@ describe('Booking', () => {
     await waitFor(() =>
       expect(screen.getByText(/Demo mode uses stadium event windows/i)).toBeInTheDocument()
     );
+    await waitFor(() => expect(screen.getByText(/Filled 98%/i)).toBeInTheDocument());
     const slotLabel = await screen.findByText(/\d{1,2}:\d{2}\s*[–-]\s*\d{1,2}:\d{2}/);
     fireEvent.click(slotLabel);
     fireEvent.click(screen.getByRole('button', { name: /Confirm Slot/i }));

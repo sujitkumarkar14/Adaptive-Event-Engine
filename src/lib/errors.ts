@@ -46,11 +46,11 @@ export function getLoginAuthErrorMessage(error: unknown): string {
       code === 'auth/missing-app-credential' ||
       /app-check|AppCheck|app check/i.test(error.message)
     ) {
-      return 'Identity verification failed (App Check). On localhost, add VITE_DISABLE_APP_CHECK=true to .env or fix reCAPTCHA / Firebase App Check settings.';
+      return 'Identity verification failed (App Check). On localhost, set VITE_DISABLE_APP_CHECK=true in .env. On production, register this app in Firebase → App Check (or temporarily relax App Check for Authentication), and ensure VITE_RECAPTCHA_SITE_KEY matches the Firebase web app.';
     }
     switch (code) {
       case 'auth/operation-not-allowed':
-        return 'This sign-in method is disabled. In Firebase Console → Authentication → Sign-in method, enable Email/Password for this project.';
+        return 'This sign-in method is disabled. In Firebase Console → Authentication → Sign-in method, enable Anonymous (required for “Live demo”) and Email/Password if you use email sign-in.';
       case 'auth/unauthorized-domain':
         return 'This origin is not allowed. Add localhost (and your port) under Firebase Console → Authentication → Settings → Authorized domains.';
       case 'auth/invalid-api-key':
@@ -79,8 +79,14 @@ export function getLoginAuthErrorMessage(error: unknown): string {
         return 'Sign-in popup was blocked or closed. Allow popups for this site or try again.';
       case 'auth/cancelled-popup-request':
         return 'Another sign-in is already in progress.';
+      case 'auth/internal-error':
+        return 'Authentication service returned an error. Try again in a moment. If it persists, confirm Identity Toolkit API is enabled for this GCP project and that Anonymous sign-in is enabled.';
+      case 'auth/web-storage-unsupported':
+        return 'This browser blocked storage needed for sign-in. Try another browser or disable strict tracking/cookie blocking for this site.';
+      case 'auth/admin-restricted-operation':
+        return 'This sign-in operation is blocked by project settings. Check Firebase Console → Authentication (enable Anonymous for the live demo) and GCP Identity Platform policies.';
       default:
-        return 'Sign-in could not be completed. Try again.';
+        return `Sign-in could not be completed (${code}). Try again, or enable Anonymous under Firebase Console → Authentication → Sign-in method for the live demo.`;
     }
   }
   return 'Sign-in could not be completed. Try again.';

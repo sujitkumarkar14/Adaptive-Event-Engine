@@ -58,9 +58,40 @@ describe('ConcourseCopilotCard', () => {
     expect(screen.getByText(/33% pressure/i)).toBeInTheDocument();
     expect(mockFetchTip).toHaveBeenCalledWith(
       expect.objectContaining({
+        latitude: 33.9538,
+        longitude: -118.3384,
         wheelchairAccessibleOnly: false,
       })
     );
+  });
+
+  it('queries Places near Motera for stadium demo mode', async () => {
+    function CopilotDemoStadium() {
+      const { dispatch } = useEntryStore();
+      useEffect(() => {
+        dispatch({
+          type: 'SET_DEMO_CONTEXT',
+          payload: { demoMode: true, demoEventId: 'narendra-modi-stadium-demo' },
+        });
+      }, [dispatch]);
+      return <ConcourseCopilotCard alertLang="en" onAlertLangChange={() => undefined} />;
+    }
+
+    render(
+      <EntryProvider>
+        <CopilotDemoStadium />
+      </EntryProvider>
+    );
+
+    await waitFor(() => {
+      expect(mockFetchTip).toHaveBeenCalledWith(
+        expect.objectContaining({
+          latitude: 23.0913,
+          longitude: 72.5977,
+          wheelchairAccessibleOnly: false,
+        })
+      );
+    });
   });
 
   it('requests wheelchair-accessible Places filtering when step-free is enabled', async () => {

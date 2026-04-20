@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FirebaseError } from 'firebase/app';
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -44,6 +45,10 @@ export const Login = () => {
       });
       navigate('/check-in', { replace: true });
     } catch (e: unknown) {
+      if (e instanceof FirebaseError) {
+        // eslint-disable-next-line no-console -- hosted demo: need auth code when Anonymous/App Check misconfigured
+        console.warn('[Login] Live demo anonymous sign-in failed:', e.code);
+      }
       setAuthError(e);
     } finally {
       setBusy(false);
@@ -122,18 +127,18 @@ export const Login = () => {
 
   return (
     <section
-      className="flex flex-col justify-center min-h-full max-w-md mx-auto px-4 py-12"
+      className="w-full max-w-md mx-auto shrink-0"
       aria-labelledby="login-heading"
     >
       <h1 id="login-heading" className="text-4xl font-black tracking-tighter uppercase mb-2">
         Identity Gate
       </h1>
-      <p className="text-on-surface-variant font-bold text-xs tracking-widest uppercase mb-10">
+      <p className="text-on-surface-variant font-bold text-xs tracking-widest uppercase mb-6 md:mb-8">
         Secure access to booking, your event pass, and venue updates
       </p>
 
       <form
-        className="border-2 border-outline bg-surface-container-lowest p-6 mb-8"
+        className="border-2 border-outline bg-surface-container-lowest p-5 md:p-6 mb-4"
         onSubmit={(e) => e.preventDefault()}
         noValidate
       >

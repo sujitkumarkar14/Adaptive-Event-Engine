@@ -4,6 +4,7 @@ import { StarkButton, StarkInput, StarkCard } from '../components/common/StarkCo
 import { functions } from '../lib/firebase';
 import { useNavigate } from 'react-router-dom';
 import { DEFAULT_DEMO_EVENT_ID } from '../lib/demoConstants';
+import { StadiumSeatFinderSvg } from '../components/demo/StadiumSeatFinderSvg';
 import { useEntryStore } from '../store/entryStore';
 import { getHttpsCallableUserMessage } from '../lib/errors';
 
@@ -118,6 +119,9 @@ export const CheckIn = () => {
               </dd>
             </div>
           </dl>
+          <div className="mt-8 border-t border-outline-variant pt-6">
+            <StadiumSeatFinderSvg seatSection={found.seatSection} className="mt-0" />
+          </div>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <StarkButton fullWidth variant="secondary" type="button" onClick={() => navigate('/dashboard')}>
               Open dashboard

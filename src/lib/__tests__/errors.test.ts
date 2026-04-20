@@ -75,6 +75,9 @@ describe('getLoginAuthErrorMessage', () => {
     expect(getLoginAuthErrorMessage(new FirebaseError('auth/popup-closed-by-user', 'x'))).toMatch(/popup/i);
     expect(getLoginAuthErrorMessage(new FirebaseError('auth/cancelled-popup-request', 'x'))).toMatch(/already in progress/i);
     expect(getLoginAuthErrorMessage(new FirebaseError('auth/unknown-code', 'x'))).toMatch(/could not be completed/i);
+    expect(getLoginAuthErrorMessage(new FirebaseError('auth/unknown-code', 'x'))).toMatch(/unknown-code/);
+    expect(getLoginAuthErrorMessage(new FirebaseError('auth/internal-error', 'x'))).toMatch(/Anonymous|Identity Toolkit/i);
+    expect(getLoginAuthErrorMessage(new FirebaseError('auth/web-storage-unsupported', 'x'))).toMatch(/storage/i);
   });
 
   it('returns generic copy for non-Firebase errors', () => {

@@ -14,6 +14,7 @@ import {
   type SlotBookabilityState,
 } from '../lib/bookingSlotBookability';
 import { DEFAULT_DEMO_EVENT_ID } from '../lib/demoConstants';
+import { slotIngressFillPercent } from '../lib/slotIngressFillPercent';
 
 const reserveEntrySlot = httpsCallable(functions, 'reserveEntrySlot');
 const reserveDemoSlot = httpsCallable(functions, 'reserveDemoSlot');
@@ -24,6 +25,8 @@ type SlotDef = {
   status: 'AVAILABLE';
   slotStart: Date;
   slotEnd: Date;
+  /** Total ingress capacity for this window (from seed or booking service). */
+  capacityTotal: number;
   capacityRemaining: number;
   defaultGate: string;
 };
@@ -41,6 +44,7 @@ const STATIC_SLOTS: SlotDef[] = [
     status: 'AVAILABLE',
     slotStart: new Date(2020, 0, 1, 14, 0),
     slotEnd: new Date(2020, 0, 1, 14, 15),
+    capacityTotal: 1000,
     capacityRemaining: 999,
     defaultGate: DEFAULT_BOOKING_GATE_ID,
   },
@@ -50,6 +54,7 @@ const STATIC_SLOTS: SlotDef[] = [
     status: 'AVAILABLE',
     slotStart: new Date(2020, 0, 1, 14, 15),
     slotEnd: new Date(2020, 0, 1, 14, 30),
+    capacityTotal: 1000,
     capacityRemaining: 999,
     defaultGate: DEFAULT_BOOKING_GATE_ID,
   },
@@ -59,6 +64,7 @@ const STATIC_SLOTS: SlotDef[] = [
     status: 'AVAILABLE',
     slotStart: new Date(2020, 0, 1, 14, 30),
     slotEnd: new Date(2020, 0, 1, 14, 45),
+    capacityTotal: 1000,
     capacityRemaining: 999,
     defaultGate: DEFAULT_BOOKING_GATE_ID,
   },
@@ -68,6 +74,7 @@ const STATIC_SLOTS: SlotDef[] = [
     status: 'AVAILABLE',
     slotStart: new Date(2020, 0, 1, 14, 45),
     slotEnd: new Date(2020, 0, 1, 15, 0),
+    capacityTotal: 1000,
     capacityRemaining: 999,
     defaultGate: DEFAULT_BOOKING_GATE_ID,
   },
@@ -120,13 +127,16 @@ export const Booking = () => {
         const st = (x.startTime as Timestamp)?.toDate();
         const en = (x.endTime as Timestamp)?.toDate();
         if (!st || !en) return;
+        const capRem = Number(x.capacityRemaining ?? 0);
+        const capTotal = Number(x.capacityTotal ?? 0);
         rows.push({
           id: s.id,
           time: fmtRange(st, en),
           status: 'AVAILABLE',
           slotStart: st,
           slotEnd: en,
-          capacityRemaining: Number(x.capacityRemaining ?? 0),
+          capacityTotal: capTotal > 0 ? capTotal : 400,
+          capacityRemaining: capRem,
           defaultGate: typeof x.defaultGate === 'string' ? x.defaultGate : DEFAULT_BOOKING_GATE_ID,
         });
       });
@@ -318,6 +328,12 @@ export const Booking = () => {
             onClick={() => !slotIsDisabled(slot) && selectSlot(slot.id)}
             className={slotIsDisabled(slot) ? 'opacity-50 cursor-not-allowed border-l-error' : ''}
           >
+            {state.demoMode && (
+              <p className="mt-2 text-[11px] font-bold tabular-nums text-on-surface-variant normal-case tracking-normal">
+                Filled {slotIngressFillPercent(slot.capacityTotal, slot.capacityRemaining)}% ·{' '}
+                {slot.capacityRemaining} spots left
+              </p>
+            )}
             {!slotIsDisabled(slot) && (
               <div className="mt-4 flex justify-between items-center border-t border-outline-variant pt-4">
                 <span className="text-[10px] font-bold uppercase tracking-widest">{slot.status}</span>

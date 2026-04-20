@@ -97,7 +97,11 @@ function AppShell() {
 
       <main
         id="main-content"
-        className="flex-1 md:ml-72 pb-20 md:pb-12 pt-16 relative overflow-y-auto w-full max-w-full px-4 md:px-8"
+        className={
+          isLogin
+            ? 'flex flex-1 flex-col justify-center min-h-[100dvh] min-h-screen relative overflow-y-auto w-full max-w-full px-4 md:px-8 py-6 md:py-8'
+            : 'flex-1 md:ml-72 pb-20 md:pb-12 pt-16 relative overflow-y-auto w-full max-w-full px-4 md:px-8'
+        }
       >
         <Suspense
           fallback={
