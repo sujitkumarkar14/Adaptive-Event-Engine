@@ -24,6 +24,12 @@
 - **Focus management** — SOS focus after reroute alert (`a11y.focus-management.spec.tsx`); focus return after a simple dialog (`a11y.focus-recovery.spec.tsx`).
 - **Reduced motion** — `prefers-reduced-motion` in `src/index.css` (see Implemented above).
 
+### Stress validation
+
+- Verified simultaneous dynamic updates: **global evacuation** plus **staff reroute** (`src/__tests__/a11y.dynamic-stress.spec.tsx`).
+- Ensured **non-conflicting** assertive `role="alert"` regions (distinct copy per banner; no duplicate text nodes across alerts).
+- Maintained **stable focus order** under rapid concurrent updates (Tab reaches SOS after both alerts are present).
+
 ### Automated validation signals (detail)
 
 - **Keyboard-only login:** `src/__tests__/a11y.keyboard-full-flow.spec.tsx` tabs through the login form without pointer input.

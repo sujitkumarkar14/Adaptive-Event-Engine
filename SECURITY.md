@@ -30,3 +30,16 @@
 ## Known limits
 
 - Rate limiting is **per Cloud Functions instance**, not globally distributed without **Cloud Armor** / API Gateway.
+
+## Abuse resistance
+
+- Simulated repeated unauthorized-style access patterns and malformed payload flooding (see `abuse-simulation.test.ts` and `input-fuzzing.test.ts`).
+- Verified rate limiting and validation safeguards under burst and randomized keys (`rate-limit-fuzz.test.ts`).
+
+### Automated checks (file references)
+
+- **`functions/src/__tests__/abuse-simulation.test.ts`** — repeated invalid / malformed payloads through validation and rate-limit paths; asserts no cross-key bucket bleed and predictable limiter behavior under bursts.
+- **`functions/src/__tests__/rate-limit-fuzz.test.ts`** — randomized keys and burst patterns against the in-memory limiter.
+- **`functions/src/__tests__/input-fuzzing.test.ts`** — randomized JSON-like objects through Zod schemas (`parseJsonBody`) and role checks; expects validation errors or success, never thrown exceptions from parsing.
+
+These tests **do not** replace a WAF or centralized audit log review; they document that malformed input and abuse-style floods are rejected without destabilizing the handler surface in CI.
