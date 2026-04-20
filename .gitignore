@@ -31,6 +31,12 @@ dist-ssr
 !GOOGLE_SERVICES.md
 !CONTRIBUTING.md
 !DECISIONS.md
+!VALIDATION_MATRIX.md
+!docs/screenshots/README.md
+
+# Perf artifact: ignore directory except checked-in summary
+artifacts/**
+!artifacts/perf-summary.json
 
 # Local follow-up checklist (not committed)
 follow-up-changes.md

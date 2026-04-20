@@ -16,6 +16,7 @@
 | **`CONTRIBUTING.md`** | Dev workflow |
 | **`DECISIONS.md`** | Lightweight ADRs |
 | **`FUNCTIONS.md`** | Server/client function catalog |
+| **`VALIDATION_MATRIX.md`** | Requirements traceability → tests / CI / artifacts |
 
 ## Engineering quality controls
 
@@ -26,8 +27,13 @@
 - **Firestore security rules** + **callable** role checks for `routingPolicy`
 - **vitest-axe** on key screens
 - **Firebase** persistent local cache (multi-tab) for offline-friendly reads
-- **One-shot verify:** `npm run verify` or `./scripts/verify.sh`
+- **One-shot verify:** `npm run verify` or `./scripts/verify.sh` (lint, coverage, build, E2E, functions)
 - **Bundle snapshot:** `npm run perf:report`
+- **Local perf artifact:** `npm run bench:perf` writes **`artifacts/perf-summary.json`** (synthetic micro-benchmarks; see **`PERFORMANCE.md`**)
+
+## Demo flows (optional screenshots)
+
+For human reviewers, add PNG/WebP captures under **`docs/screenshots/`** and describe the flow in **`docs/screenshots/README.md`**.
 
 ## Problem statement ↔ product mapping
 

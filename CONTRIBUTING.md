@@ -14,7 +14,7 @@
 5. For Functions: `cd functions && npm run build && npm test`.
 6. For E2E: `npm run build && npm run test:e2e` (install browsers once: `npm run test:e2e:install`).
 
-Shortcut: `./scripts/verify.sh` or `npm run verify`.
+Shortcut: `./scripts/verify.sh` or `npm run verify` (lint, **coverage thresholds**, production build, Playwright E2E, Functions test + build).
 
 ## Pull requests
 

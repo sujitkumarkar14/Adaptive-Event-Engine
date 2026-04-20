@@ -1,0 +1,8 @@
+{
+  "generatedAt": "2026-04-20T05:35:22.647Z",
+  "environment": "local-node",
+  "note": "Synthetic CPU micro-benchmarks only; not production SLOs or Maps/Spanner latency.",
+  "routingBenchMs": 0,
+  "bookingBenchMs": 2,
+  "broadcastBenchMs": 0
+}

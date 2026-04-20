@@ -19,12 +19,12 @@ export default defineConfig({
         'src/**/__tests__/**',
         'src/**/__tests__/fixtures/**',
       ],
-      // Raised toward current measured coverage (~63% lines / ~56% branches); relax if adding large untested surfaces.
+      // Coverage targets: 65 / 65 / 60 / 55 (lines / statements / functions / branches).
       thresholds: {
-        lines: 55,
-        branches: 48,
-        functions: 48,
-        statements: 55,
+        lines: 65,
+        branches: 55,
+        functions: 60,
+        statements: 65,
       },
     },
   },

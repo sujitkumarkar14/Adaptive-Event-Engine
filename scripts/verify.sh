@@ -6,11 +6,14 @@ cd "$ROOT"
 echo "==> ESLint"
 npm run lint
 
-echo "==> Vitest (frontend)"
-npm test
+echo "==> Vitest (frontend) + coverage thresholds"
+npm run test:coverage
 
 echo "==> Vite build"
 npm run build
+
+echo "==> Playwright E2E (preview)"
+npm run test:e2e
 
 echo "==> Functions tests + build"
 cd functions
