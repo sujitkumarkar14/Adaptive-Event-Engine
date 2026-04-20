@@ -21,3 +21,8 @@ if (!window.speechSynthesis) {
     writable: true,
   });
 }
+
+// jsdom: silence "Not implemented: HTMLCanvasElement.getContext" from dependencies (e.g. maps).
+if (typeof HTMLCanvasElement !== 'undefined') {
+  HTMLCanvasElement.prototype.getContext = vi.fn(() => null);
+}

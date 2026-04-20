@@ -7,7 +7,9 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import {
   getFirestore,
-  enableIndexedDbPersistence
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
 } from "firebase/firestore";
 import { getFunctions } from "firebase/functions";
 import { getRemoteConfig, fetchAndActivate, getValue } from "firebase/remote-config";
@@ -24,14 +26,21 @@ const firebaseConfig = {
 
 const functionsRegion = import.meta.env.VITE_FIREBASE_FUNCTIONS_REGION ?? "us-central1";
 const remoteConfigMinFetch = Number(import.meta.env.VITE_REMOTE_CONFIG_MIN_FETCH_MS ?? 3600000);
+const isTestEnv = import.meta.env.MODE === "test";
 
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+/** Tests run in jsdom/Node — skip IndexedDB persistence; browsers use persistent multi-tab cache (replaces deprecated `enableIndexedDbPersistence`). */
+export const db =
+  isTestEnv
+    ? getFirestore(app)
+    : initializeFirestore(app, {
+        localCache: persistentLocalCache({
+          tabManager: persistentMultipleTabManager(),
+        }),
+      });
 export const functions = getFunctions(app, functionsRegion);
 export const remoteConfig = getRemoteConfig(app);
-
-const isTestEnv = import.meta.env.MODE === "test";
 
 /**
  * App Check / reCAPTCHA site keys are **per Firebase web app** in the Firebase console.
@@ -77,18 +86,5 @@ export const initRemoteConfig = async () => {
         return "OPEN";
     }
 }
-
-// STRICT OFFLINE PERSISTENCE
-// The core resilience constraint: we must handle 0kbps seamlessly.
-enableIndexedDbPersistence(db)
-  .catch((err) => {
-    if (err.code == 'failed-precondition') {
-      // Multiple tabs open, persistence can only be enabled in one tab at a a time.
-      console.warn("Firestore offline persistence failed precondition.");
-    } else if (err.code == 'unimplemented') {
-      // The current browser does not support all of the features required to enable persistence
-      console.warn("Firestore offline persistence is not supported by this browser.");
-    }
-  });
 
 export default app;

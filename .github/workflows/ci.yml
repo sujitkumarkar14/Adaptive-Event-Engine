@@ -24,6 +24,10 @@ jobs:
         run: npm run test:coverage
       - name: Production build
         run: npm run build
+      - name: Install Playwright (Chromium)
+        run: npx playwright install chromium --with-deps
+      - name: E2E smoke tests
+        run: npm run test:e2e
       - name: Functions — install, build, test
         run: |
           cd functions

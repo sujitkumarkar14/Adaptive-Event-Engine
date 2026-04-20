@@ -26,6 +26,7 @@ import {
     parseJsonBody,
     VertexAggregatorBodySchema,
 } from "./validation";
+import { enforceHttpRateLimit } from "./httpRateLimit";
 
 admin.initializeApp();
 
@@ -870,6 +871,10 @@ export const vertexAggregator = onRequest(
             return;
         }
 
+        if (!enforceHttpRateLimit(req, res, "vertexAggregator")) {
+            return;
+        }
+
         const rawBody = req.body && typeof req.body === "object" ? req.body : {};
         const bodyParsed = parseJsonBody(rawBody, VertexAggregatorBodySchema);
         if (!bodyParsed.ok) {
@@ -1029,6 +1034,10 @@ export const broadcastEmergency = onRequest(
 
         if (req.method !== "POST") {
             res.status(405).send("Method Not Allowed");
+            return;
+        }
+
+        if (!enforceHttpRateLimit(req, res, "broadcastEmergency")) {
             return;
         }
 

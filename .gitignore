@@ -9,6 +9,8 @@ lerna-debug.log*
 
 node_modules
 coverage
+playwright-report
+test-results
 dist
 .firebase
 dist-ssr
@@ -16,9 +18,10 @@ dist-ssr
 .env
 .env.*.local
 
-# Personal / local Markdown — do not commit (keep only README.md)
+# Personal / local Markdown — do not commit (keep only README.md + tracked docs)
 *.md
 !README.md
+!FUNCTIONS.md
 
 # Hackathon follow-up checklist (local)
 hackathon-changes.md
