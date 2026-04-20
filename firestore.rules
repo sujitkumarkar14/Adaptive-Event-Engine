@@ -36,5 +36,27 @@ service cloud.firestore {
       allow create, update: if request.auth != null && request.auth.uid == uid;
       allow delete: if false;
     }
+
+    // Demo stadium slice — metadata, gates, slots, aggregates: read-only for signed-in users. Attendees are lookup-only via Cloud Functions.
+    match /demoEvents/{eventId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+      match /gates/{gateId} {
+        allow read: if request.auth != null;
+        allow write: if false;
+      }
+      match /slots/{slotId} {
+        allow read: if request.auth != null;
+        allow write: if false;
+      }
+      match /attendees/{attendeeId} {
+        allow read: if false;
+        allow write: if false;
+      }
+      match /aggregates/{docId} {
+        allow read: if request.auth != null;
+        allow write: if false;
+      }
+    }
   }
 }

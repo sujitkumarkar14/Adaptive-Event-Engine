@@ -7,7 +7,8 @@
 | Unit / component | `npm test` | Vitest + Testing Library + jsdom |
 | Coverage | `npm run test:coverage` | Thresholds in `vitest.config.ts` (lines **80%**, statements **80%**, functions **70%**, branches **65%**); `src/lib/firebase.ts` + `src/contexts/AuthContext.tsx` excluded (bootstrap / provider glue) |
 | E2E | `npm run build && npm run test:e2e` | Playwright: `chromium` (unauthenticated shells) + `chromium-authenticated` (`*.authenticated.spec.ts`, `*-flow.spec.ts`) with `e2e/auth.setup.ts` + `e2e/.auth/user.json`; set `E2E_TEST_EMAIL` / `E2E_TEST_PASSWORD` for real sessions; preview uses `npm run e2e:preview` (chaos panel for evac drill E2E) |
-| Functions | `cd functions && npm test` | Vitest (node), Zod + rate limit + auth helpers + `functions/src/__tests__` integration-style suites |
+| Functions | `cd functions && npm test` | Vitest (node); unit tests in `functions/src/**/*.test.ts` + `functions/src/__tests__/*` (incl. **`demoCallables.test.ts`**, **`demoSlotBookability.test.ts`**, **`mapsPlatform.gates.test.ts`**, **`fcmHelpers.test.ts`**, **`translation.test.ts`**) |
+| Functions coverage | `cd functions && npm run test:coverage` | Report in `functions/coverage/`; `functions/vitest.config.ts` excludes `src/index.ts` from coverage (entry wiring; emulator tests exercise behavior) |
 | Functions + emulators (optional) | `npm run test:emulator` | `firebase emulators:exec` (Auth + Functions + Firestore) + `RUN_EMULATOR_TESTS=1` — requires a JRE for the Firestore emulator (see `functions/src/__tests__/emulator.integration.test.ts`) |
 | Callable load snapshot | `npm run test:load` | Writes `artifacts/load-test-results.json` (configure `LOAD_TEST_URL` / `LOAD_TEST_CONCURRENCY`) |
 | k6 (optional, shell) | `BASE_URL=http://127.0.0.1:4173 k6 run tests/load/k6-venue-spike.js` | Parallel GETs to `/login` after `npm run preview`; install [k6](https://k6.io/docs/getting-started/installation/). Does not replace Firebase/Functions stress tests. |

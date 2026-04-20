@@ -1125,3 +1125,5 @@ export const broadcastEmergency = onRequest(
         });
     }
 );
+
+export { lookupDemoAttendee, reserveDemoSlot } from "./demoCallables";

@@ -1,9 +1,16 @@
 import React, { useState } from 'react';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signInAnonymously,
+} from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../lib/firebase';
 import { StarkButton, StarkInput } from '../components/common/StarkComponents';
 import { getLoginAuthErrorMessage } from '../lib/errors';
+import { useEntryStore } from '../store/entryStore';
+import { writeDemoSession } from '../lib/demoSession';
+import { DEFAULT_DEMO_EVENT_ID } from '../lib/demoConstants';
 
 function isValidEmail(s: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim());
@@ -16,6 +23,7 @@ function isStrongEnoughPassword(s: string): boolean {
 
 export const Login = () => {
   const navigate = useNavigate();
+  const { dispatch } = useEntryStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -23,6 +31,24 @@ export const Login = () => {
   const [error, setError] = useState<string | null>(null);
 
   const goOnboarding = () => navigate('/onboarding', { replace: true });
+
+  const handleDemoAccess = async () => {
+    setError(null);
+    setBusy(true);
+    try {
+      await signInAnonymously(auth);
+      writeDemoSession(DEFAULT_DEMO_EVENT_ID);
+      dispatch({
+        type: 'SET_DEMO_CONTEXT',
+        payload: { demoMode: true, demoEventId: DEFAULT_DEMO_EVENT_ID },
+      });
+      navigate('/check-in', { replace: true });
+    } catch (e: unknown) {
+      setAuthError(e);
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const setAuthError = (e: unknown) => {
     const msg = getLoginAuthErrorMessage(e);
@@ -151,6 +177,9 @@ export const Login = () => {
             </StarkButton>
             <StarkButton variant="secondary" fullWidth disabled={busy} onClick={handleRegister} type="button">
               Create Account
+            </StarkButton>
+            <StarkButton variant="tertiary" fullWidth disabled={busy} onClick={handleDemoAccess} type="button">
+              Continue with live demo (scanner first)
             </StarkButton>
           </div>
         </div>

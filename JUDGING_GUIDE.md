@@ -50,7 +50,8 @@ Review the strongest evidence first (ordered by signal):
 | E2E | `npm run test:e2e` (Playwright `webServer`: `npm run e2e:preview`) | `e2e/*.spec.ts` |
 | Pre-flight (lint + unit + build) | `npm run validate` | CI runs lint, tests, coverage, build separately — see **`.github/workflows/ci.yml`** |
 | Full local gate | `npm run verify` | `scripts/verify.sh` (lint, coverage, build, E2E, functions) |
-| Functions | `cd functions && npm test` | `functions/src/**/*.test.ts` |
+| Functions | `cd functions && npm test` | `functions/src/**/*.test.ts`, `functions/src/__tests__/*.test.ts` |
+| Functions coverage | `cd functions && npm run test:coverage` | Optional; excludes `functions/src/index.ts` from the report (see `functions/vitest.config.ts`) |
 | Load (callable) | `npm run test:load` | `scripts/load-test.mjs` → `artifacts/load-test-results.json` |
 | Load (k6, optional) | `npm run test:load:k6` | `tests/load/k6-venue-spike.js` (requires [k6](https://k6.io/) installed) |
 
@@ -112,4 +113,7 @@ Full narrative: **`PROBLEM_ALIGNMENT.md`**, feature map: **`GOAL.md`**.
 npm run docs:generate   # verify core docs exist
 npm run validate        # lint + unit tests + production build
 npm run verify          # full gate including E2E + functions (local)
+npm run deploy:all -- YOUR_GCP_PROJECT_ID   # Firestore rules + Functions + Hosting + Cloud Run (requires firebase + gcloud)
 ```
+
+**Live demo (stadium / scanner):** Anonymous sign-in → **`/check-in`** → **`lookupDemoAttendee`**; demo booking **`reserveDemoSlot`**; seed **`npm run seed:demo -- <PROJECT_ID>`**. See **`README.md`**, **`DEMO_GUIDE.md`**, **`actuals.md`**.

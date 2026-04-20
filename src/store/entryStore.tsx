@@ -1,4 +1,5 @@
 import React, { createContext, useReducer, useContext, ReactNode } from 'react';
+import { readDemoSession } from '../lib/demoSession';
 
 // --- STATE MACHINE TYPES ---
 export type SystemPhase = 'PRE_EVENT' | 'IN_JOURNEY' | 'ARRIVAL' | 'EMERGENCY';
@@ -35,6 +36,10 @@ export interface EntryState {
   a11yStatus: string;
   /** Used for translated evacuation banners and concourse alerts. */
   preferredContentLanguage: PreferredContentLanguage;
+  /** Live demo session (anonymous / judge flow) — see `demoSession.ts`. */
+  demoMode: boolean;
+  /** Firestore `demoEvents/{demoEventId}` when in demo mode. */
+  demoEventId: string | null;
 }
 
 export type EntryAction =
@@ -71,7 +76,9 @@ export type EntryAction =
         transportMode: TransportMode;
         accessibility: EntryState['accessibility'];
       };
-    };
+    }
+  | { type: 'SET_DEMO_CONTEXT'; payload: { demoMode: boolean; demoEventId: string | null } }
+  | { type: 'CLEAR_DEMO_CONTEXT' };
 
 // --- INITIAL STATE ---
 const initialState: EntryState = {
@@ -97,6 +104,8 @@ const initialState: EntryState = {
   bookingTransactionId: null,
   a11yStatus: '',
   preferredContentLanguage: 'en',
+  demoMode: false,
+  demoEventId: null,
 };
 
 // --- REDUCER (The Matrix Logic) ---
@@ -161,6 +170,14 @@ export function entryReducer(state: EntryState, action: EntryAction): EntryState
         transportMode: action.payload.transportMode,
         accessibility: { ...action.payload.accessibility },
       };
+    case 'SET_DEMO_CONTEXT':
+      return {
+        ...state,
+        demoMode: action.payload.demoMode,
+        demoEventId: action.payload.demoEventId,
+      };
+    case 'CLEAR_DEMO_CONTEXT':
+      return { ...state, demoMode: false, demoEventId: null };
     case 'API_FAILURE':
       console.warn(`[REILIENCE] API Error (${action.payload}). Yielding to last known Firestore IndexedDB cache.`);
       return state;
@@ -179,8 +196,17 @@ interface EntryProviderProps {
   children: ReactNode;
 }
 
+function initEntryState(): EntryState {
+  if (typeof window === 'undefined') return initialState;
+  const d = readDemoSession();
+  if (d.demoMode && d.demoEventId) {
+    return { ...initialState, demoMode: true, demoEventId: d.demoEventId };
+  }
+  return initialState;
+}
+
 export const EntryProvider: React.FC<EntryProviderProps> = ({ children }) => {
-  const [state, dispatch] = useReducer(entryReducer, initialState);
+  const [state, dispatch] = useReducer(entryReducer, initialState, initEntryState);
 
   React.useEffect(() => {
     const handleOnline = () => {

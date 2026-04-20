@@ -7,7 +7,7 @@ You are the **Lead System Architect & Visual Engineer**. Your goal is to produce
 Prefer **Google Cloud** and **Firebase** for production paths: 
 - **Cloud Run (Gen 2):** Primary compute for logic-heavy operations.
 - **Cloud Spanner:** High-concurrency relational transactions for arrival slot booking.
-- **Firestore:** Real-time state with **Strict Offline Persistence** for low-connectivity resilience.
+- **Firestore:** Real-time state with **persistent local cache** (IndexedDB) for low-connectivity resilience (`initializeFirestore` in the client).
 - **Vertex AI Vision:** Passive crowd density detection via existing infrastructure.
 - **Maps Platform:** Advanced Markers, Routes API, and Fleet Engine for mobility.
 - **Secret Manager:** All API keys must be bound to Cloud Functions (no client-side exposure).
@@ -34,7 +34,7 @@ Every UI component generated must adhere to these "Hyper-Clarity" protocols:
 
 ## 4. Documentation & Interoperability
 * **GOAL.md:** Maintain a 50+ word mission statement and audit how new code resolves physical congestion. Use **`GOAL.md`** in the repo root for the **problem-statement → feature** map; see **`DECISIONS.md`** **ADR-004** (Spanner vs Firestore for booking) and **ADR-005** (entry store orchestration). **`JUDGING_GUIDE.md`** is the rubric-to-evidence index for reviewers.
-* **FUNCTIONS.md:** Catalog all interoperable functions (e.g., `calculateGatePressure`, `triggerOfflineReroute`).
+* **FUNCTIONS.md:** Catalog interoperable client + server entry points (callables, HTTP handlers, demo functions — see repo file).
 * **README.md:** Clear deployment and "Stark" design implementation guides.
 * **LLM Call Provisioning:** Always maintain an endpoint (Cloud Function proxy) for on-demand LLM reasoning.
 

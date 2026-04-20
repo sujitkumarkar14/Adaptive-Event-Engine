@@ -13,8 +13,8 @@ import {
   DEFAULT_BOOKING_GATE_ID,
   ROUTING_POLICY_COLLECTION,
   ROUTING_POLICY_DOC_ID,
-  VENUE_DEMO_ORIGIN,
 } from '../lib/constants';
+import { getRoutingOrigin } from '../lib/routingOrigin';
 import { useAuth } from '../contexts/AuthContext';
 import type { StarkRouteLayer } from '../components/maps/StarkMap';
 import { fetchGateEtasMatrix, formatMatrixInsight } from '../services/gateMatrix';
@@ -157,12 +157,14 @@ export const Dashboard = () => {
       ? routingPolicy.toGate
       : state.gatePressureGateId ?? DEFAULT_BOOKING_GATE_ID;
 
+  const routingOrigin = useMemo(() => getRoutingOrigin(state), [state.demoMode]);
+
   useEffect(() => {
     let cancelled = false;
     const stepFree = state.accessibility.stepFree || state.stepFreeRequired;
     const base = {
-      originLat: VENUE_DEMO_ORIGIN.lat,
-      originLng: VENUE_DEMO_ORIGIN.lng,
+      originLat: routingOrigin.lat,
+      originLng: routingOrigin.lng,
       destinationGate: destGateForRoute,
       stepFreeRequired: stepFree,
     };
@@ -218,6 +220,8 @@ export const Dashboard = () => {
     routingPolicy?.toGate,
     role,
     routingPolicy?.emergency_vehicle_active,
+    routingOrigin.lat,
+    routingOrigin.lng,
   ]);
 
   const mapLayers = useMemo((): StarkRouteLayer[] => {
@@ -234,14 +238,14 @@ export const Dashboard = () => {
   const toGate = routingPolicy?.toGate ?? 'GATE B';
 
   useEffect(() => {
-    void fetchGateEtasMatrix(VENUE_DEMO_ORIGIN.lat, VENUE_DEMO_ORIGIN.lng).then((d) => {
+    void fetchGateEtasMatrix(routingOrigin.lat, routingOrigin.lng).then((d) => {
       if (d?.rankings?.length) {
         setMatrixInsight(formatMatrixInsight(d.rankings));
       } else {
         setMatrixInsight(null);
       }
     });
-  }, []);
+  }, [routingOrigin.lat, routingOrigin.lng]);
 
   useEffect(() => {
     void translateAlertText(PRIORITY_CLEARANCE_COPY, state.preferredContentLanguage as AlertLang).then(
@@ -361,8 +365,8 @@ export const Dashboard = () => {
     try {
       const stepFree = state.accessibility.stepFree || state.stepFreeRequired;
       const res = await calculateOptimalPath({
-        originLat: VENUE_DEMO_ORIGIN.lat,
-        originLng: VENUE_DEMO_ORIGIN.lng,
+        originLat: routingOrigin.lat,
+        originLng: routingOrigin.lng,
         destinationGate: destGateForRoute,
         stepFreeRequired: stepFree,
         priority: 'standard',
@@ -551,7 +555,7 @@ export const Dashboard = () => {
             Geospatial AR preview is not enabled in the browser. Walking guidance uses the map below.
           </p>
           <p className="text-[10px] font-mono text-outline-variant">
-            Reference origin (routing demo): {VENUE_DEMO_ORIGIN.lat.toFixed(4)}, {VENUE_DEMO_ORIGIN.lng.toFixed(4)}
+            Reference origin ({routingOrigin.source}): {routingOrigin.lat.toFixed(4)}, {routingOrigin.lng.toFixed(4)}
           </p>
           <StarkButton variant="tertiary" className="text-xs tracking-widest self-start" type="button" disabled>
             Preview unavailable

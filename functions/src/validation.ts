@@ -69,6 +69,17 @@ export const RegisterFcmTopicsBodySchema = z
     })
     .passthrough();
 
+export const LookupDemoAttendeeSchema = z.object({
+    eventId: z.string().min(1).max(128),
+    ticketNumber: z.string().min(1).max(96).regex(/^[A-Za-z0-9_-]+$/),
+});
+
+export const ReserveDemoSlotSchema = z.object({
+    eventId: z.string().min(1).max(128),
+    slotId: z.string().min(1).max(64).regex(/^[a-zA-Z0-9_-]+$/),
+    gateId: z.string().min(1).max(32).regex(/^[A-Z0-9_]+$/),
+});
+
 export function parseJsonBody<T>(raw: unknown, schema: z.ZodType<T>): { ok: true; data: T } | { ok: false; error: string } {
     const parsed = schema.safeParse(raw);
     if (!parsed.success) {

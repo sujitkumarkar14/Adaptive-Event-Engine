@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 import {
     BroadcastEmergencyBodySchema,
     CalculateOptimalPathBodySchema,
+    LookupDemoAttendeeSchema,
     parseJsonBody,
     RegisterFcmTopicsBodySchema,
+    ReserveDemoSlotSchema,
     ReserveSlotSchema,
     SearchNearbyAmenitiesBodySchema,
     TranslateAlertBodySchema,
@@ -71,5 +73,25 @@ describe("parseJsonBody", () => {
     it("accepts registerFcmTopics bodies", () => {
         const r = parseJsonBody({ token: "abc" }, RegisterFcmTopicsBodySchema);
         expect(r.ok).toBe(true);
+    });
+
+    it("accepts demo attendee lookup payloads", () => {
+        const r = parseJsonBody({ eventId: "ev1", ticketNumber: "NMS-AE360-001" }, LookupDemoAttendeeSchema);
+        expect(r.ok).toBe(true);
+    });
+
+    it("rejects demo lookup ticket with invalid characters", () => {
+        const r = parseJsonBody({ eventId: "ev1", ticketNumber: "bad ticket" }, LookupDemoAttendeeSchema);
+        expect(r.ok).toBe(false);
+    });
+
+    it("accepts demo slot reservation payloads", () => {
+        const r = parseJsonBody({ eventId: "ev1", slotId: "slot-1", gateId: "GATE_NORTH" }, ReserveDemoSlotSchema);
+        expect(r.ok).toBe(true);
+    });
+
+    it("rejects demo reserve with lowercase gate id", () => {
+        const r = parseJsonBody({ eventId: "ev1", slotId: "a", gateId: "gate_north" }, ReserveDemoSlotSchema);
+        expect(r.ok).toBe(false);
     });
 });

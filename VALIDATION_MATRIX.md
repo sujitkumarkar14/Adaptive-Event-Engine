@@ -9,7 +9,9 @@ Maps product and engineering expectations to **files, tests, and automation** in
 | **Unit / component tests** | `src/**/*.test.tsx`, `src/**/*.spec.tsx` | `npm test`, `npm run test:coverage` |
 | **Coverage floors** | `vitest.config.ts` thresholds | `npm run test:coverage` |
 | **E2E (auth shells)** | `e2e/*.spec.ts` (Playwright), incl. `e2e/long-run-simulation.spec.ts` | `npm run build && npm run test:e2e` |
-| **Cloud Functions** | `functions/src/**/*.test.ts`, `functions/src/__tests__/*.test.ts` (incl. optional `emulator.integration.test.ts` with `RUN_EMULATOR_TESTS=1`) | `cd functions && npm test` |
+| **Cloud Functions** | `functions/src/**/*.test.ts`, `functions/src/__tests__/*.test.ts` (incl. `demoCallables.test.ts`, `emulator.integration.test.ts` with `RUN_EMULATOR_TESTS=1`) | `cd functions && npm test` |
+| **Functions coverage (optional)** | `functions/vitest.config.ts` | `cd functions && npm run test:coverage` |
+| **Judge demo path** | `src/pages/Login.tsx`, `CheckIn.tsx`, `Booking.tsx`, `useAppOrchestration`, `firestore.rules`, `functions/src/demoCallables.ts`, `scripts/seed-nms-demo.cjs` | Seed: `npm run seed:demo`; client tests: `Login.test.tsx`, `CheckIn.test.tsx`, `Booking.test.tsx` (demo cases) |
 | **Validation / rate limits (Functions)** | `functions/src/validation.ts`, `functions/src/httpRateLimit.ts` + integration-style tests | `cd functions && npm test` |
 | **Fuzz / abuse simulation (Functions)** | `functions/src/__tests__/input-fuzzing.test.ts`, `rate-limit-fuzz.test.ts`, `abuse-simulation.test.ts` | `cd functions && npm test` |
 | **Routing policy auth** | `functions/src/routingPolicyAuth.ts`, `functions/src/__tests__/routing-policy-permissions.test.ts` | `cd functions && npm test` |

@@ -1,9 +1,10 @@
 import React, { useLayoutEffect } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, waitFor } from '@testing-library/react';
+import { render, waitFor, screen } from '@testing-library/react';
 import type { User } from 'firebase/auth';
 import { EntryProvider, useEntryStore } from '../../store/entryStore';
 import { useAppOrchestration } from '../useAppOrchestration';
+import { DEMO_EVENT_ID_KEY, DEMO_SESSION_FLAG_KEY } from '../../lib/demoConstants';
 
 const mockInitRemoteConfig = vi.hoisted(() => vi.fn().mockResolvedValue('OPEN'));
 
@@ -23,10 +24,11 @@ vi.mock('../../lib/firebase', async (importOriginal) => {
   };
 });
 
-type Snap = { data: () => { active?: boolean } | undefined };
+type Snap = { data: () => { active?: boolean; gates?: Record<string, number> } | undefined };
 type Cb = (s: Snap) => void;
 
 const emergencyCallbacks: Cb[] = [];
+const aggregateCallbacks: Cb[] = [];
 
 vi.mock('firebase/firestore', async (importOriginal) => {
   const actual = await importOriginal<typeof import('firebase/firestore')>();
@@ -36,6 +38,8 @@ vi.mock('firebase/firestore', async (importOriginal) => {
     onSnapshot: vi.fn((ref: { __path?: string }, cb: Cb) => {
       if (ref.__path === 'globalEvents/emergency') {
         emergencyCallbacks.push(cb);
+      } else if (ref.__path?.endsWith('/aggregates/live')) {
+        aggregateCallbacks.push(cb);
       }
       return vi.fn();
     }),
@@ -71,6 +75,23 @@ function speakableHarness({
   );
 }
 
+function GatePressureProbe() {
+  const { state } = useEntryStore();
+  return <span data-testid="gate-pressure">{state.gatePressurePercent ?? 'none'}</span>;
+}
+
+function demoOrchestrationHarness(user: User | null) {
+  const Child = () => {
+    useAppOrchestration(user);
+    return <GatePressureProbe />;
+  };
+  return (
+    <EntryProvider>
+      <Child />
+    </EntryProvider>
+  );
+}
+
 describe('useAppOrchestration', () => {
   const mockUser = { uid: 'orch-1', isAnonymous: false } as User;
   let speakSpy: ReturnType<typeof vi.spyOn>;
@@ -78,6 +99,8 @@ describe('useAppOrchestration', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     emergencyCallbacks.length = 0;
+    aggregateCallbacks.length = 0;
+    sessionStorage.clear();
     speakSpy = vi.spyOn(window.speechSynthesis, 'speak').mockImplementation(() => {});
   });
 
@@ -140,5 +163,31 @@ describe('useAppOrchestration', () => {
 
     await waitFor(() => expect(mockInitRemoteConfig).toHaveBeenCalled());
     expect(syncGatePressure).not.toHaveBeenCalled();
+  });
+
+  it('subscribes to demo aggregate live doc and skips syncGatePressure when demo session is active', async () => {
+    sessionStorage.setItem(DEMO_SESSION_FLAG_KEY, '1');
+    sessionStorage.setItem(DEMO_EVENT_ID_KEY, 'evt-orch');
+
+    const { syncGatePressure } = await import('../../lib/firestore');
+    vi.mocked(syncGatePressure).mockClear();
+
+    render(demoOrchestrationHarness(mockUser));
+
+    await waitFor(() => expect(aggregateCallbacks.length).toBeGreaterThan(0));
+    expect(syncGatePressure).not.toHaveBeenCalled();
+  });
+
+  it('dispatches gate pressure from demo aggregate snapshot (GATE_NORTH)', async () => {
+    sessionStorage.setItem(DEMO_SESSION_FLAG_KEY, '1');
+    sessionStorage.setItem(DEMO_EVENT_ID_KEY, 'evt-orch');
+
+    render(demoOrchestrationHarness(mockUser));
+
+    await waitFor(() => expect(aggregateCallbacks.length).toBeGreaterThan(0));
+    const cb = aggregateCallbacks[aggregateCallbacks.length - 1];
+    cb({ data: () => ({ gates: { GATE_NORTH: 55.4 } }) });
+
+    await waitFor(() => expect(screen.getByTestId('gate-pressure')).toHaveTextContent('55'));
   });
 });

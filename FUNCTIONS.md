@@ -1,48 +1,71 @@
 # FUNCTIONS.md | Adaptive Entry 360
 
-This document catalogs the strictly typed, interoperable functions defining the "Surgical" business logic of the venue orchestration engine. All functions must be side-effect isolated and network-agnostic where possible.
+Server and client entry points for venue orchestration logic. Prefer small, testable modules (`functions/src/*.test.ts`, `functions/src/__tests__/*`); **`index.ts`** wires HTTP/callables/triggers and is primarily covered by integration/emulator tests.
 
-**Regions:** Firebase callable and HTTP functions in this repo are deployed in **`us-central1`** (see `functions/src/index.ts`). The web app’s static hosting / Cloud Run front door may use a different region (for example **`asia-south1`** for Run); only the Functions region affects callable latency and Firestore trigger locality.
+**Regions:** Firebase callable and HTTP functions in this repo are deployed in **`us-central1`** (see `functions/src/index.ts`). The web app’s static **Firebase Hosting** bundle and **Cloud Run** front door may use another region (e.g. **`asia-south1`** for Run in `scripts/deploy-cloud-run.sh`); callable RTT depends on client ↔ Functions region.
 
-**HTTP abuse:** `vertexAggregator` and `broadcastEmergency` apply **sliding-window rate limits** per client IP (`functions/src/httpRateLimit.ts`). Tune with `HTTP_RL_VERTEX_*` and `HTTP_RL_BROADCAST_*` env vars. For global enforcement, use **Cloud Armor** or API quotas in front of the function URL.
+**HTTP abuse:** `vertexAggregator` and `broadcastEmergency` apply **sliding-window rate limits** per client IP (`functions/src/httpRateLimit.ts`). Tune with **`HTTP_RL_VERTEX_*`** and **`HTTP_RL_BROADCAST_*`**. Tests: `functions/src/httpRateLimit.test.ts`. For global enforcement, use **Cloud Armor** or API quotas in front of the function URL.
 
-## 1. State Management & Navigation (`src/store/entryStore.tsx`)
+---
 
-*   **`entryReducer(state, action)`:** The core deterministic state machine matrix handling phase transitions between `PRE_EVENT`, `IN_JOURNEY`, `ARRIVAL`, and `EMERGENCY`.
-*   **`useEntryStore()`:** Context hook providing access to `state` and `dispatch`.
+## 1. State management (`src/store/entryStore.tsx`)
 
-## 2. Infrastructure & Real-Time Sync (`src/firebase.ts`)
+- **`entryReducer` / `useEntryStore`:** Phase machine (`PRE_EVENT` | `IN_JOURNEY` | `ARRIVAL` | `EMERGENCY`), booking status, gate pressure, accessibility, **demo context** (`demoMode`, `demoEventId` from `readDemoSession()` on init).
+- **Actions:** `SET_DEMO_CONTEXT` / `CLEAR_DEMO_CONTEXT` — see `src/lib/demoSession.ts`.
 
-*   **`syncGatePressure(gateId, dispatch)`:** Listens for instantaneous edge pressure updates pushed by Vertex Aggregator via Cloud Run. Maps directly to `entryStore` data freshness hooks.
-*   **`initRemoteConfig()`:** Bootstraps `gate_2_status` toggling for dynamic rerouting directly from Firebase.
+---
 
-## 3. Predicted Domain Functions (To Be Built)
+## 2. Client Firebase & Firestore (`src/lib/`)
 
-### A. Routing & Transport
-*   **`calculateOptimalPath(req)`:`(`functions/src/index.ts` & `src/services/routing.ts`)`**
-    *   **Purpose:** Triggers the analytical engine simulating BigQuery and Google Route optimizations. Currently operates behind a `USE_MOCK_DATA` flag to prove UI rendering capabilities representing "Perimeter-to-Seat".
-*   **`triggerOfflineReroute()`:** Addressed via the Edge integration within `src/services/bleProximity.ts` locally parsing nearest paths based on offline signals.
+- **`firebase.ts`:** App init, **`initializeFirestore`** with **`persistentLocalCache`** + **`persistentMultipleTabManager`**, Auth, Functions, Remote Config, optional App Check.
+- **`firestore.ts`:** **`syncGatePressure(gateId, dispatch)`** — subscribes to **`gateLogistics/{gateId}`** for live pressure used by the dashboard path.
+- **Demo orchestration:** When **`demoMode`** and **`demoEventId`** are set, `useAppOrchestration` subscribes to **`demoEvents/{id}/aggregates/live`** for pressure instead of `gateLogistics` (see `src/hooks/useAppOrchestration.ts`).
 
-### B. Validation & Security
+---
 
-HTTPS callables validate **`request.data`** with **Zod** in `functions/src/validation.ts` (e.g. `reserveEntrySlot`, `calculateOptimalPath`, `searchNearbyAmenities`, `translateAlert`, `registerFcmTopics`).
+## 3. Cloud Functions — catalog (high level)
 
-*   **`reserveEntrySlot(data)`:`(`functions/src/index.ts`)`**
-    *   **Purpose:** Securely locks a timeslot utilizing Spanner High-concurrency proxies.
-*   **`broadcastEmergency(data)`:`(`functions/src/index.ts`)`**
-    *   **Purpose:** Writes `globalEvents/emergency` and sends a **high-priority data** FCM to topic `emergency` (clients register via `registerFcmTopics`).
-*   **`getGateEtasMatrix` / `computeGateEtas` (`mapsPlatform.ts`):** Distance Matrix (walking) ranks gates in `gateLogistics` vs attendee origin — “Fastest to Reach”.
-*   **`translateAlert`:** Cloud Translation API — English / Hindi / Telugu for alerts (`TRANSLATION_API_KEY`).
-*   **`registerFcmTopics`:** Subscribes device token to FCM topics `emergency` + `smart_reroute` (server-side; pairs with `VITE_FCM_VAPID_KEY` + `/firebase-messaging-sw.js`).
-*   **`onGatePressureChange`:** When any `gateLogistics/{gateId}` pressure crosses **> 85%**, merges `routingPolicy/live` auto reroute flags, then **segmented FCM**: queries `users` where `currentLocationZone` matches the congested gate and **`sendCongestionNudgesToTokens`** (per stored `fcmToken`). Audit: **`TARGETED_NUDGE`** / **`SEGMENTED_CONGESTION_*`**. Clients sync zone via `users/{uid}.currentLocationZone` from gate pressure (Dashboard).
-*   **`getGateEtasMatrix`:** Accepts **`request.data.origin` { lat, lng }** (or `latitude`/`longitude` / `originLat`/`originLng`). Audit category **`MATRIX_RANKING`**.
-*   **`translateAlert`:** Audit category **`A11Y_TRANSLATION`**.
-*   **`onRoutingPolicyRerouteNotify`:** When `routingPolicy/live.gateRerouteActive` flips on, sends FCM to topic `smart_reroute` (staff or auto).
-*   **`updateRoutingPolicyLive`:** Callable merge into `routingPolicy/live` (staff/admin claims in production; Firestore rules block direct client writes). Role gate: `functions/src/routingPolicyAuth.ts`. Client: `src/services/staffRoutingPolicy.ts`.
-*   **HTTP `400` bodies:** Error detail strings are length-limited via `sanitizeHttpErrorDetail` before JSON response.
-*   **`withRetry` (`functions/src/retry.ts`):** Generic async retry with exponential backoff for transient errors (optional adoption in callables/clients). Tests: `functions/src/__tests__/retry-logic.test.ts`.
-*   **`isSlotAvailable` / `reservationOutcome` (`functions/src/bookingCapacity.ts`):** Pure helpers aligned with Spanner capacity checks in `reserveEntrySlot`. Tests: `functions/src/__tests__/booking-capacity-logic.test.ts`.
+### Validation
 
-### C. Sensors & Proximity
-*   **`detectBeaconProximity(callback)`:`(`src/services/bleProximity.ts`)`**
-    *   **Purpose:** Triggers strictly inside `IN_JOURNEY` to passively listen for station beacons (e.g., `0x181A` UUID), overriding GPS routing manually with high-urgency notifications.
+HTTPS callables validate **`request.data`** with **Zod** in `functions/src/validation.ts` (e.g. `ReserveSlotSchema`, **`LookupDemoAttendeeSchema`**, **`ReserveDemoSlotSchema`**, `CalculateOptimalPathBodySchema`, `SearchNearbyAmenitiesBodySchema`, `TranslateAlertBodySchema`, `RegisterFcmTopicsBodySchema`). **`parseJsonBody`** returns safe parse results.
+
+### Booking & capacity
+
+- **`reserveEntrySlot`:** Callable; transactional **Spanner** path on `ArrivalWindows` (`evaluateArrivalWindowRow` in `functions/src/bookingCapacity.ts`). Tests: `functions/src/__tests__/booking-capacity-logic.test.ts`.
+- **`reserveDemoSlot`:** Callable; **Firestore** transaction on `demoEvents/{eventId}/slots` + user merge doc; validates with **`evaluateSlotBookability`** (`functions/src/demoSlotBookability.ts`). **Source:** `functions/src/demoCallables.ts`.
+
+### Stadium / judge demo (no Spanner)
+
+- **`lookupDemoAttendee`:** Callable; reads **`demoEvents/{eventId}/attendees/{ticketNumber}`** server-side only. **Source:** `functions/src/demoCallables.ts`. Re-exported from `functions/src/index.ts`.
+
+### Maps & translation (`functions/src/mapsPlatform.ts`, `translation.ts`)
+
+- **`calculateOptimalPath`**, **`getGateEtasMatrix`**, **`searchNearbyAmenities`**, **`translateAlert`:** Callables using Routes / Distance Matrix / Places / Translation as configured; **`USE_MOCK_DATA`** and emulator behavior documented in `index.ts`.
+- **Pure helpers / tests:** `normalizeGateId`, `destinationForGate`, `allGateCoordinates`, **`computeGateEtas`** — see `functions/src/mapsPlatform.gates.test.ts`.
+
+### FCM helpers (`functions/src/fcmHelpers.ts`)
+
+- **`sendEmergencyTopicMessage`**, **`sendSmartRerouteTopicMessage`**, **`sendCongestionNudgesToTokens`** — Tests: `functions/src/fcmHelpers.test.ts`.
+
+### Policy & HTTP
+
+- **`updateRoutingPolicyLive`:** Callable merge into **`routingPolicy/live`**; role gate: `functions/src/routingPolicyAuth.ts`. Client wrapper: **`mergeRoutingPolicyLive`** in `src/services/staffRoutingPolicy.ts` (callable name **`updateRoutingPolicyLive`**).
+- **`broadcastEmergency`**, **`vertexAggregator`:** HTTP JSON bodies validated with Zod; errors sanitized via **`sanitizeHttpErrorDetail`**.
+- **`onGatePressureChange` / `onRoutingPolicyRerouteNotify`:** Firestore triggers as defined in `index.ts`.
+
+### Shared utilities
+
+- **`withRetry`** (`functions/src/retry.ts`): Tests `functions/src/__tests__/retry-logic.test.ts`.
+- **Rate limit:** `enforceHttpRateLimit` — covered in `httpRateLimit.test.ts`.
+
+---
+
+## 4. Predictions vs stubs
+
+Some product paragraphs in older briefs described **BigQuery / ML / closed-loop reroute** as future work. Today, **Vertex ingest** may run in mock/emulator mode; **staff reroute** is policy + FCM **`smart_reroute`** + dashboard UX — see **`CHECKLIST.md`** for paradigm status.
+
+---
+
+## 5. Client services (`src/services/`)
+
+- **`routing.ts`**, **`bleProximity.ts`**, **`rewards.ts`**, staff **`staffRoutingPolicy.ts`** — call HTTPS callables / Firestore as implemented per file.

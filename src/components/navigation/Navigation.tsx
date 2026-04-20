@@ -16,6 +16,7 @@ type NavItem = {
 
 /** Attendee-safe routes (always shown). */
 const ATTENDEE_NAV_ITEMS: NavItem[] = [
+  { name: 'Check-in', shortName: 'Scan', icon: 'qr_code_scanner', path: '/check-in' },
   { name: 'Transit', shortName: 'Transit', icon: 'directions_bus', path: '/onboarding' },
   { name: 'Booking', shortName: 'Book', icon: 'schedule', path: '/booking' },
   { name: 'Event Pass', shortName: 'Pass', icon: 'qr_code', path: '/vouchers' },

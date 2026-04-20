@@ -169,4 +169,17 @@ describe('entryReducer', () => {
     expect(next.transportMode).toBe('Metro');
     expect(next.accessibility).toEqual({ stepFree: true, lowSensory: false, visualAid: true });
   });
+
+  it('SET_DEMO_CONTEXT and CLEAR_DEMO_CONTEXT toggle demo fields', () => {
+    let s = createTestEntryState();
+    s = entryReducer(s, {
+      type: 'SET_DEMO_CONTEXT',
+      payload: { demoMode: true, demoEventId: 'narendra-modi-stadium-demo' },
+    });
+    expect(s.demoMode).toBe(true);
+    expect(s.demoEventId).toBe('narendra-modi-stadium-demo');
+    s = entryReducer(s, { type: 'CLEAR_DEMO_CONTEXT' });
+    expect(s.demoMode).toBe(false);
+    expect(s.demoEventId).toBeNull();
+  });
 });

@@ -1,16 +1,77 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { httpsCallable } from 'firebase/functions';
 import { FirebaseError } from 'firebase/app';
+import { collection, doc, onSnapshot, orderBy, query, Timestamp } from 'firebase/firestore';
 import { StarkCard, StarkButton } from '../components/common/StarkComponents';
 import { useNavigate } from 'react-router-dom';
 import { useEntryStore } from '../store/entryStore';
-import { functions } from '../lib/firebase';
+import { functions, db } from '../lib/firebase';
 import { DEFAULT_BOOKING_GATE_ID } from '../lib/constants';
 import { BOOKING_VENUE_UNAVAILABLE_COPY, getHttpsCallableUserMessage } from '../lib/errors';
+import {
+  evaluateSlotBookability,
+  bookabilityLabel,
+  type SlotBookabilityState,
+} from '../lib/bookingSlotBookability';
+import { DEFAULT_DEMO_EVENT_ID } from '../lib/demoConstants';
 
 const reserveEntrySlot = httpsCallable(functions, 'reserveEntrySlot');
+const reserveDemoSlot = httpsCallable(functions, 'reserveDemoSlot');
 
-type SlotDef = { id: string; time: string; status: 'AVAILABLE' };
+type SlotDef = {
+  id: string;
+  time: string;
+  status: 'AVAILABLE';
+  slotStart: Date;
+  slotEnd: Date;
+  capacityRemaining: number;
+  defaultGate: string;
+};
+
+function fmtRange(a: Date, b: Date): string {
+  const f = (d: Date) =>
+    d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false });
+  return `${f(a)} – ${f(b)}`;
+}
+
+const STATIC_SLOTS: SlotDef[] = [
+  {
+    id: '1',
+    time: '14:00 - 14:15',
+    status: 'AVAILABLE',
+    slotStart: new Date(2020, 0, 1, 14, 0),
+    slotEnd: new Date(2020, 0, 1, 14, 15),
+    capacityRemaining: 999,
+    defaultGate: DEFAULT_BOOKING_GATE_ID,
+  },
+  {
+    id: '2',
+    time: '14:15 - 14:30',
+    status: 'AVAILABLE',
+    slotStart: new Date(2020, 0, 1, 14, 15),
+    slotEnd: new Date(2020, 0, 1, 14, 30),
+    capacityRemaining: 999,
+    defaultGate: DEFAULT_BOOKING_GATE_ID,
+  },
+  {
+    id: '3',
+    time: '14:30 - 14:45',
+    status: 'AVAILABLE',
+    slotStart: new Date(2020, 0, 1, 14, 30),
+    slotEnd: new Date(2020, 0, 1, 14, 45),
+    capacityRemaining: 999,
+    defaultGate: DEFAULT_BOOKING_GATE_ID,
+  },
+  {
+    id: '4',
+    time: '14:45 - 15:00',
+    status: 'AVAILABLE',
+    slotStart: new Date(2020, 0, 1, 14, 45),
+    slotEnd: new Date(2020, 0, 1, 15, 0),
+    capacityRemaining: 999,
+    defaultGate: DEFAULT_BOOKING_GATE_ID,
+  },
+];
 
 export const Booking = () => {
   const navigate = useNavigate();
@@ -18,21 +79,97 @@ export const Booking = () => {
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [blockedSlotIds, setBlockedSlotIds] = useState<Set<string>>(() => new Set());
   const [venueWideUnavailable, setVenueWideUnavailable] = useState(false);
+  const [demoSlots, setDemoSlots] = useState<SlotDef[] | null>(null);
+  const [demoWindows, setDemoWindows] = useState<{
+    bookingWindowStart: Date;
+    bookingWindowEnd: Date;
+  } | null>(null);
+  const [demoTimeTick, setDemoTimeTick] = useState(0);
 
-  /** Schedule windows only — capacity is verified when you confirm (callable + Spanner). */
-  const timeSlots: SlotDef[] = useMemo(
-    () => [
-      { id: '1', time: '14:00 - 14:15', status: 'AVAILABLE' },
-      { id: '2', time: '14:15 - 14:30', status: 'AVAILABLE' },
-      { id: '3', time: '14:30 - 14:45', status: 'AVAILABLE' },
-      { id: '4', time: '14:45 - 15:00', status: 'AVAILABLE' },
-    ],
-    []
-  );
+  const eventId = state.demoEventId ?? DEFAULT_DEMO_EVENT_ID;
+
+  useEffect(() => {
+    if (!state.demoMode) return;
+    const id = window.setInterval(() => setDemoTimeTick((t) => t + 1), 30_000);
+    return () => window.clearInterval(id);
+  }, [state.demoMode]);
+
+  useEffect(() => {
+    if (!state.demoMode) {
+      setDemoSlots(null);
+      setDemoWindows(null);
+      return;
+    }
+    const evRef = doc(db, 'demoEvents', eventId);
+    const unsubEv = onSnapshot(evRef, (snap) => {
+      const d = snap.data();
+      if (!d) {
+        setDemoWindows(null);
+        return;
+      }
+      const bs = (d.bookingWindowStart as Timestamp | undefined)?.toDate();
+      const be = (d.bookingWindowEnd as Timestamp | undefined)?.toDate();
+      if (bs && be) setDemoWindows({ bookingWindowStart: bs, bookingWindowEnd: be });
+      else setDemoWindows(null);
+    });
+    const slotsQ = query(collection(db, 'demoEvents', eventId, 'slots'), orderBy('startTime'));
+    const unsubSlots = onSnapshot(slotsQ, (snap) => {
+      const rows: SlotDef[] = [];
+      snap.forEach((s) => {
+        const x = s.data();
+        const st = (x.startTime as Timestamp)?.toDate();
+        const en = (x.endTime as Timestamp)?.toDate();
+        if (!st || !en) return;
+        rows.push({
+          id: s.id,
+          time: fmtRange(st, en),
+          status: 'AVAILABLE',
+          slotStart: st,
+          slotEnd: en,
+          capacityRemaining: Number(x.capacityRemaining ?? 0),
+          defaultGate: typeof x.defaultGate === 'string' ? x.defaultGate : DEFAULT_BOOKING_GATE_ID,
+        });
+      });
+      setDemoSlots(rows);
+    });
+    return () => {
+      unsubEv();
+      unsubSlots();
+    };
+  }, [state.demoMode, eventId]);
+
+  const timeSlots = demoSlots && demoSlots.length > 0 ? demoSlots : !state.demoMode ? STATIC_SLOTS : [];
+
+  const slotUiState = useMemo(() => {
+    const map = new Map<string, SlotBookabilityState | 'legacy_blocked' | 'legacy_ok'>();
+    const win = state.demoMode && demoWindows ? demoWindows : null;
+    for (const slot of timeSlots) {
+      if (state.demoMode && win) {
+        map.set(
+          slot.id,
+          evaluateSlotBookability({
+            now: new Date(),
+            bookingWindowStart: win.bookingWindowStart,
+            bookingWindowEnd: win.bookingWindowEnd,
+            slotStart: slot.slotStart,
+            slotEnd: slot.slotEnd,
+            capacityRemaining: slot.capacityRemaining,
+          })
+        );
+      } else {
+        map.set(slot.id, blockedSlotIds.has(slot.id) ? 'legacy_blocked' : 'legacy_ok');
+      }
+    }
+    return map;
+  }, [timeSlots, state.demoMode, demoWindows, blockedSlotIds, demoTimeTick]);
 
   const slotIsDisabled = (slot: SlotDef) => {
     if (venueWideUnavailable) return true;
-    return blockedSlotIds.has(slot.id);
+    const st = slotUiState.get(slot.id);
+    if (!state.demoMode) {
+      return st === 'legacy_blocked';
+    }
+    return st !== 'available';
   };
 
   const selectSlot = (id: string) => {
@@ -56,6 +193,28 @@ export const Booking = () => {
     if (!selectedSlot) return;
     dispatch({ type: 'SET_BOOKING_STATUS', payload: { status: 'loading' } });
     try {
+      if (state.demoMode) {
+        const slot = timeSlots.find((s) => s.id === selectedSlot);
+        const gate = slot?.defaultGate ?? DEFAULT_BOOKING_GATE_ID;
+        const result = await reserveDemoSlot({
+          eventId,
+          slotId: selectedSlot,
+          gateId: gate,
+        });
+        const data = result.data as { transactionId?: string; status?: string };
+        setVenueWideUnavailable(false);
+        dispatch({
+          type: 'SET_BOOKING_STATUS',
+          payload: {
+            status: 'success',
+            error: null,
+            transactionId: data.transactionId ?? null,
+          },
+        });
+        dispatch({ type: 'SET_LAST_SYNC', payload: new Date() });
+        return;
+      }
+
       const result = await reserveEntrySlot({
         slotId: selectedSlot,
         gateId: DEFAULT_BOOKING_GATE_ID,
@@ -107,8 +266,12 @@ export const Booking = () => {
     if (venueWideUnavailable) {
       return 'Temporarily unavailable';
     }
-    if (blockedSlotIds.has(slot.id)) {
+    if (!state.demoMode && blockedSlotIds.has(slot.id)) {
       return 'Unavailable for booking';
+    }
+    const st = slotUiState.get(slot.id);
+    if (state.demoMode && st && st !== 'legacy_blocked' && st !== 'legacy_ok') {
+      return bookabilityLabel(st);
     }
     return 'Confirm to check capacity';
   };
@@ -123,9 +286,17 @@ export const Booking = () => {
           Select your secure ingress slot
         </p>
         <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-outline max-w-xl">
-          Windows are illustrative until you confirm — availability is enforced by the reservation service.
+          {state.demoMode
+            ? 'Demo mode uses stadium event windows in Firestore — past slots close automatically when data is seeded.'
+            : 'Windows are illustrative until you confirm — availability is enforced by the reservation service.'}
         </p>
       </div>
+
+      {state.demoMode && timeSlots.length === 0 && (
+        <p role="status" className="mb-4 text-on-surface-variant font-bold text-sm border-l-4 border-outline pl-4">
+          No demo slots in Firestore yet. Run the stadium seed script, then refresh.
+        </p>
+      )}
 
       {venueWideUnavailable && (
         <p

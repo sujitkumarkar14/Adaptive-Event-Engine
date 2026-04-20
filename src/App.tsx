@@ -9,8 +9,10 @@ import { useAppOrchestration } from './hooks/useAppOrchestration';
 import { AppErrorBoundary } from './components/AppErrorBoundary';
 import { PageErrorBoundary } from './components/PageErrorBoundary';
 import { TtsFallbackNotice } from './components/TtsFallbackNotice';
+import { readDemoSession } from './lib/demoSession';
 
 const Login = React.lazy(() => import('./pages/Login'));
+const CheckIn = React.lazy(() => import('./pages/CheckIn'));
 const Onboarding = React.lazy(() => import('./pages/Onboarding'));
 const Booking = React.lazy(() => import('./pages/Booking'));
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
@@ -38,7 +40,8 @@ function LoginRoute() {
     );
   }
   if (user) {
-    return <Navigate to="/onboarding" replace />;
+    const demo = readDemoSession();
+    return <Navigate to={demo.demoMode ? '/check-in' : '/onboarding'} replace />;
   }
   return (
     <Suspense
@@ -62,7 +65,11 @@ function RootRedirect() {
       </div>
     );
   }
-  return <Navigate to={user ? '/onboarding' : '/login'} replace />;
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  const demo = readDemoSession();
+  return <Navigate to={demo.demoMode ? '/check-in' : '/onboarding'} replace />;
 }
 
 function AppShell() {
@@ -142,6 +149,16 @@ function AppShell() {
                 <ProtectedRoute>
                   <PageErrorBoundary>
                     <Concierge />
+                  </PageErrorBoundary>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/check-in"
+              element={
+                <ProtectedRoute>
+                  <PageErrorBoundary>
+                    <CheckIn />
                   </PageErrorBoundary>
                 </ProtectedRoute>
               }

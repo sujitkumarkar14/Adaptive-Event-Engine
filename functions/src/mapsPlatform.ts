@@ -10,6 +10,11 @@ export const GATE_DESTINATIONS: Record<string, { latitude: number; longitude: nu
     GATE_A: { latitude: 33.95385, longitude: -118.3382 },
     GATE_B: { latitude: 33.9544, longitude: -118.3389 },
     GATE_C: { latitude: 33.9534, longitude: -118.3375 },
+    /** Narendra Modi Stadium (Ahmedabad) — used by live demo seed + demo routing. */
+    GATE_NORTH: { latitude: 23.0914, longitude: 72.5977 },
+    GATE_EAST: { latitude: 23.0908, longitude: 72.5989 },
+    GATE_SOUTH: { latitude: 23.0898, longitude: 72.5972 },
+    GATE_WEST: { latitude: 23.091, longitude: 72.5964 },
 };
 
 export function normalizeGateId(raw: string | undefined): string {

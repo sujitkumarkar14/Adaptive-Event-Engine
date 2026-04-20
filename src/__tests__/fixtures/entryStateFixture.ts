@@ -20,6 +20,9 @@ export function createTestEntryState(overrides?: Partial<EntryState>): EntryStat
     bookingError: null,
     bookingTransactionId: null,
     a11yStatus: '',
+    preferredContentLanguage: 'en',
+    demoMode: false,
+    demoEventId: null,
     ...overrides,
   };
 }

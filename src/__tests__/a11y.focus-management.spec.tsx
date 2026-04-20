@@ -111,7 +111,10 @@ describe('a11y: focus after reroute alert', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveTextContent(/CRITICAL TEST: Reroute active/);
+      const alerts = screen.getAllByRole('alert');
+      const reroute = alerts.find((el) => el.textContent?.includes('CRITICAL TEST'));
+      expect(reroute).toBeTruthy();
+      expect(reroute).toHaveTextContent(/CRITICAL TEST: Reroute active/);
     });
 
     const sos = screen.getByRole('button', {

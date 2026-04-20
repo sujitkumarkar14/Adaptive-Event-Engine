@@ -5,6 +5,7 @@ This folder documents **where test and CI outputs appear** so reviewers do not h
 | Evidence type | Location | How to produce |
 |---------------|----------|----------------|
 | **Vitest coverage** (HTML + lcov) | `coverage/` (repo root) | `npm run test:coverage` |
+| **Functions Vitest coverage** | `functions/coverage/` (if generated) | `cd functions && npm run test:coverage` |
 | **Playwright HTML report** | `playwright-report/` | `npx playwright show-report` after a run |
 | **Playwright traces / results** | `test-results/` | Default Playwright output; traces **on-first-retry** in `playwright.config.ts` |
 | **Callable load snapshot** | `artifacts/load-test-results.json` | `npm run test:load` (see `scripts/load-test.mjs`); CI emulator job uploads this path |

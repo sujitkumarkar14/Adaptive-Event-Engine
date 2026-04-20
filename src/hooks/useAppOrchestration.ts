@@ -33,9 +33,33 @@ export function useAppOrchestration(user: User | null) {
 
   useEffect(() => {
     if (!user) return;
+    if (state.demoMode && state.demoEventId) {
+      const ref = doc(db, 'demoEvents', state.demoEventId, 'aggregates', 'live');
+      const unsub = onSnapshot(
+        ref,
+        (snap) => {
+          const gates = snap.data()?.gates as Record<string, number> | undefined;
+          const primary =
+            typeof gates?.[DEFAULT_BOOKING_GATE_ID] === 'number'
+              ? gates![DEFAULT_BOOKING_GATE_ID]
+              : typeof gates?.GATE_NORTH === 'number'
+                ? gates.GATE_NORTH
+                : Object.values(gates ?? {})[0];
+          if (typeof primary === 'number' && Number.isFinite(primary)) {
+            const p = Math.min(100, Math.max(0, Math.round(primary)));
+            dispatch({
+              type: 'UPDATE_GATE_PRESSURE',
+              payload: { percent: p, gateId: DEFAULT_BOOKING_GATE_ID, at: new Date() },
+            });
+          }
+        },
+        () => undefined
+      );
+      return () => unsub();
+    }
     // Real-time pressure from Firestore `gateLogistics/{gateId}` — written by Vertex AI Vision aggregator (`vertexAggregator`).
     return syncGatePressure(DEFAULT_BOOKING_GATE_ID, dispatch);
-  }, [dispatch, user]);
+  }, [dispatch, user, state.demoMode, state.demoEventId]);
 
   useEffect(() => {
     if (!user) return;

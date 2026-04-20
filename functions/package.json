@@ -9,6 +9,7 @@
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:emulator": "vitest run src/__tests__/emulator.integration.test.ts"
   },
   "keywords": [],

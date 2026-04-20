@@ -8,7 +8,9 @@
 | `src/pages/` | Route targets (lazy-loaded from `App.tsx`). |
 | `src/components/` | Shared UI (e.g. `StarkComponents`, navigation, admin tools). |
 | `src/services/` | Client helpers (routing, BLE stubs, **staff routing policy** callable wrapper). |
-| `functions/src/` | Cloud Functions: HTTPS callables, HTTP ingress (`vertexAggregator`, `broadcastEmergency`), Firestore triggers, Spanner booking proxy, Zod validation, rate limiting. |
+| `functions/src/` | Cloud Functions: HTTPS callables, HTTP ingress (`vertexAggregator`, `broadcastEmergency`), Firestore triggers, Spanner booking proxy, **demo callables** (`lookupDemoAttendee`, `reserveDemoSlot`), Zod validation, rate limiting. |
+| `scripts/deploy-all.sh` | Single **full deploy**: rules → Functions → client build → Hosting → Cloud Run (`deploy-cloud-run.sh`). Root **`./deploy.sh`** is a wrapper. |
+| `src/lib/demo*.ts` | Demo session keys, stadium constants, bookability helper shared with Functions parity. |
 | `e2e/` | Playwright smoke and scenario tests against production build (`vite preview`). |
 
 ## Paths

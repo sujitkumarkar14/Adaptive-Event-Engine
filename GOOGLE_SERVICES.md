@@ -10,6 +10,8 @@
 | **Cloud Spanner** (via Functions) | Slot reservation consistency | Reduce overbooking under contention |
 | **Maps Platform** | Walking ETAs, gate matrix | Crowd movement guidance |
 | **App Check** | Attenuate abuse on client calls | Optional; reCAPTCHA providers |
-| **Cloud Build / Run** | CI/CD and hosting story | Deploy SPA and backends in GCP |
+| **Cloud Build / Run** | CI/CD: full stack via **`npm run deploy:all`** (Hosting + containerized SPA on Run) | See **`scripts/deploy-all.sh`** |
+
+**Judge demo data:** Firestore documents under **`demoEvents/{eventId}`** (event metadata, `gates`, `slots`, `aggregates/live`, `attendees` server-read only) — seeded for demos with **`npm run seed:demo`**.
 
 See **`README.md`** for narrative context and **`FUNCTIONS.md`** for function-level detail.

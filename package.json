@@ -8,6 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "validate": "npm run lint && npm run test && npm run build",
+    "seed:demo": "node scripts/seed-nms-demo.cjs",
     "docs:generate": "node scripts/docs-generate.mjs",
     "verify": "bash scripts/verify.sh",
     "bench:perf": "node scripts/write-perf-summary.mjs",
@@ -23,7 +24,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ci": "npm run build && playwright test",
     "test:e2e:install": "playwright install chromium",
-    "e2e:preview": "VITE_ENABLE_CHAOS_CONTROLLER=true vite build && vite preview --host 127.0.0.1 --port 4173 --strictPort"
+    "e2e:preview": "VITE_ENABLE_CHAOS_CONTROLLER=true vite build && vite preview --host 127.0.0.1 --port 4173 --strictPort",
+    "deploy:all": "bash scripts/deploy-all.sh"
   },
   "dependencies": {
     "firebase": "^12.12.0",

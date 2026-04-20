@@ -15,6 +15,7 @@ How the system behaves under **partial failure**, **offline use**, and **load** 
 ## Client offline and cache
 
 - **Firestore:** `persistentLocalCache` + multi-tab manager — last subscribed reads can still display when the network drops (see **`ARCHITECTURE.md`**).
+- **Demo mode:** When **`demoMode`** is on, gate pressure may be driven from **`demoEvents/{eventId}/aggregates/live`** (or script-simulated aggregates) instead of **`gateLogistics`** — still a single-listener pattern in `useAppOrchestration`, not thousands of per-attendee client subscriptions.
 - **Network flag:** `entryStore` listens to `online` / `offline` and updates sync UI (`Navigation` footer). Tests: `src/__tests__/offline-network.integration.spec.tsx`; Playwright: `e2e/offline-then-reconnect-sync.spec.ts`, `e2e/offline-recovery-flow.spec.ts`.
 
 ## Routing policy and emergencies

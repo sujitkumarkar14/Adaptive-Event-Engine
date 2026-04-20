@@ -20,6 +20,8 @@
 | **`CONTRIBUTING.md`** | Dev workflow |
 | **`DECISIONS.md`** | Lightweight ADRs |
 | **`FUNCTIONS.md`** | Server/client function catalog |
+| **`DEMO_GUIDE.md`** | Judge walkthrough + **live demo** (scanner-first) cues |
+| **`actuals.md`** | Screen-by-screen: design intent vs current wiring |
 | **`VALIDATION_MATRIX.md`** | Requirements traceability → tests / CI / artifacts |
 | **`RESILIENCE.md`** | Retries, offline, capacity, failure modes |
 
@@ -39,6 +41,8 @@
 - **Local perf artifact:** `npm run bench:perf` writes **`artifacts/perf-summary.json`** (synthetic micro-benchmarks; see **`PERFORMANCE.md`**)
 - **Concurrency snapshot:** `npm run bench:concurrency` writes **`artifacts/concurrency-summary.json`** (simulated parallel waves; see **`PERFORMANCE.md`**)
 - **Scale-shaped snapshot:** `npm run bench:scale` writes **`artifacts/scale-simulation.json`** (illustrative; see **`PERFORMANCE.md`**)
+- **Stadium demo seed (Firestore):** `npm run seed:demo -- <GCP_PROJECT_ID>` — seeds `demoEvents/{eventId}` + synthetic attendees (requires ADC / `gcloud auth application-default login`; deploy Functions + rules first)
+- **Full GCP deploy (rules, Functions, Hosting, Cloud Run):** `npm run deploy:all -- <GCP_PROJECT_ID>` or **`./deploy.sh <GCP_PROJECT_ID>`** — runs **`scripts/deploy-all.sh`** (see script header for steps)
 
 ## Demo flows (optional screenshots)
 
@@ -191,9 +195,11 @@ These are **design targets**, not guaranteed SLAs. Measure in your own project a
   **Limits are per Cloud Functions instance** (cold starts reset counters). For production, add **Google Cloud Armor**, **API Gateway quotas**, or **Cloud Endpoints** in front of these URLs.
 - **Threat model (short):** Browser `apiKey` is public; enforce **Firestore rules**, **App Check**, **API key HTTP referrer restrictions**, and **least-privilege IAM** for deploy pipelines. Stolen ingest/broadcast keys can still abuse HTTP until rotated—rate limits + Armor reduce blast radius.
 
-## Demo mode & Chaos Controller
+## Live demo (judges) vs Chaos Controller
 
-A **Chaos Controller** panel (dev / test / `VITE_ENABLE_CHAOS_CONTROLLER`) can simulate API failures, network loss, evacuation drills, and **demo role overrides** stored in **`localStorage`**. That override is for **local demos only**—it does not replace production Auth custom claims.
+**Judge / stadium demo path (production-safe):** On **`/login`**, **Continue with live demo (scanner first)** signs in **anonymously** (enable Anonymous Auth in the Firebase console), sets **`sessionStorage`** flags (`src/lib/demoSession.ts`), dispatches **`SET_DEMO_CONTEXT`** in `entryStore`, and routes to **`/check-in`**. **Check-in** calls the callable **`lookupDemoAttendee`** (attendee docs are not readable by the client — see **`firestore.rules`**). **Booking** in demo mode loads slots from **`demoEvents/{eventId}/slots`** and reserves via **`reserveDemoSlot`**. **`useAppOrchestration`** can read gate pressure from **`demoEvents/{eventId}/aggregates/live`** instead of `gateLogistics`. Synthetic data: **`npm run seed:demo -- <PROJECT_ID>`** (`scripts/seed-nms-demo.cjs`). Details: **`DEMO_GUIDE.md`**, **`actuals.md`**.
+
+**Chaos Controller** (dev / test / `VITE_ENABLE_CHAOS_CONTROLLER`) simulates API failures, network loss, evacuation drills, and **demo role overrides** in **`localStorage`**. That override is for **local UI demos only** — it does not replace production Auth custom claims.
 
 ## Accessibility features for large public venues
 
@@ -223,9 +229,10 @@ A **Chaos Controller** panel (dev / test / `VITE_ENABLE_CHAOS_CONTROLLER`) can s
 | Layer | Command |
 |-------|---------|
 | Unit / component | `npm test` |
-| Coverage | `npm run test:coverage` |
+| Coverage (frontend thresholds in `vitest.config.ts`) | `npm run test:coverage` |
 | E2E (Chromium; requires **build** first) | `npm run build && npm run test:e2e` |
-| Functions | `cd functions && npm test` |
+| Cloud Functions unit tests | `cd functions && npm test` |
+| Cloud Functions coverage | `cd functions && npm run test:coverage` |
 
 Install Playwright browsers once: `npm run test:e2e:install`.
 
@@ -236,7 +243,8 @@ Firebase **emulator** mode may use mock keys (e.g. `MOCK_VERTEX_INGEST_KEY`)—*
 ## Deployment & regions
 
 - **Cloud Functions** in this repo target **`us-central1`** (see `functions/src/index.ts`).
-- If you front the SPA with **Cloud Run** or static hosting, that layer may live in another region (e.g. **`asia-south1`**). Document both; latency differs by hop.
+- **One-shot full deploy** (Firestore rules → Functions → Vite build → **Firebase Hosting** → **Cloud Run** via `cloudbuild.yaml`): **`npm run deploy:all -- <PROJECT_ID>`** or **`./deploy.sh <PROJECT_ID>`** (wrapper for **`scripts/deploy-all.sh`**). Requires `firebase login`, `gcloud` auth, and billing/APIs for Cloud Build + Run.
+- If you front the SPA with **Cloud Run** or static hosting, that layer may live in another region (e.g. **`asia-south1`** as in `scripts/deploy-cloud-run.sh`). Document both; latency differs by hop.
 
 ## Tech stack
 
