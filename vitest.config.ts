@@ -15,16 +15,18 @@ export default defineConfig({
       include: ['src/**/*.{ts,tsx}'],
       exclude: [
         'src/main.tsx',
+        'src/lib/firebase.ts',
+        'src/contexts/AuthContext.tsx',
         'src/**/*.test.{ts,tsx}',
         'src/**/__tests__/**',
         'src/**/__tests__/fixtures/**',
       ],
-      // Coverage targets: 65 / 65 / 60 / 55 (lines / statements / functions / branches).
+      // Targets on measured code (Firebase bootstrap + AuthProvider excluded — see TESTING.md).
       thresholds: {
-        lines: 65,
-        branches: 55,
-        functions: 60,
-        statements: 65,
+        lines: 77,
+        branches: 65,
+        functions: 70,
+        statements: 75,
       },
     },
   },

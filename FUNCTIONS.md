@@ -24,6 +24,9 @@ This document catalogs the strictly typed, interoperable functions defining the 
 *   **`triggerOfflineReroute()`:** Addressed via the Edge integration within `src/services/bleProximity.ts` locally parsing nearest paths based on offline signals.
 
 ### B. Validation & Security
+
+HTTPS callables validate **`request.data`** with **Zod** in `functions/src/validation.ts` (e.g. `reserveEntrySlot`, `calculateOptimalPath`, `searchNearbyAmenities`, `translateAlert`, `registerFcmTopics`).
+
 *   **`reserveEntrySlot(data)`:`(`functions/src/index.ts`)`**
     *   **Purpose:** Securely locks a timeslot utilizing Spanner High-concurrency proxies.
 *   **`broadcastEmergency(data)`:`(`functions/src/index.ts`)`**

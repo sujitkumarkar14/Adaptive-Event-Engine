@@ -5,6 +5,7 @@ Maps product and engineering expectations to **files, tests, and automation** in
 | Area | Evidence | CI / command |
 |------|----------|----------------|
 | **Lint** | `eslint.config.js`, source | `npm run lint` |
+| **CI — Functions emulator** | `.github/workflows/ci.yml` job `functions-emulator` | `firebase emulators:exec` + integration + load artifact |
 | **Unit / component tests** | `src/**/*.test.tsx`, `src/**/*.spec.tsx` | `npm test`, `npm run test:coverage` |
 | **Coverage floors** | `vitest.config.ts` thresholds | `npm run test:coverage` |
 | **E2E (auth shells)** | `e2e/*.spec.ts` (Playwright), incl. `e2e/long-run-simulation.spec.ts` | `npm run build && npm run test:e2e` |

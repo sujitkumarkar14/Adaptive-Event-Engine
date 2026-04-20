@@ -5,8 +5,8 @@
 | Layer | Command | Notes |
 |-------|---------|--------|
 | Unit / component | `npm test` | Vitest + Testing Library + jsdom |
-| Coverage | `npm run test:coverage` | Thresholds in `vitest.config.ts` (lines/statements **65%**, functions **60%**, branches **55%**) |
-| E2E | `npm run build && npm run test:e2e` | Playwright + Chromium; scenario shells in `e2e/*.spec.ts`; authenticated flow in `e2e/attendee-authenticated-flow.spec.ts` when `E2E_TEST_EMAIL` / `E2E_TEST_PASSWORD` are set |
+| Coverage | `npm run test:coverage` | Thresholds in `vitest.config.ts` (lines **77%**, statements **75%**, functions **70%**, branches **65%**); `src/lib/firebase.ts` + `src/contexts/AuthContext.tsx` excluded (bootstrap / provider glue) |
+| E2E | `npm run build && npm run test:e2e` | Playwright: `chromium` (unauthenticated shells) + `chromium-authenticated` (`*.authenticated.spec.ts`) with `e2e/auth.setup.ts` + `e2e/.auth/user.json`; set `E2E_TEST_EMAIL` / `E2E_TEST_PASSWORD` for real sessions |
 | Functions | `cd functions && npm test` | Vitest (node), Zod + rate limit + auth helpers + `functions/src/__tests__` integration-style suites |
 | Functions + emulators (optional) | `npm run test:emulator` | `firebase emulators:exec` + `RUN_EMULATOR_TESTS=1` (see `functions/src/__tests__/emulator.integration.test.ts`) |
 | Callable load snapshot | `npm run test:load` | Writes `artifacts/load-test-results.json` (configure `LOAD_TEST_URL` / `LOAD_TEST_CONCURRENCY`) |
@@ -29,7 +29,7 @@ See **`VALIDATION_MATRIX.md`** for a compact requirements → evidence table.
 
 ## CI
 
-`.github/workflows/ci.yml` runs lint, unit tests, coverage, production build, Playwright install + E2E, then Functions install/build/test.
+`.github/workflows/ci.yml` runs lint, unit tests, coverage, production build, Playwright install + E2E, Functions install/build/test, and a **`functions-emulator`** job (`firebase emulators:exec` + `RUN_EMULATOR_TESTS=1` + `npm run test:load`) with **`load-test-results.json`** uploaded as an artifact.
 
 ## Verify all (local)
 
@@ -41,4 +41,4 @@ Or: `npm run verify` (same steps: lint, coverage, build, E2E, functions).
 
 ## Coverage policy
 
-Thresholds target **65 / 65 / 60 / 55** (lines / statements / functions / branches). If you add large UI surfaces without tests, add coverage **or** adjust thresholds with a short note in the PR — avoid silently disabling gates.
+Thresholds target **77 / 75 / 70 / 65** (lines / statements / functions / branches) on included files. Firebase client init and `AuthProvider` are excluded from the denominator so the gate measures application logic, not SDK wiring. If you add large UI surfaces without tests, add coverage **or** adjust thresholds with a short note in the PR — avoid silently disabling gates.

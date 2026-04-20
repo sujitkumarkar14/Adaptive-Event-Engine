@@ -4,12 +4,8 @@ const hasAuth = Boolean(process.env.E2E_TEST_EMAIL && process.env.E2E_TEST_PASSW
 const describeAuth = hasAuth ? test.describe : test.describe.skip;
 
 describeAuth('authenticated attendee journey', () => {
-  test('login, onboarding, dashboard shell', async ({ page }) => {
-    await page.goto('/login');
-    await page.getByRole('textbox', { name: /email/i }).fill(process.env.E2E_TEST_EMAIL!);
-    await page.getByLabel(/^Password$/i).fill(process.env.E2E_TEST_PASSWORD!);
-    await page.getByRole('button', { name: /^Sign In$/i }).click();
-    await expect(page).toHaveURL(/\/onboarding/, { timeout: 60_000 });
+  test('onboarding to dashboard with saved session', async ({ page }) => {
+    await page.goto('/onboarding');
     await page.getByRole('button', { name: /Car/i }).first().click();
     await page.getByRole('button', { name: /Initialize System/i }).click();
     await expect(page).toHaveURL(/\/dashboard/, { timeout: 60_000 });

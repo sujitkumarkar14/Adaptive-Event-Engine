@@ -47,4 +47,27 @@ describe('calculateOptimalPath', () => {
     expect(r!.pathNodes[1].description).toBe('Parking zone');
     expect(r!.status).toBe('OPTIMIZED_VIA_MOCK');
   });
+
+  it('mock: vip and emergency priorities use distinct polylines and timings', async () => {
+    const vip = await calculateOptimalPath({
+      originLat: 1,
+      originLng: 2,
+      destinationGate: 'GATE_A',
+      stepFreeRequired: false,
+      priority: 'vip',
+    });
+    expect(vip!.encodedPolyline).toBe('wocsF`b}u_@}@wAqCnE');
+    expect(vip!.perimeterToSeatTime).toBe('14 mins (suite)');
+
+    const em = await calculateOptimalPath({
+      originLat: 1,
+      originLng: 2,
+      destinationGate: 'GATE_A',
+      stepFreeRequired: false,
+      priority: 'emergency',
+    });
+    expect(em!.encodedPolyline).toBe('oocsFjb}u_@_@?}L?kL');
+    expect(em!.durationSeconds).toBe(360);
+    expect(em!.distanceMeters).toBe(890);
+  });
 });

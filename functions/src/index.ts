@@ -23,8 +23,12 @@ import {
 import { translateText, type TranslationLangCode } from "./translation";
 import {
     BroadcastEmergencyBodySchema,
+    CalculateOptimalPathBodySchema,
     parseJsonBody,
+    RegisterFcmTopicsBodySchema,
     ReserveSlotSchema,
+    SearchNearbyAmenitiesBodySchema,
+    TranslateAlertBodySchema,
     VertexAggregatorBodySchema,
 } from "./validation";
 import { enforceHttpRateLimit } from "./httpRateLimit";
@@ -201,15 +205,12 @@ export const calculateOptimalPath = functions.https.onCall(
             throw new functions.https.HttpsError("unauthenticated", "Authentication required.");
         }
 
-        const { originLat, originLng, destinationGate, stepFreeRequired, priority, returnToVehicle } = (request.data ??
-            {}) as {
-            originLat?: number;
-            originLng?: number;
-            destinationGate?: string;
-            stepFreeRequired?: boolean;
-            priority?: RoutePriority | string;
-            returnToVehicle?: boolean;
-        };
+        const bodyParsed = parseJsonBody(request.data ?? {}, CalculateOptimalPathBodySchema);
+        if (!bodyParsed.ok) {
+            throw new functions.https.HttpsError("invalid-argument", "Invalid route request payload.");
+        }
+        const { originLat, originLng, destinationGate, stepFreeRequired, priority, returnToVehicle } =
+            bodyParsed.data;
 
         const oLat = typeof originLat === "number" ? originLat : Number(originLat);
         const oLng = typeof originLng === "number" ? originLng : Number(originLng);
@@ -389,11 +390,11 @@ export const searchNearbyAmenities = functions.https.onCall(
             throw new functions.https.HttpsError("unauthenticated", "Authentication required.");
         }
 
-        const { latitude, longitude, wheelchairAccessibleOnly } = (request.data ?? {}) as {
-            latitude?: number;
-            longitude?: number;
-            wheelchairAccessibleOnly?: boolean;
-        };
+        const placesParsed = parseJsonBody(request.data ?? {}, SearchNearbyAmenitiesBodySchema);
+        if (!placesParsed.ok) {
+            throw new functions.https.HttpsError("invalid-argument", "Invalid places request payload.");
+        }
+        const { latitude, longitude, wheelchairAccessibleOnly } = placesParsed.data;
 
         const lat = typeof latitude === "number" ? latitude : Number(latitude);
         const lng = typeof longitude === "number" ? longitude : Number(longitude);
@@ -552,11 +553,11 @@ export const translateAlert = functions.https.onCall({ secrets: [translationApiK
     if (!request.auth) {
         throw new functions.https.HttpsError("unauthenticated", "Authentication required.");
     }
-    const { text, target, source } = (request.data ?? {}) as {
-        text?: string;
-        target?: string;
-        source?: TranslationLangCode;
-    };
+    const trParsed = parseJsonBody(request.data ?? {}, TranslateAlertBodySchema);
+    if (!trParsed.ok) {
+        throw new functions.https.HttpsError("invalid-argument", "Invalid translation request payload.");
+    }
+    const { text, target, source } = trParsed.data;
     const raw = typeof text === "string" ? text : "";
     const tgt = (target === "hi" || target === "te" || target === "en" ? target : "en") as TranslationLangCode;
 
@@ -580,11 +581,13 @@ export const translateAlert = functions.https.onCall({ secrets: [translationApiK
     }
 
     try {
+        const srcLang =
+            source === "hi" || source === "te" || source === "en" ? source : "en";
         const translatedText = await translateText({
             apiKey: translationKey,
             text: raw,
             target: tgt,
-            source: source ?? "en",
+            source: srcLang,
         });
         logAuditJson({
             severity: "INFO",
@@ -662,7 +665,11 @@ export const registerFcmTopics = functions.https.onCall(async (request) => {
     if (!request.auth) {
         throw new functions.https.HttpsError("unauthenticated", "Authentication required.");
     }
-    const { token } = (request.data ?? {}) as { token?: string };
+    const fcmParsed = parseJsonBody(request.data ?? {}, RegisterFcmTopicsBodySchema);
+    if (!fcmParsed.ok) {
+        throw new functions.https.HttpsError("invalid-argument", "Invalid FCM registration payload.");
+    }
+    const { token } = fcmParsed.data;
     if (!token || typeof token !== "string") {
         throw new functions.https.HttpsError("invalid-argument", "FCM registration token required.");
     }

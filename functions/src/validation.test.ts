@@ -1,8 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
     BroadcastEmergencyBodySchema,
+    CalculateOptimalPathBodySchema,
     parseJsonBody,
+    RegisterFcmTopicsBodySchema,
     ReserveSlotSchema,
+    SearchNearbyAmenitiesBodySchema,
+    TranslateAlertBodySchema,
     VertexAggregatorBodySchema,
 } from "./validation";
 
@@ -44,5 +48,28 @@ describe("parseJsonBody", () => {
     it("rejects reserve slot with invalid gate id characters", () => {
         const r = parseJsonBody({ slotId: "1", gateId: "gate-lowercase" }, ReserveSlotSchema);
         expect(r.ok).toBe(false);
+    });
+
+    it("accepts calculateOptimalPath bodies with numeric or string coordinates", () => {
+        const r = parseJsonBody(
+            { originLat: "34.05", originLng: -118.24, destinationGate: "GATE_B", priority: "vip" },
+            CalculateOptimalPathBodySchema
+        );
+        expect(r.ok).toBe(true);
+    });
+
+    it("accepts searchNearbyAmenities bodies", () => {
+        const r = parseJsonBody({ latitude: 1, longitude: 2, wheelchairAccessibleOnly: true }, SearchNearbyAmenitiesBodySchema);
+        expect(r.ok).toBe(true);
+    });
+
+    it("accepts translateAlert bodies", () => {
+        const r = parseJsonBody({ text: "Hello", target: "hi", source: "en" }, TranslateAlertBodySchema);
+        expect(r.ok).toBe(true);
+    });
+
+    it("accepts registerFcmTopics bodies", () => {
+        const r = parseJsonBody({ token: "abc" }, RegisterFcmTopicsBodySchema);
+        expect(r.ok).toBe(true);
     });
 });

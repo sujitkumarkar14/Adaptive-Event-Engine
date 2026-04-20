@@ -18,4 +18,29 @@ describe('Onboarding', () => {
     fireEvent.click(carBtn);
     expect(carBtn).toHaveClass(/bg-primary-container/);
   });
+
+  it('toggles step-free and low-sensory preferences', () => {
+    render(
+      <MemoryRouter>
+        <EntryProvider>
+          <Onboarding />
+        </EntryProvider>
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByText(/Step-free access/i));
+    fireEvent.click(screen.getByText(/Low-sensory environments/i));
+    fireEvent.click(screen.getByText(/Visual aid support/i));
+  });
+
+  it('shows Initialize System and skip configuration', () => {
+    render(
+      <MemoryRouter>
+        <EntryProvider>
+          <Onboarding />
+        </EntryProvider>
+      </MemoryRouter>
+    );
+    expect(screen.getByRole('button', { name: /Initialize System/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Skip configuration/i })).toBeInTheDocument();
+  });
 });

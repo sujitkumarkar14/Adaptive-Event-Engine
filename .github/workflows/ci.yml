@@ -34,3 +34,25 @@ jobs:
           npm ci
           npm run build
           npm test
+  functions-emulator:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - name: Install root dependencies
+        run: npm ci
+      - name: Emulator — integration test + load snapshot
+        run: |
+          cd functions
+          npm ci
+          npm run build
+          cd ..
+          npx firebase-tools@14.7.0 emulators:exec --only auth,functions --project adaptive-entry \
+            "cd functions && RUN_EMULATOR_TESTS=1 npm test -- emulator.integration && cd .. && LOAD_TEST_URL=http://127.0.0.1:5001/adaptive-entry/us-central1/reserveEntrySlot npm run test:load"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: load-test-results
+          path: artifacts/load-test-results.json

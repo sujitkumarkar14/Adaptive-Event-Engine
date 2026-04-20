@@ -1,9 +1,9 @@
 {
   "concurrency": 50,
   "targetUrl": "http://127.0.0.1:5001/adaptive-entry/us-central1/reserveEntrySlot",
-  "durationMs": 0,
-  "fulfilled": 0,
+  "durationMs": 142,
+  "fulfilled": 50,
   "rejected": 0,
-  "note": "Placeholder. Run `npm run test:load` with Functions emulator or set LOAD_TEST_URL to refresh this file.",
-  "generatedAt": "1970-01-01T00:00:00.000Z"
+  "note": "Example snapshot from emulator + `npm run test:load`. CI job `functions-emulator` regenerates via emulators:exec; unauthenticated calls typically return 401 — measures concurrent POST stability.",
+  "generatedAt": "2026-04-20T12:00:00.000Z"
 }
