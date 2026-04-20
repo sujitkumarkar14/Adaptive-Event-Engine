@@ -9,6 +9,7 @@
 | **`ARCHITECTURE.md`** | Repo layout, hot vs analytical path |
 | **`SECURITY.md`** | Threat model, auth, secrets, limits |
 | **`ACCESSIBILITY.md`** | a11y features and manual checks |
+| **`docs/accessibility-audit.md`** | Contrast + screen reader audit trail (evidence-oriented) |
 | **`PERFORMANCE.md`** | Bundles, strategies, targets |
 | **`TESTING.md`** | Commands, CI, coverage policy |
 | **`PROBLEM_ALIGNMENT.md`** | Challenge dimensions → features |
@@ -204,6 +205,13 @@ A **Chaos Controller** panel (dev / test / `VITE_ENABLE_CHAOS_CONTROLLER`) can s
 - **Automated:** `vitest-axe` on selected screens (e.g. `StaffDashboard`).
 - **Manual checklist (suggested):** Tab through booking → dashboard → staff surfaces; verify focus visible; verify emergency/alert paths are perceivable without color alone.
 - This does **not** certify WCAG **AAA** for the whole product—treat automated tests as **regression guards**. See **`ACCESSIBILITY.md`**.
+
+## Accessibility audit
+
+- **Contrast:** Primary text and control pairs spot-checked against **WCAG 2.1 AA** intent (browser DevTools / informal); see **`docs/accessibility-audit.md`** for methodology and limitations.
+- **Screen readers:** VoiceOver / NVDA **spot-checks** on login and alert surfaces documented in the audit doc; automated **structural** checks in **`src/__tests__/a11y.screen-reader-flow.spec.tsx`** (headings, labels, `role="alert"`, `aria-live`).
+- **Live regions:** Assertive alerts and polite status regions covered by `vitest` (e.g. `a11y.dynamic-stress.spec.tsx`, screen reader flow spec) plus manual verification notes in the audit file.
+- **Keyboard-only navigation:** End-to-end tab order on login (`a11y.keyboard-full-flow.spec.tsx`) and related journey specs—see **`ACCESSIBILITY.md`** and **`docs/accessibility-audit.md`**.
 
 ## Testing
 

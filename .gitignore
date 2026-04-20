@@ -34,6 +34,7 @@ dist-ssr
 !VALIDATION_MATRIX.md
 !RESILIENCE.md
 !follow-up-changes.md
+!docs/accessibility-audit.md
 !docs/screenshots/README.md
 
 # Perf artifact: ignore directory except checked-in summary

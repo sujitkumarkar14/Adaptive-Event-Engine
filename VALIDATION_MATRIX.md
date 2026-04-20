@@ -12,7 +12,7 @@ Maps product and engineering expectations to **files, tests, and automation** in
 | **Validation / rate limits (Functions)** | `functions/src/validation.ts`, `functions/src/httpRateLimit.ts` + integration-style tests | `cd functions && npm test` |
 | **Fuzz / abuse simulation (Functions)** | `functions/src/__tests__/input-fuzzing.test.ts`, `rate-limit-fuzz.test.ts`, `abuse-simulation.test.ts` | `cd functions && npm test` |
 | **Routing policy auth** | `functions/src/routingPolicyAuth.ts`, `functions/src/__tests__/routing-policy-permissions.test.ts` | `cd functions && npm test` |
-| **Accessibility (automated)** | `vitest-axe` in `src/__tests__/a11y.*.spec.tsx` (incl. `a11y.dynamic-stress.spec.tsx`), `pages/__tests__/*a11y*` | `npm test` |
+| **Accessibility (automated + audit trail)** | `vitest-axe` in `src/__tests__/a11y.*.spec.tsx` (incl. `a11y.dynamic-stress.spec.tsx`, `a11y.screen-reader-flow.spec.tsx`), `pages/__tests__/*a11y*`; **`docs/accessibility-audit.md`** | `npm test` |
 | **Performance artifact (local)** | `artifacts/perf-summary.json`, `scripts/write-perf-summary.mjs` | `npm run bench:perf` |
 | **Concurrency snapshot (simulated)** | `artifacts/concurrency-summary.json`, `scripts/benchmark-concurrency.mjs` | `npm run bench:concurrency` |
 | **Scale simulation (illustrative)** | `artifacts/scale-simulation.json`, `scripts/write-scale-simulation.mjs` | `npm run bench:scale` |

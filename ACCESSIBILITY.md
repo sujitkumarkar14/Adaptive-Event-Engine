@@ -1,5 +1,7 @@
 # Accessibility — Adaptive Entry 360
 
+**Recorded audit (contrast methodology, screen reader notes, evidence map):** **`docs/accessibility-audit.md`**.
+
 ## Implemented
 
 - **Skip link** to `#main-content` in `App.jsx`.

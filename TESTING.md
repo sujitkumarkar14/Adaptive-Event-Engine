@@ -17,7 +17,7 @@
 | **Crowd movement** | Dashboard reroute + gate matrix tests (`Dashboard.*.test.tsx`), E2E: `e2e/crowd-movement-reroute.spec.ts`, `e2e/high-congestion-reroute.spec.ts` |
 | **Waiting times** | Booking flow tests (`Booking.test.tsx`, `Booking.emergency.spec.tsx`), E2E: `e2e/waiting-time-booking.spec.ts` |
 | **Real-time coordination** | Staff dashboard + routing policy tests, `useAppOrchestration` / integration tests, E2E: `e2e/real-time-coordination.spec.ts`, Functions HTTP/callable validation |
-| **Accessibility** | `vitest-axe`; `a11y.focus-management`, `a11y.keyboard-full-flow`, `a11y.full-keyboard-journey`, `a11y.dynamic-content-announcement`, `a11y.focus-recovery` |
+| **Accessibility** | `vitest-axe`; `a11y.focus-management`, `a11y.keyboard-full-flow`, `a11y.full-keyboard-journey`, `a11y.dynamic-content-announcement`, `a11y.dynamic-stress`, `a11y.screen-reader-flow`, `a11y.focus-recovery`; audit notes **`docs/accessibility-audit.md`** |
 | **Offline / sync** | `src/__tests__/offline-network.integration.spec.tsx`, E2E: `e2e/offline-recovery-flow.spec.ts`, `e2e/offline-then-reconnect-sync.spec.ts` |
 | **Concurrency / consistency (shell)** | `e2e/multi-user-state-consistency.spec.ts`, `e2e/rapid-reroute-updates.spec.ts`, `e2e/concurrent-booking-conflict.spec.ts`, semantic `e2e/crowd-movement-consistency.spec.ts`, `e2e/waiting-time-capacity-enforcement.spec.ts`, `e2e/real-time-coordination-under-load.spec.ts` |
 | **Resilience (simulated)** | `e2e/backend-failure-recovery.spec.ts`; Functions: `retry-logic`, `booking-capacity-logic` |
