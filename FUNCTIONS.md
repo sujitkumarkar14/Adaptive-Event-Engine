@@ -35,7 +35,8 @@ This document catalogs the strictly typed, interoperable functions defining the 
 *   **`getGateEtasMatrix`:** Accepts **`request.data.origin` { lat, lng }** (or `latitude`/`longitude` / `originLat`/`originLng`). Audit category **`MATRIX_RANKING`**.
 *   **`translateAlert`:** Audit category **`A11Y_TRANSLATION`**.
 *   **`onRoutingPolicyRerouteNotify`:** When `routingPolicy/live.gateRerouteActive` flips on, sends FCM to topic `smart_reroute` (staff or auto).
-*   **`updateRoutingPolicyLive`:** Callable merge into `routingPolicy/live` (staff/admin claims in production; Firestore rules block direct client writes). Client: `src/services/staffRoutingPolicy.ts`.
+*   **`updateRoutingPolicyLive`:** Callable merge into `routingPolicy/live` (staff/admin claims in production; Firestore rules block direct client writes). Role gate: `functions/src/routingPolicyAuth.ts`. Client: `src/services/staffRoutingPolicy.ts`.
+*   **HTTP `400` bodies:** Error detail strings are length-limited via `sanitizeHttpErrorDetail` before JSON response.
 
 ### C. Sensors & Proximity
 *   **`detectBeaconProximity(callback)`:`(`src/services/bleProximity.ts`)`**

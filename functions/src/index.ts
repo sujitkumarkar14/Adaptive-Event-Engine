@@ -27,6 +27,8 @@ import {
     VertexAggregatorBodySchema,
 } from "./validation";
 import { enforceHttpRateLimit } from "./httpRateLimit";
+import { isRoutingPolicyRoleAllowed } from "./routingPolicyAuth";
+import { sanitizeHttpErrorDetail } from "./sanitizeHttpError";
 
 admin.initializeApp();
 
@@ -624,7 +626,7 @@ export const updateRoutingPolicyLive = functions.https.onCall(async (request) =>
     }
     const emulator = process.env.FUNCTIONS_EMULATOR === "true";
     const role = (request.auth.token as { role?: string }).role;
-    if (!emulator && role !== "staff" && role !== "admin") {
+    if (!isRoutingPolicyRoleAllowed(emulator, role)) {
         throw new functions.https.HttpsError(
             "permission-denied",
             "Staff or admin custom claim (role) required to update routing policy."
@@ -878,7 +880,10 @@ export const vertexAggregator = onRequest(
         const rawBody = req.body && typeof req.body === "object" ? req.body : {};
         const bodyParsed = parseJsonBody(rawBody, VertexAggregatorBodySchema);
         if (!bodyParsed.ok) {
-            res.status(400).json({ error: "invalid_body", detail: bodyParsed.error });
+            res.status(400).json({
+                error: "invalid_body",
+                detail: sanitizeHttpErrorDetail(bodyParsed.error),
+            });
             return;
         }
         const payload = bodyParsed.data;
@@ -1044,7 +1049,10 @@ export const broadcastEmergency = onRequest(
         const rawBody = req.body && typeof req.body === "object" ? req.body : {};
         const bodyParsed = parseJsonBody(rawBody, BroadcastEmergencyBodySchema);
         if (!bodyParsed.ok) {
-            res.status(400).json({ error: "invalid_body", detail: bodyParsed.error });
+            res.status(400).json({
+                error: "invalid_body",
+                detail: sanitizeHttpErrorDetail(bodyParsed.error),
+            });
             return;
         }
         const { type, location, key } = bodyParsed.data;

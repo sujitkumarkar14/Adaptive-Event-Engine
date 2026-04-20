@@ -22,9 +22,18 @@ dist-ssr
 *.md
 !README.md
 !FUNCTIONS.md
+!ARCHITECTURE.md
+!SECURITY.md
+!ACCESSIBILITY.md
+!PERFORMANCE.md
+!TESTING.md
+!PROBLEM_ALIGNMENT.md
+!GOOGLE_SERVICES.md
+!CONTRIBUTING.md
+!DECISIONS.md
 
-# Hackathon follow-up checklist (local)
-hackathon-changes.md
+# Local follow-up checklist (not committed)
+follow-up-changes.md
 
 # Stitch HTML design exports (large; optional in repo)
 stitch_adaptive_event_entry_system/

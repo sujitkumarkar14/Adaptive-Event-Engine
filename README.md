@@ -2,6 +2,33 @@
 
 **A Google Cloud–oriented venue choreography demo** built with React 19, Firebase (Firestore, Auth, FCM), and optional Google Cloud Spanner / Maps / Vertex paths behind feature flags and secrets.
 
+## Documentation index
+
+| Doc | Purpose |
+|-----|---------|
+| **`ARCHITECTURE.md`** | Repo layout, hot vs analytical path |
+| **`SECURITY.md`** | Threat model, auth, secrets, limits |
+| **`ACCESSIBILITY.md`** | a11y features and manual checks |
+| **`PERFORMANCE.md`** | Bundles, strategies, targets |
+| **`TESTING.md`** | Commands, CI, coverage policy |
+| **`PROBLEM_ALIGNMENT.md`** | Challenge dimensions → features |
+| **`GOOGLE_SERVICES.md`** | Service × purpose table |
+| **`CONTRIBUTING.md`** | Dev workflow |
+| **`DECISIONS.md`** | Lightweight ADRs |
+| **`FUNCTIONS.md`** | Server/client function catalog |
+
+## Engineering quality controls
+
+- **ESLint** in CI and locally (`npm run lint`)
+- **Vitest** unit/component tests + **coverage** thresholds (`vitest.config.ts`)
+- **Playwright** E2E on production build (Chromium in CI)
+- **Zod** on sensitive HTTP bodies in Cloud Functions
+- **Firestore security rules** + **callable** role checks for `routingPolicy`
+- **vitest-axe** on key screens
+- **Firebase** persistent local cache (multi-tab) for offline-friendly reads
+- **One-shot verify:** `npm run verify` or `./scripts/verify.sh`
+- **Bundle snapshot:** `npm run perf:report`
+
 ## Problem statement ↔ product mapping
 
 | Challenge | How this repo addresses it |
@@ -52,6 +79,34 @@ flowchart LR
   Call --> FS
 ```
 
+## Why Google Cloud is core
+
+The product is built around **live shared state** (Firestore), **identity** (Firebase Auth + claims), **server-only operations** (Cloud Functions + Spanner for consistency), **push coordination** (FCM), and **operational toggles** (Remote Config). Maps and Translation APIs support movement and inclusivity. That stack is the product—not a thin wrapper around a static site.
+
+## Google services used
+
+| Service | Used for | Why it matters |
+|---------|----------|----------------|
+| Firebase Auth | Sign-in, custom claims | Staff vs attendee capabilities |
+| Firestore | Live venue/user state | Real-time coordination |
+| Cloud Functions | Callables, HTTP, triggers | Policy updates, Spanner proxy, FCM subscribe |
+| FCM | Emergency + smart reroute topics | Alerts without polling |
+| Remote Config | Gate / feature toggles | Change behavior between events |
+| Cloud Spanner | Slot reservations | Strong consistency under load |
+| Maps Platform | Walking ETAs, gate matrix | Crowd movement |
+| App Check | Abuse reduction (optional) | Protect callable surfaces |
+| Cloud Build / Run | CI/CD, hosting | Deploy in GCP |
+
+More detail: **`GOOGLE_SERVICES.md`**.
+
+## Efficiency measures
+
+- Route-level **code splitting** (`React.lazy`).
+- **Lazy-loaded** map and command surfaces.
+- **Persistent Firestore cache** for degraded connectivity.
+- **Minimal hot-path compute** on the client for coordination (server enforces routing policy writes).
+- **Realtime listeners** instead of polling where possible.
+
 ## Bundle size (honest numbers)
 
 Production `vite build` splits the app and the Firebase SDK. Typical sizes from a recent build:
@@ -61,7 +116,7 @@ Production `vite build` splits the app and the Firebase SDK. Typical sizes from 
 | Main app chunk (`index-*.js`) | ~206 kB | ~65 kB |
 | Firebase SDK chunk | ~471 kB | ~142 kB |
 
-CSS is on the order of **~22 kB** minified (**~5 kB** gzip). Route-level code splitting (`React.lazy`) keeps secondary screens out of the first chunk where configured. The Firebase chunk is large by design; mitigations are lazy routes, avoiding unnecessary SDK imports, and not mounting Maps until needed.
+CSS is on the order of **~22 kB** minified (**~5 kB** gzip; includes reduced-motion base rules). Route-level code splitting (`React.lazy`) keeps secondary screens out of the first chunk where configured. The Firebase chunk is large by design; mitigations are lazy routes, avoiding unnecessary SDK imports, and not mounting Maps until needed.
 
 ## Performance & reliability targets (indicative)
 
@@ -74,6 +129,17 @@ These are **design targets**, not guaranteed SLAs. Measure in your own project a
 | FCM data message (topic) | Often **under 5–15 s** | Not real-time guaranteed; device state / Doze affect delivery. |
 | Degraded connectivity | Offline reads from cache | Writes queue until online (Firestore behavior). |
 
+## Security controls implemented
+
+- **Role-based access** for `routingPolicy` updates (`updateRoutingPolicyLive` + custom claims; see `functions/src/routingPolicyAuth.ts`).
+- **Firestore least-privilege rules**; sensitive docs not client-writable.
+- **Zod** validation on `vertexAggregator` and `broadcastEmergency` bodies.
+- **Secret-based** server operations (`defineSecret`); **constant-time** secret comparison.
+- **Per-IP HTTP rate limiting** (sliding window; instance-local—add **Cloud Armor** / quotas at the edge for global enforcement).
+- **App Check** support in the web client (optional; reCAPTCHA).
+- **Sanitized** HTTP error details (`sanitizeHttpErrorDetail`) on `400` responses.
+- **Production hardening:** document API key restrictions, IAM, Armor—see **`SECURITY.md`**.
+
 ## Security & abuse
 
 - **Secrets:** `defineSecret` for ingest/broadcast keys; **constant-time** compare for shared secrets.
@@ -85,12 +151,21 @@ These are **design targets**, not guaranteed SLAs. Measure in your own project a
 
 A **Chaos Controller** panel (dev / test / `VITE_ENABLE_CHAOS_CONTROLLER`) can simulate API failures, network loss, evacuation drills, and **demo role overrides** stored in **`localStorage`**. That override is for **local demos only**—it does not replace production Auth custom claims.
 
+## Accessibility features for large public venues
+
+- **Step-free routing** intent in navigation and egress messaging.
+- **Screen-reader–friendly** emergency and alert patterns (live regions, TTS where enabled).
+- **Keyboard-accessible** controls on primary flows; **skip link** to main content.
+- **Text-to-speech** for critical alerts via Web Speech API (`useTranslation`).
+- **Multilingual** copy path via translation hook.
+- **`prefers-reduced-motion`:** respected globally in `index.css` (reduces animations/transitions).
+
 ## Accessibility
 
 - **Intent:** Skip link, landmarks, live regions for alerts, keyboard-focusable controls where applicable.
 - **Automated:** `vitest-axe` on selected screens (e.g. `StaffDashboard`).
-- **Manual checklist (suggested):** Tab through booking → dashboard → staff surfaces; verify focus visible; verify emergency/alert paths are perceivable without color alone; respect **`prefers-reduced-motion`** where animations are added.
-- This does **not** certify WCAG **AAA** for the whole product—treat automated tests as **regression guards**.
+- **Manual checklist (suggested):** Tab through booking → dashboard → staff surfaces; verify focus visible; verify emergency/alert paths are perceivable without color alone.
+- This does **not** certify WCAG **AAA** for the whole product—treat automated tests as **regression guards**. See **`ACCESSIBILITY.md`**.
 
 ## Testing
 
@@ -116,4 +191,4 @@ Firebase **emulator** mode may use mock keys (e.g. `MOCK_VERTEX_INGEST_KEY`)—*
 
 React 19, Vite 8, Tailwind, Firebase JS SDK, Cloud Functions (Node 22), Vitest, Playwright, ESLint.
 
-See **`FUNCTIONS.md`** for a catalog of major client and server entry points.
+See **`FUNCTIONS.md`** for a catalog of major client and server entry points. **`CONTRIBUTING.md`** for the full local workflow.
