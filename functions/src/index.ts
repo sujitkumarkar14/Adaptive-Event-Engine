@@ -24,6 +24,7 @@ import { translateText, type TranslationLangCode } from "./translation";
 import {
     BroadcastEmergencyBodySchema,
     parseJsonBody,
+    ReserveSlotSchema,
     VertexAggregatorBodySchema,
 } from "./validation";
 import { enforceHttpRateLimit } from "./httpRateLimit";
@@ -96,16 +97,17 @@ export const reserveEntrySlot = functions.https.onCall({ secrets: [mapsPlatformK
         throw new functions.https.HttpsError("unauthenticated", "Request had no identity credentials.");
     }
 
-    const { slotId, gateId } = request.data as any;
-    if (!slotId || !gateId) {
+    const parsed = parseJsonBody(request.data, ReserveSlotSchema);
+    if (!parsed.ok) {
         logAuditJson({
             severity: "NOTICE",
             action: "SLOT_RESERVATION_INVALID",
-            reason: "missing_slot_or_gate",
+            reason: "validation_failed",
             uid: request.auth.uid,
         });
-        throw new functions.https.HttpsError("invalid-argument", "Missing slot or gate specifiers.");
+        throw new functions.https.HttpsError("invalid-argument", "Invalid slot or gate format.");
     }
+    const { slotId, gateId } = parsed.data;
 
     const uid = request.auth.uid;
 

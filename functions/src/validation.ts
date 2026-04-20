@@ -18,6 +18,20 @@ export const VertexAggregatorBodySchema = z
     })
     .passthrough();
 
+/** `reserveEntrySlot` callable — aligns with client booking payloads (`Booking.tsx`). */
+export const ReserveSlotSchema = z.object({
+    slotId: z
+        .string()
+        .min(1)
+        .max(64)
+        .regex(/^[a-zA-Z0-9_-]+$/),
+    gateId: z
+        .string()
+        .min(1)
+        .max(32)
+        .regex(/^[A-Z0-9_]+$/),
+});
+
 export function parseJsonBody<T>(raw: unknown, schema: z.ZodType<T>): { ok: true; data: T } | { ok: false; error: string } {
     const parsed = schema.safeParse(raw);
     if (!parsed.success) {

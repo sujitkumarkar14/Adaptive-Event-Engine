@@ -6,8 +6,10 @@
 |-------|---------|--------|
 | Unit / component | `npm test` | Vitest + Testing Library + jsdom |
 | Coverage | `npm run test:coverage` | Thresholds in `vitest.config.ts` (lines/statements **65%**, functions **60%**, branches **55%**) |
-| E2E | `npm run build && npm run test:e2e` | Playwright + Chromium; scenario shells in `e2e/*.spec.ts` |
+| E2E | `npm run build && npm run test:e2e` | Playwright + Chromium; scenario shells in `e2e/*.spec.ts`; authenticated flow in `e2e/attendee-authenticated-flow.spec.ts` when `E2E_TEST_EMAIL` / `E2E_TEST_PASSWORD` are set |
 | Functions | `cd functions && npm test` | Vitest (node), Zod + rate limit + auth helpers + `functions/src/__tests__` integration-style suites |
+| Functions + emulators (optional) | `npm run test:emulator` | `firebase emulators:exec` + `RUN_EMULATOR_TESTS=1` (see `functions/src/__tests__/emulator.integration.test.ts`) |
+| Callable load snapshot | `npm run test:load` | Writes `artifacts/load-test-results.json` (configure `LOAD_TEST_URL` / `LOAD_TEST_CONCURRENCY`) |
 | Functions build | `cd functions && npm run build` | `tsc` |
 
 ## Product dimensions → tests

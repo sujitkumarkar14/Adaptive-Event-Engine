@@ -4,7 +4,7 @@
 
 ## Implemented
 
-- **Skip link** to `#main-content` in `App.jsx`.
+- **Skip link** to `#main-content` in `App.tsx`.
 - **Semantic regions** and headings on major pages; **live regions** for alerts where used.
 - **Keyboard:** focusable cards/buttons; Stark components use native `button` / labeled inputs.
 - **TTS:** Web Speech API for evacuation/alert copy via `useTranslation` where enabled.

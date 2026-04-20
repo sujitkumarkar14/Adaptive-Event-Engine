@@ -13,7 +13,7 @@ Typical production output (see `README.md` for latest):
 
 ## Strategies
 
-- **Route-level code splitting** via `React.lazy` in `App.jsx`.
+- **Route-level code splitting** via `React.lazy` in `App.tsx`.
 - **Firebase** isolated in its own async chunk.
 - **Firestore:** `persistentLocalCache` + multi-tab manager for offline-friendly reads.
 - **Realtime:** Firestore listeners and FCM topics instead of polling where possible.

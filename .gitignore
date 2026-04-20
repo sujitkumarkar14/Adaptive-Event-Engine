@@ -33,6 +33,7 @@ dist-ssr
 !DECISIONS.md
 !VALIDATION_MATRIX.md
 !RESILIENCE.md
+!SECURITY_RUNBOOK.md
 !follow-up-changes.md
 !docs/accessibility-audit.md
 !docs/screenshots/README.md
@@ -42,6 +43,7 @@ artifacts/**
 !artifacts/perf-summary.json
 !artifacts/concurrency-summary.json
 !artifacts/scale-simulation.json
+!artifacts/load-test-results.json
 
 # Stitch HTML design exports (large; optional in repo)
 stitch_adaptive_event_entry_system/

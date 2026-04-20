@@ -5,7 +5,7 @@
 | Area | Role |
 |------|------|
 | `src/` | React 19 SPA: pages, components, hooks, services, store (`entryStore`), Firebase bootstrap (`lib/firebase.ts`). |
-| `src/pages/` | Route targets (lazy-loaded from `App.jsx`). |
+| `src/pages/` | Route targets (lazy-loaded from `App.tsx`). |
 | `src/components/` | Shared UI (e.g. `StarkComponents`, navigation, admin tools). |
 | `src/services/` | Client helpers (routing, BLE stubs, **staff routing policy** callable wrapper). |
 | `functions/src/` | Cloud Functions: HTTPS callables, HTTP ingress (`vertexAggregator`, `broadcastEmergency`), Firestore triggers, Spanner booking proxy, Zod validation, rate limiting. |

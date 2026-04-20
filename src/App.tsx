@@ -6,6 +6,8 @@ import { TopNavBar, SideNavBar, BottomNav, DataFreshnessFooter } from './compone
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { RoleRoute } from './components/RoleRoute';
 import { useAppOrchestration } from './hooks/useAppOrchestration';
+import { AppErrorBoundary } from './components/AppErrorBoundary';
+import { TtsFallbackNotice } from './components/TtsFallbackNotice';
 
 const Login = React.lazy(() => import('./pages/Login'));
 const Onboarding = React.lazy(() => import('./pages/Onboarding'));
@@ -74,6 +76,7 @@ function AppShell() {
 
   return (
     <div className={`flex bg-[#ffffff] min-h-screen font-body text-on-surface ${globalClass}`}>
+      <TtsFallbackNotice />
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-inverse-surface focus:text-inverse-on-surface focus:font-black focus:uppercase focus:tracking-widest top-0 left-0"
@@ -190,13 +193,15 @@ function AppShell() {
 
 function App() {
   return (
-    <EntryProvider>
-      <AuthProvider>
-        <Router>
-          <AppShell />
-        </Router>
-      </AuthProvider>
-    </EntryProvider>
+    <AppErrorBoundary>
+      <EntryProvider>
+        <AuthProvider>
+          <Router>
+            <AppShell />
+          </Router>
+        </AuthProvider>
+      </EntryProvider>
+    </AppErrorBoundary>
   );
 }
 

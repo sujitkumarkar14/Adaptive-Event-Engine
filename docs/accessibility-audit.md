@@ -15,13 +15,19 @@ This document records **evidence-oriented** accessibility checks for the Adaptiv
 
 ## Contrast (WCAG 2.1 AA target)
 
-| Check | Method | Result (summary) |
-|-------|--------|------------------|
-| Primary body / headings on default surfaces | Manual: browser DevTools **Accessibility** → **Contrast** (Chrome) or **Accessibility Insights** contrast checks on representative screens | **Pass (informal):** default text uses on-surface / on-surface-variant tokens on light surfaces; high-emergency banners use **text + layout + borders**, not color alone. |
-| Error text on login | Same, on `#login` error `role="alert"` region when visible | **Pass (informal):** error copy on `error-container` / `on-error-container` pair reviewed for legibility. |
-| Focus visibility | Keyboard tab through login → primary actions | **Pass:** `focus-visible` rings on Stark buttons/inputs (see `ACCESSIBILITY.md`). |
+Ratios use the **relative luminance** formula (WCAG 2.1 success criterion 1.4.3) on hex values from `tailwind.config.js` (design tokens). Normal text requires **4.5:1**; large text (18pt+ or 14pt+ bold) **3:1**; non-text UI focus indicators **3:1** where applicable.
 
-**Note:** Automated **axe** runs in CI catch many contrast issues on tested DOM trees; spot-check **high-contrast mode** (OS) on staging for regressions.
+| Element | Foreground | Background | Ratio | WCAG AA (normal 4.5:1) |
+|---------|------------|--------------|-------|-------------------------|
+| Body text | `#1a1b1e` (`on-surface`) | `#faf9fd` (`surface`) | **16.43:1** | PASS |
+| Login / form error text | `#93000a` (`on-error-container`) | `#ffdad6` (`error-container`) | **7.24:1** | PASS |
+| Primary button label | `#ffffff` (`on-primary`) | `#005bbf` (`primary`) | **6.46:1** | PASS |
+| Focus ring (primary on surface) | `#005bbf` | `#faf9fd` | **6.17:1** | PASS |
+| Global evac banner (current) | `#ba1a1a` (`text-error`) | `#000000` | **3.25:1** | **Below 4.5:1** — acceptable for **large / bold** display type (3:1); borders + copy reduce reliance on color alone. Prefer `#ffffff` on `#ba1a1a` (**6.46:1**) for small error text. |
+
+**Method:** computed in-repo with the WCAG luminance formula (same as Chrome DevTools contrast). Re-verify in **Chrome → Inspect → Accessibility → Contrast** after visual changes.
+
+**Note:** Automated **axe** runs in CI still act as regression guards; this table is the **numeric** evidence trail.
 
 ---
 

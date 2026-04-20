@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
 import { StarkButton, StarkInput } from '../components/common/StarkComponents';
+import { useEntryStore } from '../store/entryStore';
+import { translateAlertText, type AlertLang } from '../services/translationClient';
 
 export const Concierge = () => {
+  const { state } = useEntryStore();
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
+  const [query, setQuery] = useState('');
+  const [answer, setAnswer] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const toggleVoice = () => {
     setIsListening(!isListening);
@@ -12,6 +18,21 @@ export const Concierge = () => {
       setTimeout(() => setTranscript('Where is the nearest step-free gate?'), 2000);
     } else {
       setTranscript('');
+    }
+  };
+
+  const handleQuery = async () => {
+    if (!query.trim()) return;
+    setLoading(true);
+    setAnswer('');
+    try {
+      const translated = await translateAlertText(
+        query.trim(),
+        state.preferredContentLanguage as AlertLang
+      );
+      setAnswer(translated);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -25,12 +46,19 @@ export const Concierge = () => {
       </div>
 
       <div className="flex-grow flex flex-col items-center justify-center gap-8 mb-8">
-        <div 
+        <div
           className={`w-48 h-48 rounded-none border-4 flex items-center justify-center transition-all ${
-            isListening ? 'border-primary bg-primary-fixed animate-pulse text-primary' : 'border-outline-variant text-outline'
+            isListening
+              ? 'border-primary bg-primary-fixed animate-pulse text-primary'
+              : 'border-outline-variant text-outline'
           }`}
         >
-          <span className="material-symbols-outlined normal-case text-6xl" style={{fontVariationSettings: "'FILL' 1"}}>mic</span>
+          <span
+            className="material-symbols-outlined normal-case text-6xl"
+            style={{ fontVariationSettings: "'FILL' 1" }}
+          >
+            mic
+          </span>
         </div>
 
         <div className="text-center h-16 px-4">
@@ -39,10 +67,24 @@ export const Concierge = () => {
       </div>
 
       <div className="mt-auto space-y-4 border-t-[1px] border-outline-variant pt-8">
-        <StarkInput 
-          label="Manual Query" 
-          placeholder="Ask for directions or assistance..."
+        <StarkInput
+          label="Ask for directions or assistance"
+          placeholder="e.g. Where is the nearest step-free gate?"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
         />
+        <StarkButton fullWidth onClick={handleQuery} disabled={loading}>
+          {loading ? 'Translating…' : 'Submit (Cloud Translation)'}
+        </StarkButton>
+        {answer ? (
+          <p
+            role="status"
+            aria-live="polite"
+            className="mt-4 font-bold text-lg text-on-surface border-2 border-outline-variant p-4 bg-surface-container-lowest"
+          >
+            {answer}
+          </p>
+        ) : null}
         <StarkButton fullWidth onClick={toggleVoice} variant={isListening ? 'secondary' : 'primary'}>
           {isListening ? 'Stop Listening' : 'Hold to Speak'}
         </StarkButton>

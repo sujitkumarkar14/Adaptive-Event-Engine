@@ -8,6 +8,11 @@ describe('useTranslation', () => {
     expect(result.current.t('any.key', 'Fallback copy')).toBe('Fallback copy');
   });
 
+  it('exposes ttsSupported when speechSynthesis is present', () => {
+    const { result } = renderHook(() => useTranslation());
+    expect(typeof result.current.ttsSupported).toBe('boolean');
+  });
+
   it('announceEmergency calls speechSynthesis.speak when available', () => {
     const speak = vi.fn();
     const orig = window.speechSynthesis;

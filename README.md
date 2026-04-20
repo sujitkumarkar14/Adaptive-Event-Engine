@@ -8,6 +8,7 @@
 |-----|---------|
 | **`ARCHITECTURE.md`** | Repo layout, hot vs analytical path |
 | **`SECURITY.md`** | Threat model, auth, secrets, limits |
+| **`SECURITY_RUNBOOK.md`** | Secret rotation, App Check, Armor, incident checklist |
 | **`ACCESSIBILITY.md`** | a11y features and manual checks |
 | **`docs/accessibility-audit.md`** | Contrast + screen reader audit trail (evidence-oriented) |
 | **`PERFORMANCE.md`** | Bundles, strategies, targets |

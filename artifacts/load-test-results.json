@@ -1,0 +1,9 @@
+{
+  "concurrency": 50,
+  "targetUrl": "http://127.0.0.1:5001/adaptive-entry/us-central1/reserveEntrySlot",
+  "durationMs": 0,
+  "fulfilled": 0,
+  "rejected": 0,
+  "note": "Placeholder. Run `npm run test:load` with Functions emulator or set LOAD_TEST_URL to refresh this file.",
+  "generatedAt": "1970-01-01T00:00:00.000Z"
+}

@@ -1,5 +1,7 @@
 # Security — Adaptive Entry 360
 
+Operational rotation, App Check rollout, and incident steps: **`SECURITY_RUNBOOK.md`**.
+
 ## Threat model (summary)
 
 | Asset | Risk | Mitigation in repo |
@@ -7,7 +9,7 @@
 | Firestore data | Unauthorized read/write | Security rules; sensitive paths (e.g. `routingPolicy`) client **read-only**; writes via **callable** + role claims. |
 | HTTP ingest / broadcast | Key theft, flooding | Shared secrets (`defineSecret`), **constant-time** compare, **Zod** bodies, **per-IP rate limits** (instance-local; add **Cloud Armor** in prod). |
 | Web client | Scraping, abuse | **App Check** optional; API key **HTTP referrer** restrictions (document in GCP); least-privilege **IAM** for deploy. |
-| Demo overrides | Confusion with real RBAC | `localStorage` demo role only in dev/test; **not** enforced server-side. |
+| Demo overrides | Confusion with real RBAC | Demo role is read from `localStorage` only when **`import.meta.env.DEV`** or **`VITE_ENABLE_CHAOS_CONTROLLER`** is set (see `AuthContext`); **not** a server-side security boundary. |
 
 ## Auth & roles
 

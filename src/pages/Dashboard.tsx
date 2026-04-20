@@ -57,6 +57,7 @@ export const Dashboard = () => {
   const [exitOptimizationBusy, setExitOptimizationBusy] = useState(false);
   const [exitRouteLayer, setExitRouteLayer] = useState<StarkRouteLayer | null>(null);
   const [pendingVoucherCode, setPendingVoucherCode] = useState<string | null>(null);
+  const [gateWaitMins, setGateWaitMins] = useState<number | null>(null);
   const sosSubmittedRef = useRef(false);
 
   useEffect(() => {
@@ -109,6 +110,29 @@ export const Dashboard = () => {
     });
     return () => unsub();
   }, [user?.uid]);
+
+  useEffect(() => {
+    if (role === 'staff' || role === 'admin') {
+      setGateWaitMins(null);
+      return;
+    }
+    const gid = state.gatePressureGateId ?? DEFAULT_BOOKING_GATE_ID;
+    const ref = doc(db, 'gateLogistics', gid);
+    const unsub = onSnapshot(
+      ref,
+      (snap) => {
+        const d = snap.data() as { currentPressure?: number } | undefined;
+        const p = d?.currentPressure;
+        if (typeof p === 'number' && Number.isFinite(p)) {
+          setGateWaitMins(Math.round(Math.max(0, Math.min(100, p)) * 0.25));
+        } else {
+          setGateWaitMins(null);
+        }
+      },
+      () => setGateWaitMins(null)
+    );
+    return () => unsub();
+  }, [state.gatePressureGateId, role]);
 
   const gateRerouteActive =
     Boolean(routingPolicy?.gateRerouteActive) || rcRerouteActive;
@@ -425,6 +449,25 @@ export const Dashboard = () => {
         onExitOptimization={handleExitOptimization}
         exitOptimizationBusy={exitOptimizationBusy}
       />
+
+      {role !== 'staff' && role !== 'admin' && gateWaitMins !== null ? (
+        <div
+          role="status"
+          aria-live="polite"
+          className="border-2 border-outline-variant bg-surface-container-lowest p-4 mb-4"
+        >
+          <p className="text-xs font-black uppercase tracking-widest text-on-surface-variant mb-1">
+            Estimated gate wait
+          </p>
+          <p className="text-2xl font-black text-on-surface">
+            {gateWaitMins}{' '}
+            <span className="text-sm font-bold normal-case tracking-normal">min</span>
+          </p>
+          <p className="text-[10px] text-on-surface-variant mt-2 uppercase tracking-wider">
+            From live pressure at {state.gatePressureGateId ?? DEFAULT_BOOKING_GATE_ID}
+          </p>
+        </div>
+      ) : null}
 
       {pendingVoucherCode ? (
         <RewardUnlockedCard voucherCode={pendingVoucherCode} onDismiss={dismissReward} />
