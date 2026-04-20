@@ -16,22 +16,9 @@ dist-ssr
 .env
 .env.*.local
 
-# Local / hackathon docs (not pushed to GitHub)
-DEMO_GUIDE.md
-complex.md
-CHECKLIST.md
-checklist.md
-gemini.md
-goal.md
-RUBRIC_COMPLIANCE.md
-todo.md
-plan.md
-done.md
-summary.md
-TEST_RESULTS.md
-FUNCTIONS.md
-# Template: normally committed; ignore only if you keep secrets out of repo entirely
-.env.example
+# Personal / local Markdown — do not commit (keep only README.md)
+*.md
+!README.md
 
 # Stitch HTML design exports (large; optional in repo)
 stitch_adaptive_event_entry_system/
@@ -46,3 +33,6 @@ stitch_adaptive_event_entry_system/
 *.njsproj
 *.sln
 *.sw?
+
+# Cloud Functions build output (rebuilt on deploy)
+functions/lib/

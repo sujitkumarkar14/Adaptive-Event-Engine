@@ -64,7 +64,8 @@ remoteConfig.settings.minimumFetchIntervalMillis = Number.isFinite(remoteConfigM
   ? remoteConfigMinFetch
   : 3600000;
 remoteConfig.defaultConfig = {
-  gate_2_status: "OPEN"
+  gate_2_status: "OPEN",
+  gate_reroute_active: "false"
 };
 
 export const initRemoteConfig = async () => {

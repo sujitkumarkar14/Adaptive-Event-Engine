@@ -13,5 +13,28 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow write: if false;
     }
+
+    // Staff dashboard broadcasts reroute policy; tighten to token claims in production.
+    match /routingPolicy/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // Segmented FCM: device token + current zone for congestion nudges (each user owns their doc).
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Bottom-up priority signals: attendee owns one doc keyed by uid; staff/admin may monitor collection.
+    match /userAlerts/{uid} {
+      allow read: if request.auth != null && (
+        request.auth.uid == uid ||
+        request.auth.token.role == 'staff' ||
+        request.auth.token.role == 'admin'
+      );
+      allow create, update: if request.auth != null && request.auth.uid == uid;
+      allow delete: if false;
+    }
   }
 }

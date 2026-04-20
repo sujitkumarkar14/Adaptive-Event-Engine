@@ -1,6 +1,33 @@
 import React from 'react';
 import { StarkCard, StarkButton } from '../components/common/StarkComponents';
 
+export function RewardUnlockedCard({
+  voucherCode,
+  onDismiss,
+}: {
+  voucherCode: string;
+  onDismiss?: () => void;
+}) {
+  return (
+    <StarkCard
+      title="Reward unlocked"
+      subtitle="Venue coordination incentive"
+      active
+      className="border-4 border-black"
+    >
+      <p className="mt-4 font-mono text-xl font-black tracking-widest text-on-surface">{voucherCode}</p>
+      <p className="mt-2 text-xs font-bold uppercase tracking-widest text-on-surface-variant">
+        Show this code at participating concessions (demo).
+      </p>
+      {onDismiss ? (
+        <StarkButton variant="secondary" fullWidth className="mt-6 uppercase tracking-widest" onClick={onDismiss}>
+          Dismiss
+        </StarkButton>
+      ) : null}
+    </StarkCard>
+  );
+}
+
 export const Vouchers = () => {
   return (
     <section className="flex flex-col h-full">

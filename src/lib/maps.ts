@@ -1,5 +1,8 @@
+import { httpsCallable } from 'firebase/functions';
 import { STITCH_VENUE_SVG_FALLBACK } from './stitchVenueSvg';
 import { devLog, devWarn } from './debug';
+import { functions } from './firebase';
+import { PARKING_LOT_ORIGIN } from './constants';
 
 export type FeatureCollectionLike = {
   type: 'FeatureCollection';
@@ -103,4 +106,29 @@ export const fetchVenuePolygons = async (venueId: string): Promise<VenuePolygonR
   };
 };
 
+export type ConcourseCopilotResult = {
+  tip: string;
+  places: Array<{
+    name: string;
+    distanceMeters?: number;
+    wheelchairAccessibleEntrance?: boolean;
+  }>;
+};
+
+/**
+ * Places API (New) via authenticated callable — keeps API key off the client bundle.
+ */
+export async function fetchConcourseCopilotTip(params: {
+  latitude: number;
+  longitude: number;
+  wheelchairAccessibleOnly: boolean;
+}): Promise<ConcourseCopilotResult> {
+  const callable = httpsCallable(functions, 'searchNearbyAmenities');
+  const { data } = await callable(params);
+  return data as ConcourseCopilotResult;
+}
+
 export { STITCH_VENUE_SVG_FALLBACK };
+
+/** Static lot waypoint shared with `calculateOptimalPath` (return-to-vehicle mode). */
+export { PARKING_LOT_ORIGIN };

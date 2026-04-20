@@ -5,6 +5,9 @@ export type SystemPhase = 'PRE_EVENT' | 'IN_JOURNEY' | 'ARRIVAL' | 'EMERGENCY';
 export type TransportMode = 'Car' | 'Metro' | 'Shuttle' | null;
 export type BookingStatus = 'idle' | 'loading' | 'success' | 'error';
 
+/** Evacuation / alert copy + Matrix UI (a11y inclusion — Hindi / Telugu). */
+export type PreferredContentLanguage = 'en' | 'hi' | 'te';
+
 export interface EntryState {
   phase: SystemPhase;
   transportMode: TransportMode;
@@ -30,6 +33,8 @@ export interface EntryState {
   bookingTransactionId: string | null;
   /** Ephemeral copy for `aria-live` regions (BottomNav / Dashboard) */
   a11yStatus: string;
+  /** Used for translated evacuation banners and concourse alerts. */
+  preferredContentLanguage: PreferredContentLanguage;
 }
 
 export type EntryAction =
@@ -56,7 +61,8 @@ export type EntryAction =
         transactionId?: string | null;
       };
     }
-  | { type: 'CLEAR_A11Y' };
+  | { type: 'CLEAR_A11Y' }
+  | { type: 'SET_PREFERRED_CONTENT_LANGUAGE'; payload: PreferredContentLanguage };
 
 // --- INITIAL STATE ---
 const initialState: EntryState = {
@@ -81,6 +87,7 @@ const initialState: EntryState = {
   bookingError: null,
   bookingTransactionId: null,
   a11yStatus: '',
+  preferredContentLanguage: 'en',
 };
 
 // --- REDUCER (The Matrix Logic) ---
@@ -136,6 +143,8 @@ export function entryReducer(state: EntryState, action: EntryAction): EntryState
       };
     case 'CLEAR_A11Y':
       return { ...state, a11yStatus: '' };
+    case 'SET_PREFERRED_CONTENT_LANGUAGE':
+      return { ...state, preferredContentLanguage: action.payload };
     case 'API_FAILURE':
       console.warn(`[REILIENCE] API Error (${action.payload}). Yielding to last known Firestore IndexedDB cache.`);
       return state;

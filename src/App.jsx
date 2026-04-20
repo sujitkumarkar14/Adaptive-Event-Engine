@@ -2,8 +2,9 @@ import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { EntryProvider, useEntryStore } from './store/entryStore';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { TopNavBar, SideNavBar, BottomNav, DataFreshnessFooter } from './components/common/Navigation';
+import { TopNavBar, SideNavBar, BottomNav, DataFreshnessFooter } from './components/navigation/Navigation';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { RoleRoute } from './components/RoleRoute';
 import { useAppOrchestration } from './hooks/useAppOrchestration';
 
 const Login = React.lazy(() => import('./pages/Login'));
@@ -21,6 +22,8 @@ const AeroMetric = React.lazy(() =>
 const GateSupervisor = React.lazy(() =>
   import('./pages/CommandDashboards').then((module) => ({ default: module.GateCommand }))
 );
+const StaffDashboard = React.lazy(() => import('./pages/StaffDashboard'));
+const Unauthorized = React.lazy(() => import('./pages/Unauthorized'));
 
 function LoginRoute() {
   const { user, loading } = useAuth();
@@ -136,26 +139,42 @@ function AppShell() {
               }
             />
             <Route
+              path="/staff"
+              element={
+                <RoleRoute allowedRoles={['staff', 'admin']}>
+                  <StaffDashboard />
+                </RoleRoute>
+              }
+            />
+            <Route
               path="/command/traffic"
               element={
-                <ProtectedRoute>
+                <RoleRoute allowedRoles={['staff', 'admin']}>
                   <TrafficMatrix />
-                </ProtectedRoute>
+                </RoleRoute>
               }
             />
             <Route
               path="/command/aero"
               element={
-                <ProtectedRoute>
+                <RoleRoute allowedRoles={['staff', 'admin']}>
                   <AeroMetric />
-                </ProtectedRoute>
+                </RoleRoute>
               }
             />
             <Route
               path="/command/gates"
               element={
-                <ProtectedRoute>
+                <RoleRoute allowedRoles={['staff', 'admin']}>
                   <GateSupervisor />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/unauthorized"
+              element={
+                <ProtectedRoute>
+                  <Unauthorized />
                 </ProtectedRoute>
               }
             />

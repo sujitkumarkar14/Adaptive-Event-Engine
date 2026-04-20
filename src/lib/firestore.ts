@@ -4,7 +4,8 @@ import { db } from './firebase';
 import type { EntryAction } from '../store/entryStore';
 
 interface GatePressureDoc {
-  currentPressure: number;
+  currentPressure?: number;
+  pressurePercent?: number;
   lastUpdated?: Timestamp | Date;
 }
 
@@ -26,8 +27,13 @@ export const syncGatePressure = (gateId: string, dispatch: Dispatch<EntryAction>
     (snapshot) => {
       if (!snapshot.exists()) return;
       const raw = snapshot.data() as GatePressureDoc;
-      const percent =
-        typeof raw.currentPressure === 'number' ? raw.currentPressure : Number(raw.currentPressure) || 0;
+      const fromPressure =
+        typeof raw.pressurePercent === 'number'
+          ? raw.pressurePercent
+          : typeof raw.currentPressure === 'number'
+            ? raw.currentPressure
+            : Number(raw.pressurePercent ?? raw.currentPressure) || 0;
+      const percent = Math.min(100, Math.max(0, fromPressure));
       const at = coerceDate(raw.lastUpdated);
       dispatch({
         type: 'UPDATE_GATE_PRESSURE',

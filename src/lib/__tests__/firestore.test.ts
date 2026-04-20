@@ -61,6 +61,29 @@ describe('syncGatePressure', () => {
     expect(dispatch).not.toHaveBeenCalled();
   });
 
+  it('prefers pressurePercent over currentPressure when both exist', () => {
+    const dispatch = vi.fn();
+
+    mockOnSnapshot.mockImplementation((_ref: unknown, onNext: (s: unknown) => void) => {
+      onNext({
+        exists: () => true,
+        data: () => ({
+          currentPressure: 50,
+          pressurePercent: 77,
+          lastUpdated: new Date(),
+        }),
+      });
+      return vi.fn();
+    });
+
+    syncGatePressure('GATE_P', dispatch);
+    const action = dispatch.mock.calls[0][0];
+    expect(action.type).toBe('UPDATE_GATE_PRESSURE');
+    if (action.type === 'UPDATE_GATE_PRESSURE') {
+      expect(action.payload.percent).toBe(77);
+    }
+  });
+
   it('logs when snapshot errors', () => {
     const dispatch = vi.fn();
     const errLog = vi.spyOn(console, 'error').mockImplementation(() => {});

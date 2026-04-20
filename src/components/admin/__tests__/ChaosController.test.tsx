@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { DEMO_ROLE_STORAGE_KEY } from '../../../contexts/AuthContext';
 import { ChaosController } from '../ChaosController';
 
 const mockDispatch = vi.fn();
@@ -11,6 +12,11 @@ vi.mock('../../../store/entryStore', () => ({
 describe('ChaosController', () => {
   beforeEach(() => {
     mockDispatch.mockClear();
+    localStorage.removeItem(DEMO_ROLE_STORAGE_KEY);
+  });
+
+  afterEach(() => {
+    localStorage.removeItem(DEMO_ROLE_STORAGE_KEY);
   });
 
   it('dispatches SET_NETWORK_STATUS false when killing network', () => {
@@ -26,6 +32,24 @@ describe('ChaosController', () => {
       type: 'API_FAILURE',
       payload: '502 Bad Gateway Vertex',
     });
+  });
+
+  it('stores demo staff role and fires demo-role-changed for role switcher', () => {
+    const dispatchEvt = vi.spyOn(window, 'dispatchEvent');
+    render(<ChaosController />);
+    fireEvent.click(screen.getByRole('button', { name: /^Staff$/i }));
+    expect(localStorage.getItem(DEMO_ROLE_STORAGE_KEY)).toBe('staff');
+    expect(dispatchEvt).toHaveBeenCalled();
+    const evt = dispatchEvt.mock.calls.find((c) => c[0]?.type === 'demo-role-changed');
+    expect(evt?.[0]?.type).toBe('demo-role-changed');
+    dispatchEvt.mockRestore();
+  });
+
+  it('clears demo role when Use token is chosen', () => {
+    localStorage.setItem(DEMO_ROLE_STORAGE_KEY, 'admin');
+    render(<ChaosController />);
+    fireEvent.click(screen.getByRole('button', { name: /use token/i }));
+    expect(localStorage.getItem(DEMO_ROLE_STORAGE_KEY)).toBeNull();
   });
 
   it('dispatches TRIGGER_EMERGENCY and announces evacuation for evac drill', () => {

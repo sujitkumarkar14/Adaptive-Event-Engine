@@ -6,13 +6,16 @@ import { syncGatePressure } from '../lib/firestore';
 import { useEntryStore } from '../store/entryStore';
 import { useTranslation } from './useTranslation';
 import { DEFAULT_BOOKING_GATE_ID } from '../lib/constants';
+import { subscribeVenueFcmTopics } from '../lib/fcmRegister';
 
 /**
  * Remote Config bootstrap, authenticated gate pressure sync, and global emergency Firestore mesh.
  * Isolated from UI; mounted once from the app shell.
  */
 export function useAppOrchestration(user: User | null) {
-  const { dispatch } = useEntryStore();
+  const { dispatch, state } = useEntryStore();
+  const stepFreeRequired = state.stepFreeRequired;
+  const stepFreePref = state.accessibility.stepFree;
   const { announceEmergency, t } = useTranslation();
   const emergencyActiveRef = useRef(false);
 
@@ -35,23 +38,35 @@ export function useAppOrchestration(user: User | null) {
   }, [dispatch, user]);
 
   useEffect(() => {
+    if (!user) return;
+    void subscribeVenueFcmTopics().catch(() => undefined);
+  }, [user]);
+
+  useEffect(() => {
     const unsub = onSnapshot(doc(db, 'globalEvents', 'emergency'), (snap) => {
       const d = snap.data();
       if (d?.active === true) {
         if (!emergencyActiveRef.current) {
           emergencyActiveRef.current = true;
           dispatch({ type: 'TRIGGER_EMERGENCY' });
-          announceEmergency(
-            t(
-              'emergency.evacuate',
-              'Emergency detected. Please proceed to the nearest marked exit immediately.'
-            )
-          );
+          const needsStepFree = stepFreePref || stepFreeRequired;
+          if (needsStepFree) {
+            announceEmergency(
+              'Emergency detected. Please proceed to the nearest Step-Free exit located at Section 102.'
+            );
+          } else {
+            announceEmergency(
+              t(
+                'emergency.evacuate',
+                'Emergency detected. Please proceed to the nearest marked exit immediately.'
+              )
+            );
+          }
         }
       } else {
         emergencyActiveRef.current = false;
       }
     });
     return () => unsub();
-  }, [dispatch, announceEmergency, t]);
+  }, [dispatch, announceEmergency, t, stepFreePref, stepFreeRequired]);
 }

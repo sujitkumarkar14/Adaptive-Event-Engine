@@ -22,6 +22,8 @@ interface ImportMetaEnv {
   readonly VITE_APP_ENVIRONMENT?: string;
   /** Set `"true"` to skip Firebase App Check initialization (recommended for localhost if Auth fails with App Check / reCAPTCHA). */
   readonly VITE_DISABLE_APP_CHECK?: string;
+  /** Web Push public key from Firebase Console → Cloud Messaging (FCM in browser + service worker). */
+  readonly VITE_FCM_VAPID_KEY?: string;
 }
 
 interface ImportMeta {

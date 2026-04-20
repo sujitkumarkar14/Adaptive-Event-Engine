@@ -14,6 +14,11 @@ describe('calculateOptimalPath', () => {
     expect(a!.perimeterToSeatTime).toBe('18 mins');
     expect(a!.pathNodes[1].description).toBe('Elevator Bank C');
     expect(a!.status).toBe('OPTIMIZED_VIA_MOCK');
+    expect(a!.encodedPolyline).toBeDefined();
+    expect(typeof a!.encodedPolyline).toBe('string');
+    expect(a!.encodedPolyline!.length).toBeGreaterThan(4);
+    expect(a!.distanceMeters).toBe(420);
+    expect(a!.durationSeconds).toBe(1080);
 
     const b = await calculateOptimalPath({
       originLat: 1,
@@ -23,6 +28,23 @@ describe('calculateOptimalPath', () => {
     });
     expect(b!.perimeterToSeatTime).toBe('12 mins');
     expect(b!.pathNodes[1].description).toBe('Stairwell B');
+    expect(b!.durationSeconds).toBe(720);
     log.mockRestore();
+  });
+
+  it('uses parking destination when returnToVehicle is true (mock path)', async () => {
+    const r = await calculateOptimalPath({
+      originLat: 10,
+      originLng: -20,
+      destinationGate: 'GATE_A',
+      stepFreeRequired: false,
+      priority: 'standard',
+      returnToVehicle: true,
+    });
+    expect(r).not.toBeNull();
+    expect(r!.perimeterToSeatTime).toBe('9 mins to lot');
+    expect(r!.pathNodes.length).toBe(2);
+    expect(r!.pathNodes[1].description).toBe('Parking zone');
+    expect(r!.status).toBe('OPTIMIZED_VIA_MOCK');
   });
 });
