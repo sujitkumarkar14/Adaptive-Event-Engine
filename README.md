@@ -1,34 +1,69 @@
-# Adaptive Entry 360  
-**A Google Cloud Native Venue Choreography Engine**
+# Adaptive Entry 360
 
-Adaptive Entry 360 is not a standard React prototype. It is a functionally resilient, offline-first choreography engine built specifically for 132k-capacity stadium parameters leveraging edge computing and split-path Google Cloud architectures.
+**A Google Cloud–oriented venue choreography demo** built with React 19, Firebase (Firestore, Auth, FCM), and optional Google Cloud Spanner / Maps / Vertex paths behind feature flags and secrets.
 
-## The Architecture (Split Path)
+## Architecture (split path)
 
-We structured the engine to bypass cellular congestion points natively by splitting the logic into two paths:
+1. **Hot path (Firestore + IndexedDB)**  
+   Primary sync uses Firebase with IndexedDB persistence where enabled. When connectivity drops, the client can lean on cached state for read-heavy flows.
 
-1.  **The "Hot Path" (Firestore + IndexedDB)**
-    Primary synchronization passes through Firebase utilizing `enableIndexedDbPersistence`. When a venue encounters a massive 0kbps cellular blackout, the React state-machine natively yields to the last known cache, allowing security routing to operate completely offline.
-    
-2.  **The "Analytical Path" (Cloud Spanner + Cloud Run)**
-    When you attempt to book a slot alongside 10,000 other attendees, that payload routes to a specific Cloud Function protected by Google Cloud Secret Keys (`defineSecret`). It hits **Google Cloud Spanner** invoking a strict `database.runTransactionAsync` consistency lock to prevent database overbooking at global scale natively.
+2. **Analytical path (Cloud Functions + Spanner / HTTP)**  
+   Booking and other high-consistency flows can route through HTTPS functions that talk to **Cloud Spanner** with transactional guards. HTTP endpoints such as **`vertexAggregator`** and **`broadcastEmergency`** validate JSON bodies with **Zod** before applying side effects.
 
-## 189 kB (The Speed Constraint)
-To operate efficiently in crushing cell-density situations, we eradicated heavy component libraries. 
-*   **Stark Architect Protocol:** Relying entirely on CSS classes (`0px` radii, no shadows, binary contrasts).
-*   **Vite Native Chunking:** React Router operates under extreme boundaries parsing all routes through `React.lazy()` and `Suspense`. The fundamental Javascript payload executing on a user's phone is currently restricted to **189 kB**.
+Staff updates to **`routingPolicy/live`** (reroute flags, emergency vehicle ingress, etc.) go through the **`updateRoutingPolicyLive`** callable; Firestore security rules deny direct client writes to that document.
 
-## Demo Mode & Chaos Controller
-We engineered a built-in testing dashboard. The **Chaos Controller** explicitly proves system behavior:
-*   Inject `502 Vertex AI` surges. The store isolates the dirty data.
-*   Collapse the network to 0kbps to trigger deterministic heuristics instantly.
-*   Trigger a **Global Emergency Fire-Drill** testing the WebSocket Mesh.
+### Diagram (optional)
 
-## Web Accessibility (AAA Compliant)
-WCAG constraints are deeply integrated at the source.
-*   The `useTranslation` hook catches Emergency WebSocket payloads and fires the **Web Speech API (`SpeechSynthesisUtterance`)** to bypass visual sight restrictions in smoke or crush scenarios natively speaking evacuation paths.
-*   **Keyboard Absolute Navigation:** Fully operable via Tab/Escape keystrokes, utilizing structured `role="region"`, `aria-label`, and `Skip To Content` DOM skips at the index level natively, proven via mapped Vitest mock payloads.
+```mermaid
+flowchart LR
+  subgraph client [Browser]
+    UI[React app]
+  end
+  subgraph fb [Firebase]
+    FS[(Firestore)]
+  end
+  subgraph fn [Cloud Functions — us-central1]
+    Call[HTTPS callables]
+    HTTP[HTTP functions]
+  end
+  UI -->|read / subscribe| FS
+  UI -->|updateRoutingPolicyLive, registerFcmTopics| Call
+  HTTP --> FS
+  Call --> FS
+```
 
----
-**Deployment target:** Google Cloud Run (asia-south1). NGINX unprivileged GZIP edge container.  
-**Tech Scale:** React 19, Google Cloud Spanner, Vertex AI Vision, Maps Platforms Datasets API.
+## Bundle size (honest numbers)
+
+Production `vite build` splits the app and the Firebase SDK. Typical sizes from a recent build:
+
+| Asset (examples) | Minified | Gzip (approx.) |
+|-------------------|----------|----------------|
+| Main app chunk (`index-*.js`) | ~206 kB | ~65 kB |
+| Firebase SDK chunk | ~460 kB | ~139 kB |
+
+CSS is on the order of **~22 kB** minified (**~5 kB** gzip). Route-level code splitting (`React.lazy`) keeps secondary screens out of the first chunk where configured.
+
+## Demo mode & Chaos Controller
+
+A **Chaos Controller** panel (dev / test / `VITE_ENABLE_CHAOS_CONTROLLER`) can simulate API failures, network loss, evacuation drills, and **demo role overrides** stored in **`localStorage`**. That override is for **local demos only**—it does not replace production Auth custom claims; remove it before judging real RBAC.
+
+## Accessibility
+
+The UI uses semantic structure, focus styles, and live regions where appropriate. **Automated checks:** `vitest-axe` runs on selected screens (see `src/pages/__tests__/StaffDashboard.a11y.test.tsx`). That does **not** certify WCAG **AAA** for the whole product; treat it as a regression guard, not a compliance sign-off.
+
+## Performance notes
+
+- **Lazy routes** reduce initial JS for paths you do not open immediately.
+- **Firebase** is a separate chunk; first interactive load includes it when Auth/Firestore/Functions are used.
+- **Maps / heavy panels** load with their routes; avoid loading the map on the critical path if you need a smaller first paint.
+
+## Deployment & regions
+
+- **Cloud Functions** in this repo target **`us-central1`** (see `functions/src/index.ts`).
+- If you front the SPA with **Cloud Run** or static hosting, that layer may live in another region (e.g. **`asia-south1`**). Document both in your own infra README; latency differs by hop.
+
+## Tech stack
+
+React 19, Vite 8, Tailwind, Firebase JS SDK, Cloud Functions (Node 22), Vitest, ESLint.
+
+See **`FUNCTIONS.md`** for a catalog of major client and server entry points.

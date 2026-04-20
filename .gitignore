@@ -20,6 +20,9 @@ dist-ssr
 *.md
 !README.md
 
+# Hackathon follow-up checklist (local)
+hackathon-changes.md
+
 # Stitch HTML design exports (large; optional in repo)
 stitch_adaptive_event_entry_system/
 
@@ -36,3 +39,4 @@ stitch_adaptive_event_entry_system/
 
 # Cloud Functions build output (rebuilt on deploy)
 functions/lib/
+.env.example

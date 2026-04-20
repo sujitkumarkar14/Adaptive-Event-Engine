@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { collection, doc, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
+import { collection, doc, onSnapshot } from 'firebase/firestore';
 import { StarkCard, StarkButton } from '../components/common/StarkComponents';
 import { db } from '../lib/firebase';
 import {
@@ -8,6 +8,7 @@ import {
   ROUTING_POLICY_DOC_ID,
 } from '../lib/constants';
 import { useAuth } from '../contexts/AuthContext';
+import { mergeRoutingPolicyLive } from '../services/staffRoutingPolicy';
 
 type GateDoc = {
   currentPressure?: number;
@@ -98,18 +99,13 @@ export const StaffDashboard = () => {
     setBusy(true);
     setErr(null);
     try {
-      await setDoc(
-        routingRef,
-        {
-          gateRerouteActive: true,
-          fromGate: primaryGate,
-          toGate: primaryGate === 'GATE_A' ? 'GATE_B' : 'GATE_A',
-          message:
-            'CRITICAL: Gate A Congested. Follow Smart Route to Gate B.',
-          updatedAt: serverTimestamp(),
-        },
-        { merge: true }
-      );
+      await mergeRoutingPolicyLive({
+        gateRerouteActive: true,
+        fromGate: primaryGate,
+        toGate: primaryGate === 'GATE_A' ? 'GATE_B' : 'GATE_A',
+        message:
+          'CRITICAL: Gate A Congested. Follow Smart Route to Gate B.',
+      });
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Failed to update routing policy');
     } finally {
@@ -121,14 +117,7 @@ export const StaffDashboard = () => {
     setBusy(true);
     setErr(null);
     try {
-      await setDoc(
-        routingRef,
-        {
-          gateRerouteActive: false,
-          updatedAt: serverTimestamp(),
-        },
-        { merge: true }
-      );
+      await mergeRoutingPolicyLive({ gateRerouteActive: false });
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Failed to clear routing policy');
     } finally {

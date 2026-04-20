@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { StarkCard, StarkButton } from '../common/StarkComponents';
 import { useEntryStore } from '../../store/entryStore';
 import { useTranslation } from '../../hooks/useTranslation';
 import { DEMO_ROLE_STORAGE_KEY } from '../../contexts/AuthContext';
 import { db } from '../../lib/firebase';
 import { ROUTING_POLICY_COLLECTION, ROUTING_POLICY_DOC_ID } from '../../lib/constants';
+import { mergeRoutingPolicyLive } from '../../services/staffRoutingPolicy';
 
 /** Demo-only: hidden in production unless explicitly enabled (prevents evac / API simulators in the wild). */
 const showChaosSimulator =
@@ -48,11 +49,7 @@ export const ChaosController = () => {
     };
 
     const toggleAmbulanceIngress = async () => {
-        await setDoc(
-            routingPolicyRef,
-            { emergency_vehicle_active: !emergencyVehicleActive },
-            { merge: true }
-        );
+        await mergeRoutingPolicyLive({ emergency_vehicle_active: !emergencyVehicleActive });
     };
 
     const handleVipArrival = () => {

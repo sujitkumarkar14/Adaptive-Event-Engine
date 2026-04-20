@@ -2,7 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { StaffDashboard } from '../StaffDashboard';
 
-const mockSetDoc = vi.fn().mockResolvedValue(undefined);
+const mockMergeRoutingPolicyLive = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
+
+vi.mock('../../services/staffRoutingPolicy', () => ({
+  mergeRoutingPolicyLive: (...args: unknown[]) => mockMergeRoutingPolicyLive(...args),
+}));
 
 vi.mock('../../contexts/AuthContext', () => ({
   useAuth: () => ({
@@ -50,13 +54,11 @@ vi.mock('firebase/firestore', () => ({
     return vi.fn();
   }
   ),
-  serverTimestamp: vi.fn(() => ({ __ts: true })),
-  setDoc: (...args: unknown[]) => mockSetDoc(...args),
 }));
 
 describe('StaffDashboard', () => {
   beforeEach(() => {
-    mockSetDoc.mockClear();
+    mockMergeRoutingPolicyLive.mockClear();
     userAlertsFixture.docs = [];
   });
 
@@ -71,8 +73,8 @@ describe('StaffDashboard', () => {
     render(<StaffDashboard />);
     const btn = await screen.findByRole('button', { name: /trigger reroute/i });
     fireEvent.click(btn);
-    await waitFor(() => expect(mockSetDoc).toHaveBeenCalled());
-    const [, payload] = mockSetDoc.mock.calls[0];
+    await waitFor(() => expect(mockMergeRoutingPolicyLive).toHaveBeenCalled());
+    const [payload] = mockMergeRoutingPolicyLive.mock.calls[0];
     expect(payload).toMatchObject(
       expect.objectContaining({
         gateRerouteActive: true,

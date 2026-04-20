@@ -21,6 +21,11 @@ import {
     sendSmartRerouteTopicMessage,
 } from "./fcmHelpers";
 import { translateText, type TranslationLangCode } from "./translation";
+import {
+    BroadcastEmergencyBodySchema,
+    parseJsonBody,
+    VertexAggregatorBodySchema,
+} from "./validation";
 
 admin.initializeApp();
 
@@ -596,6 +601,55 @@ export const translateAlert = functions.https.onCall({ secrets: [translationApiK
     }
 });
 
+const ROUTING_POLICY_MERGE_KEYS = new Set([
+    "gateRerouteActive",
+    "fromGate",
+    "toGate",
+    "message",
+    "emergency_vehicle_active",
+    "clearZoneActive",
+    "clearZoneSectors",
+    "autoTriggered",
+]);
+
+/**
+ * Staff/ops: merge `routingPolicy/live` (clients cannot write Firestore directly — rules deny writes).
+ * Production: Firebase Auth custom claim `role` must be `staff` or `admin`.
+ * Emulator: any authenticated user (local demo without claims).
+ */
+export const updateRoutingPolicyLive = functions.https.onCall(async (request) => {
+    if (!request.auth) {
+        throw new functions.https.HttpsError("unauthenticated", "Authentication required.");
+    }
+    const emulator = process.env.FUNCTIONS_EMULATOR === "true";
+    const role = (request.auth.token as { role?: string }).role;
+    if (!emulator && role !== "staff" && role !== "admin") {
+        throw new functions.https.HttpsError(
+            "permission-denied",
+            "Staff or admin custom claim (role) required to update routing policy."
+        );
+    }
+    const raw = request.data;
+    if (raw == null || typeof raw !== "object" || Array.isArray(raw)) {
+        throw new functions.https.HttpsError("invalid-argument", "Object payload required.");
+    }
+    const cleaned: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
+        if (ROUTING_POLICY_MERGE_KEYS.has(k)) {
+            cleaned[k] = v;
+        }
+    }
+    cleaned.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+    await admin.firestore().collection("routingPolicy").doc("live").set(cleaned, { merge: true });
+    logAuditJson({
+        severity: "INFO",
+        action: "ROUTING_POLICY_MERGED",
+        uid: request.auth.uid,
+        keys: Object.keys(cleaned).filter((x) => x !== "updatedAt"),
+    });
+    return { ok: true };
+});
+
 /**
  * Subscribe device FCM token to `emergency` + `smart_reroute` topics (server-side; required for web).
  */
@@ -816,10 +870,16 @@ export const vertexAggregator = onRequest(
             return;
         }
 
+        const rawBody = req.body && typeof req.body === "object" ? req.body : {};
+        const bodyParsed = parseJsonBody(rawBody, VertexAggregatorBodySchema);
+        if (!bodyParsed.ok) {
+            res.status(400).json({ error: "invalid_body", detail: bodyParsed.error });
+            return;
+        }
+        const payload = bodyParsed.data;
+
         const rawHeader = req.headers["x-vertex-ingest-key"];
         const headerKey = typeof rawHeader === "string" ? rawHeader : Array.isArray(rawHeader) ? rawHeader[0] : undefined;
-        const payload =
-            req.body && typeof req.body === "object" ? (req.body as Record<string, unknown>) : {};
         const bodyKey = typeof payload.ingestKey === "string" ? payload.ingestKey : undefined;
         const provided = headerKey ?? bodyKey;
 
@@ -860,7 +920,7 @@ export const vertexAggregator = onRequest(
         }
 
         if (USE_MOCK_DATA) {
-            const p = payload as { averageDensity?: number; count?: number; zoneId?: string };
+            const p = payload;
             const heatmapAverage =
                 typeof p.averageDensity === "number"
                     ? p.averageDensity
@@ -889,11 +949,7 @@ export const vertexAggregator = onRequest(
             return;
         }
 
-        const ingestPayload = payload as {
-            count?: number;
-            zoneId?: string;
-            pressurePercent?: number;
-        };
+        const ingestPayload = payload;
 
         if (!ingestPayload.zoneId || typeof ingestPayload.zoneId !== "string") {
             logAuditJson({
@@ -976,12 +1032,13 @@ export const broadcastEmergency = onRequest(
             return;
         }
 
-        const body = (req.body && typeof req.body === "object" ? req.body : {}) as {
-            type?: string;
-            location?: string;
-            key?: string;
-        };
-        const { type, location, key } = body;
+        const rawBody = req.body && typeof req.body === "object" ? req.body : {};
+        const bodyParsed = parseJsonBody(rawBody, BroadcastEmergencyBodySchema);
+        if (!bodyParsed.ok) {
+            res.status(400).json({ error: "invalid_body", detail: bodyParsed.error });
+            return;
+        }
+        const { type, location, key } = bodyParsed.data;
 
         const expected = emergencyBroadcastKey.value();
         const emulatorMode = process.env.FUNCTIONS_EMULATOR === "true";

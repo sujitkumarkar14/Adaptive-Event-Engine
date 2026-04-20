@@ -106,6 +106,8 @@ export const StarkCard: React.FC<StarkCardProps> = ({
 }) => {
   const { state } = useEntryStore();
   const isEmergency = state?.phase === 'EMERGENCY';
+  const titleId = React.useId();
+  const interactive = Boolean(onClick);
 
   const borderClass = active 
       ? (isEmergency ? "border-error" : "border-primary-container") 
@@ -117,11 +119,12 @@ export const StarkCard: React.FC<StarkCardProps> = ({
   
   return (
     <div 
-      className={`border-2 p-6 transition-all duration-200 cursor-pointer outline-none focus:ring-4 focus:ring-primary ${borderClass} ${bgClass} ${className}`}
+      className={`border-2 p-6 transition-all duration-200 ${interactive ? 'cursor-pointer outline-none focus:ring-4 focus:ring-primary' : ''} ${borderClass} ${bgClass} ${className}`}
       onClick={onClick}
-      role="region"
-      aria-pressed={active}
-      tabIndex={0}
+      role={interactive ? 'button' : 'region'}
+      aria-pressed={interactive ? active : undefined}
+      aria-labelledby={titleId}
+      tabIndex={interactive ? 0 : undefined}
       onKeyDown={(e) => {
         if((e.key === 'Enter' || e.key === ' ') && onClick) {
             e.preventDefault();
@@ -130,7 +133,7 @@ export const StarkCard: React.FC<StarkCardProps> = ({
       }}
     >
       <div className="flex flex-col mb-2">
-        <span className="font-black text-sm uppercase tracking-tight">{title}</span>
+        <span id={titleId} className="font-black text-sm uppercase tracking-tight">{title}</span>
         {subtitle && <span className={`text-xs ${active ? 'text-inverse-on-surface opacity-80' : 'text-on-surface-variant'}`}>{subtitle}</span>}
       </div>
       <div>

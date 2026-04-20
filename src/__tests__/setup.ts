@@ -1,5 +1,8 @@
 import '@testing-library/jest-dom';
-import { vi } from 'vitest';
+import * as axeMatchers from 'vitest-axe/matchers';
+import { expect, vi } from 'vitest';
+
+expect.extend(axeMatchers);
 
 // jsdom does not ship Web Speech API — stubs for useTranslation tests and components.
 if (typeof globalThis.SpeechSynthesisUtterance === 'undefined') {

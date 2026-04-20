@@ -46,16 +46,23 @@ describe('WCAG AAA Compliance: Stark Components', () => {
         expect(input).not.toHaveFocus();
     });
 
-    it('StarkCard functions as a region and captures Enter Key for native click logic', () => {
+    it('StarkCard uses role button when clickable and captures Enter for activation', () => {
         const mockClick = vi.fn();
         render(<StarkCard title="Zone Alpha" onClick={mockClick}>Content</StarkCard>);
         
-        const cardRegion = screen.getByRole('region');
+        const card = screen.getByRole('button', { name: /Zone Alpha/i });
         
-        fireEvent.keyDown(cardRegion, { key: 'Enter', code: 'Enter' });
+        fireEvent.keyDown(card, { key: 'Enter', code: 'Enter' });
         
         expect(mockClick).toHaveBeenCalledTimes(1);
-        expect(cardRegion).toHaveAttribute('tabIndex', '0');
+        expect(card).toHaveAttribute('tabIndex', '0');
+    });
+
+    it('StarkCard without onClick is a labeled region', () => {
+        render(<StarkCard title="Static">Content</StarkCard>);
+        const card = screen.getByRole('region', { name: /Static/i });
+        expect(card).toBeInTheDocument();
+        expect(card).not.toHaveAttribute('tabIndex');
     });
 
     it('StarkButton uses error palette when phase is EMERGENCY', () => {

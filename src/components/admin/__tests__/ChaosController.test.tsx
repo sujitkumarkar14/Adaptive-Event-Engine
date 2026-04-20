@@ -1,9 +1,26 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { DEMO_ROLE_STORAGE_KEY } from '../../../contexts/AuthContext';
 import { ChaosController } from '../ChaosController';
 
 const mockDispatch = vi.fn();
+const mockMergeRoutingPolicyLive = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
+
+vi.mock('../../../services/staffRoutingPolicy', () => ({
+  mergeRoutingPolicyLive: (...args: unknown[]) => mockMergeRoutingPolicyLive(...args),
+}));
+
+vi.mock('../../../lib/firebase', () => ({
+  db: {},
+}));
+
+vi.mock('firebase/firestore', () => ({
+  doc: vi.fn(() => ({})),
+  onSnapshot: vi.fn((_ref: unknown, cb: (s: { data: () => Record<string, unknown> }) => void) => {
+    queueMicrotask(() => cb({ data: () => ({ emergency_vehicle_active: false }) }));
+    return vi.fn();
+  }),
+}));
 
 vi.mock('../../../store/entryStore', () => ({
   useEntryStore: () => ({ dispatch: mockDispatch }),
@@ -12,11 +29,20 @@ vi.mock('../../../store/entryStore', () => ({
 describe('ChaosController', () => {
   beforeEach(() => {
     mockDispatch.mockClear();
+    mockMergeRoutingPolicyLive.mockClear();
     localStorage.removeItem(DEMO_ROLE_STORAGE_KEY);
   });
 
   afterEach(() => {
     localStorage.removeItem(DEMO_ROLE_STORAGE_KEY);
+  });
+
+  it('calls mergeRoutingPolicyLive when toggling ambulance ingress', async () => {
+    render(<ChaosController />);
+    fireEvent.click(screen.getByRole('button', { name: /Ambulance ingress/i }));
+    await waitFor(() => {
+      expect(mockMergeRoutingPolicyLive).toHaveBeenCalledWith({ emergency_vehicle_active: true });
+    });
   });
 
   it('dispatches SET_NETWORK_STATUS false when killing network', () => {
