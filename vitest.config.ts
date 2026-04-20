@@ -27,10 +27,10 @@ export default defineConfig({
       ],
       // Targets on measured code (Firebase bootstrap + AuthProvider excluded — see TESTING.md).
       thresholds: {
-        lines: 77,
-        branches: 65,
+        lines: 80,
+        statements: 80,
         functions: 70,
-        statements: 75,
+        branches: 65,
       },
     },
   },

@@ -14,13 +14,13 @@ export default defineConfig({
     { name: 'setup', testMatch: /auth\.setup\.ts/ },
     {
       name: 'chromium',
-      testIgnore: [/auth\.setup\.ts$/, /\.authenticated\.spec\.ts$/],
+      testIgnore: [/auth\.setup\.ts$/, /\.authenticated\.spec\.ts$/, /-flow\.spec\.ts$/],
       use: { ...devices['Desktop Chrome'] },
     },
     {
       name: 'chromium-authenticated',
       dependencies: ['setup'],
-      testMatch: /\.authenticated\.spec\.ts$/,
+      testMatch: [/\.authenticated\.spec\.ts$/, /-flow\.spec\.ts$/],
       use: {
         ...devices['Desktop Chrome'],
         storageState: 'e2e/.auth/user.json',
@@ -28,7 +28,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run preview -- --host 127.0.0.1 --port 4173 --strictPort',
+    command: 'npm run e2e:preview',
     url: 'http://127.0.0.1:4173',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

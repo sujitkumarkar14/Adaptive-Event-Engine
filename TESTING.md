@@ -5,10 +5,10 @@
 | Layer | Command | Notes |
 |-------|---------|--------|
 | Unit / component | `npm test` | Vitest + Testing Library + jsdom |
-| Coverage | `npm run test:coverage` | Thresholds in `vitest.config.ts` (lines **77%**, statements **75%**, functions **70%**, branches **65%**); `src/lib/firebase.ts` + `src/contexts/AuthContext.tsx` excluded (bootstrap / provider glue) |
-| E2E | `npm run build && npm run test:e2e` | Playwright: `chromium` (unauthenticated shells) + `chromium-authenticated` (`*.authenticated.spec.ts`) with `e2e/auth.setup.ts` + `e2e/.auth/user.json`; set `E2E_TEST_EMAIL` / `E2E_TEST_PASSWORD` for real sessions |
+| Coverage | `npm run test:coverage` | Thresholds in `vitest.config.ts` (lines **80%**, statements **80%**, functions **70%**, branches **65%**); `src/lib/firebase.ts` + `src/contexts/AuthContext.tsx` excluded (bootstrap / provider glue) |
+| E2E | `npm run build && npm run test:e2e` | Playwright: `chromium` (unauthenticated shells) + `chromium-authenticated` (`*.authenticated.spec.ts`, `*-flow.spec.ts`) with `e2e/auth.setup.ts` + `e2e/.auth/user.json`; set `E2E_TEST_EMAIL` / `E2E_TEST_PASSWORD` for real sessions; preview uses `npm run e2e:preview` (chaos panel for evac drill E2E) |
 | Functions | `cd functions && npm test` | Vitest (node), Zod + rate limit + auth helpers + `functions/src/__tests__` integration-style suites |
-| Functions + emulators (optional) | `npm run test:emulator` | `firebase emulators:exec` + `RUN_EMULATOR_TESTS=1` (see `functions/src/__tests__/emulator.integration.test.ts`) |
+| Functions + emulators (optional) | `npm run test:emulator` | `firebase emulators:exec` (Auth + Functions + Firestore) + `RUN_EMULATOR_TESTS=1` — requires a JRE for the Firestore emulator (see `functions/src/__tests__/emulator.integration.test.ts`) |
 | Callable load snapshot | `npm run test:load` | Writes `artifacts/load-test-results.json` (configure `LOAD_TEST_URL` / `LOAD_TEST_CONCURRENCY`) |
 | k6 (optional, shell) | `BASE_URL=http://127.0.0.1:4173 k6 run tests/load/k6-venue-spike.js` | Parallel GETs to `/login` after `npm run preview`; install [k6](https://k6.io/docs/getting-started/installation/). Does not replace Firebase/Functions stress tests. |
 | Functions build | `cd functions && npm run build` | `tsc` |
@@ -30,7 +30,7 @@ See **`VALIDATION_MATRIX.md`** for a compact requirements → evidence table.
 
 ## CI
 
-`.github/workflows/ci.yml` runs lint, unit tests, coverage, production build, Playwright install + E2E, Functions install/build/test, and a **`functions-emulator`** job (`firebase emulators:exec` + `RUN_EMULATOR_TESTS=1` + `npm run test:load`) with **`load-test-results.json`** uploaded as an artifact.
+`.github/workflows/ci.yml` runs lint, unit tests, coverage, production build, Playwright install + E2E, Functions install/build/test, and a **`functions-emulator`** job (Java 21 + `firebase emulators:exec` with Auth + Functions + Firestore + `RUN_EMULATOR_TESTS=1` + `npm run test:load`) with **`load-test-results.json`** uploaded as an artifact.
 
 ## Verify all (local)
 
@@ -46,4 +46,4 @@ Or: `npm run verify` (same steps: lint, coverage, build, E2E, functions).
 
 ## Coverage policy
 
-Thresholds target **77 / 75 / 70 / 65** (lines / statements / functions / branches) on included files. Firebase client init and `AuthProvider` are excluded from the denominator so the gate measures application logic, not SDK wiring. If you add large UI surfaces without tests, add coverage **or** adjust thresholds with a short note in the PR — avoid silently disabling gates.
+Thresholds target **80 / 80 / 70 / 65** (lines / statements / functions / branches) on included files. Firebase client init and `AuthProvider` are excluded from the denominator so the gate measures application logic, not SDK wiring. If you add large UI surfaces without tests, add coverage **or** adjust thresholds with a short note in the PR — avoid silently disabling gates.

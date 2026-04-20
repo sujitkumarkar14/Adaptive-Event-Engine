@@ -41,6 +41,12 @@ Indicative numbers (not SLAs) are in `README.md` — Firestore snapshot latency,
 - **Env:** `SCALE_SIM_USERS`, `SCALE_CONCURRENT` override defaults (**500** / **120**).
 - This is **not** a production SLO or load-test result — it documents a **scale-shaped** checked-in snapshot for reviewers.
 
+## Benchmark context
+
+Committed load-test artifacts (`artifacts/load-test-results.json`) are produced by `npm run test:load`, typically under the local Firebase emulator suite in CI (`functions-emulator` workflow) for repeatability. They describe concurrent POST handling and response-time spread on the callable HTTP surface, not internet round-trip latency or Spanner transaction latency.
+
 ## Load / scale
 
-This repo does **not** include load-test harnesses or stadium-scale benchmarks. Add k6, Artillery, or GCP load tests in your deployment project if required.
+- **Callable fan-out:** `npm run test:load` → `artifacts/load-test-results.json` (concurrency, duration, avg/p95 response ms).
+- **Optional k6:** `npm run test:load:k6` + `tests/load/k6-venue-spike.js` for heavier scenarios when k6 is installed.
+- Stadium-scale benchmarks belong in your deployment environment (Artillery, GCP load testing, etc.) if required beyond these signals.

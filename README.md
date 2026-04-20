@@ -155,7 +155,7 @@ More detail: **`GOOGLE_SERVICES.md`**.
 
 Production `vite build` splits the app and the Firebase SDK. Typical sizes from a recent build:
 
-| Asset (examples) | Minified | Gzip (approx.) |
+| Asset (bundles) | Minified | Gzip (approx.) |
 |-------------------|----------|----------------|
 | Main app chunk (`index-*.js`) | ~206 kB | ~65 kB |
 | Firebase SDK chunk | ~471 kB | ~142 kB |

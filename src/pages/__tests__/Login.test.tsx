@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { Login } from '../Login';
 
@@ -46,5 +46,56 @@ describe('Login', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: /^Sign In$/i }));
     expect(screen.getByRole('alert')).toHaveTextContent(/required/i);
+  });
+
+  it('shows validation when passwords do not match on register', async () => {
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
+    fireEvent.change(screen.getByRole('textbox', { name: /email/i }), { target: { value: 'a@b.com' } });
+    fireEvent.change(screen.getByLabelText(/^Password$/i), { target: { value: 'abc12345' } });
+    fireEvent.change(screen.getByLabelText(/Confirm password/i), { target: { value: 'diff12345' } });
+    fireEvent.click(screen.getByRole('button', { name: /Create Account/i }));
+    expect(screen.getByRole('alert')).toHaveTextContent(/do not match/i);
+  });
+
+  it('rejects weak password on register', () => {
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
+    fireEvent.change(screen.getByRole('textbox', { name: /email/i }), { target: { value: 'a@b.com' } });
+    fireEvent.change(screen.getByLabelText(/^Password$/i), { target: { value: 'abcdefgh' } });
+    fireEvent.change(screen.getByLabelText(/Confirm password/i), { target: { value: 'abcdefgh' } });
+    fireEvent.click(screen.getByRole('button', { name: /Create Account/i }));
+    expect(screen.getByRole('alert')).toHaveTextContent(/letters and numbers/i);
+  });
+
+  it('signs in with email and password', async () => {
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
+    fireEvent.change(screen.getByRole('textbox', { name: /email/i }), { target: { value: 'fan@test.com' } });
+    fireEvent.change(screen.getByLabelText(/^Password$/i), { target: { value: 'abc12345' } });
+    fireEvent.click(screen.getByRole('button', { name: /^Sign In$/i }));
+    await waitFor(() => expect(mockSignInWithEmail).toHaveBeenCalled());
+  });
+
+  it('creates account with valid password', async () => {
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
+    fireEvent.change(screen.getByRole('textbox', { name: /email/i }), { target: { value: 'new@test.com' } });
+    fireEvent.change(screen.getByLabelText(/^Password$/i), { target: { value: 'abc12345' } });
+    fireEvent.change(screen.getByLabelText(/Confirm password/i), { target: { value: 'abc12345' } });
+    fireEvent.click(screen.getByRole('button', { name: /Create Account/i }));
+    await waitFor(() => expect(mockCreateUser).toHaveBeenCalled());
   });
 });

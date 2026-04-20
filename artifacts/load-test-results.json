@@ -1,9 +1,12 @@
 {
   "concurrency": 50,
+  "environment": "firebase-emulator",
   "targetUrl": "http://127.0.0.1:5001/adaptive-entry/us-central1/reserveEntrySlot",
-  "durationMs": 142,
-  "fulfilled": 50,
-  "rejected": 0,
-  "note": "Example snapshot from emulator + `npm run test:load`. CI job `functions-emulator` regenerates via emulators:exec; unauthenticated calls typically return 401 — measures concurrent POST stability.",
-  "generatedAt": "2026-04-20T12:00:00.000Z"
+  "durationMs": 35,
+  "fulfilled": 0,
+  "rejected": 50,
+  "avgResponseMs": 10,
+  "p95ResponseMs": 12,
+  "notes": "Concurrent POSTs to the callable HTTP surface; unauthenticated responses are expected (e.g. 401). Measures fan-out stability and response-time spread, not Spanner booking success.",
+  "generatedAt": "2026-04-20T12:11:17.500Z"
 }

@@ -19,28 +19,55 @@ const URL =
 
 const start = Date.now();
 const results = await Promise.allSettled(
-  Array.from({ length: CONCURRENCY }, (_, i) =>
-    fetch(URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        data: { slotId: `load-${i}`, gateId: 'GATE_A' },
-      }),
-    }).then((r) => ({ status: r.status, ok: r.ok }))
-  )
+  Array.from({ length: CONCURRENCY }, async (_, i) => {
+    const t0 = Date.now();
+    try {
+      const r = await fetch(URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data: { slotId: `load-${i}`, gateId: 'GATE_A' },
+        }),
+      });
+      const responseMs = Date.now() - t0;
+      return { status: r.status, ok: r.ok, responseMs };
+    } catch {
+      const responseMs = Date.now() - t0;
+      throw { responseMs };
+    }
+  })
 );
 
 const fulfilled = results.filter((r) => r.status === 'fulfilled').length;
 const rejected = results.filter((r) => r.status === 'rejected').length;
+const responseTimesMs = results
+  .map((r) => {
+    if (r.status === 'fulfilled') return r.value.responseMs;
+    const reason = r.reason;
+    return typeof reason?.responseMs === 'number' ? reason.responseMs : null;
+  })
+  .filter((n) => typeof n === 'number')
+  .sort((a, b) => a - b);
+const avgResponseMs =
+  responseTimesMs.length === 0
+    ? null
+    : Math.round(responseTimesMs.reduce((a, b) => a + b, 0) / responseTimesMs.length);
+const p95ResponseMs =
+  responseTimesMs.length === 0
+    ? null
+    : responseTimesMs[Math.min(responseTimesMs.length - 1, Math.floor(responseTimesMs.length * 0.95))];
 
 const summary = {
   concurrency: CONCURRENCY,
+  environment: process.env.LOAD_TEST_ENV ?? 'local',
   targetUrl: URL,
   durationMs: Date.now() - start,
   fulfilled,
   rejected,
-  note:
-    'Unauthenticated calls typically return 401/403; this measures endpoint stability under concurrent POSTs, not Spanner success.',
+  avgResponseMs,
+  p95ResponseMs,
+  notes:
+    'Concurrent POSTs to the callable HTTP surface; unauthenticated responses are expected (e.g. 401). Measures fan-out stability and response-time spread, not Spanner booking success.',
   generatedAt: new Date().toISOString(),
 };
 

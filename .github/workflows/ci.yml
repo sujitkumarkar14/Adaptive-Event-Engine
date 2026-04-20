@@ -40,6 +40,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -52,7 +56,7 @@ jobs:
           npm ci
           npm run build
           cd ..
-          npx firebase-tools@14.7.0 emulators:exec --only auth,functions --project adaptive-entry \
+          npx firebase-tools@14.7.0 emulators:exec --only auth,functions,firestore --project adaptive-entry \
             "cd functions && RUN_EMULATOR_TESTS=1 npm test -- emulator.integration && cd .. && LOAD_TEST_URL=http://127.0.0.1:5001/adaptive-entry/us-central1/reserveEntrySlot npm run test:load"
       - uses: actions/upload-artifact@v4
         with:
