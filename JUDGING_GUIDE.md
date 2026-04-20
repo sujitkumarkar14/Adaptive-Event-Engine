@@ -98,12 +98,6 @@ Full narrative: **`PROBLEM_ALIGNMENT.md`**, feature map: **`GOAL.md`**.
 
 ---
 
-## What we do not claim (north star / future)
-
-Per **`GOAL.md`** and **`DECISIONS.md`**: full **XState** rewrite of `entryStore`, **Gemini** venue assistant productization, **TanStack Query** layering, **Vertex** model quantization, and **Maps Advanced Markers** 3D are **optional** follow-ups—documented so judges see intent without mistaking roadmap for shipped code.
-
----
-
 ## Quick commands for reviewers
 
 ```bash
