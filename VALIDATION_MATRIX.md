@@ -13,6 +13,8 @@ Maps product and engineering expectations to **files, tests, and automation** in
 | **Routing policy auth** | `functions/src/routingPolicyAuth.ts`, `functions/src/__tests__/routing-policy-permissions.test.ts` | `cd functions && npm test` |
 | **Accessibility (automated)** | `vitest-axe` in `src/__tests__/a11y.*.spec.tsx`, `pages/__tests__/*a11y*` | `npm test` |
 | **Performance artifact (local)** | `artifacts/perf-summary.json`, `scripts/write-perf-summary.mjs` | `npm run bench:perf` |
+| **Concurrency snapshot (simulated)** | `artifacts/concurrency-summary.json`, `scripts/benchmark-concurrency.mjs` | `npm run bench:concurrency` |
+| **Deep E2E shells** | `e2e/high-congestion-reroute.spec.ts`, `e2e/emergency-during-booking.spec.ts`, `e2e/offline-recovery-flow.spec.ts`, semantic `e2e/crowd-movement-reroute.spec.ts`, etc. | `npm run build && npm run test:e2e` |
 | **Security docs** | `SECURITY.md`, `FUNCTIONS.md` | Manual review |
 | **End-to-end verify** | `scripts/verify.sh` | `npm run verify` |
 

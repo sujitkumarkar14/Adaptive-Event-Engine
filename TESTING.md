@@ -14,10 +14,11 @@
 
 | Theme | What we prove |
 |-------------|----------------|
-| **Crowd movement** | Dashboard reroute + gate matrix tests (`Dashboard.*.test.tsx`), E2E shells for protected wayfinding routes |
-| **Waiting times** | Booking flow tests (`Booking.test.tsx`), callable mocks for `reserveEntrySlot` |
-| **Real-time coordination** | Staff dashboard + routing policy tests, `useAppOrchestration` / integration tests, Functions HTTP/callable validation |
-| **Accessibility** | `vitest-axe` in `src/__tests__/a11y.*.spec.tsx` and staff dashboard a11y tests |
+| **Crowd movement** | Dashboard reroute + gate matrix tests (`Dashboard.*.test.tsx`), E2E: `e2e/crowd-movement-reroute.spec.ts`, `e2e/high-congestion-reroute.spec.ts` |
+| **Waiting times** | Booking flow tests (`Booking.test.tsx`, `Booking.emergency.spec.tsx`), E2E: `e2e/waiting-time-booking.spec.ts` |
+| **Real-time coordination** | Staff dashboard + routing policy tests, `useAppOrchestration` / integration tests, E2E: `e2e/real-time-coordination.spec.ts`, Functions HTTP/callable validation |
+| **Accessibility** | `vitest-axe` in `src/__tests__/a11y.*.spec.tsx`, focus + keyboard suites (`a11y.focus-management`, `a11y.keyboard-full-flow`) |
+| **Offline / sync** | `src/__tests__/offline-network.integration.spec.tsx`, E2E: `e2e/offline-recovery-flow.spec.ts` |
 | **Security / abuse** | Functions: `routingPolicyAuth`, `httpRateLimit`, `validation`, integration tests under `functions/src/__tests__/` |
 
 See **`VALIDATION_MATRIX.md`** for a compact requirements → evidence table.

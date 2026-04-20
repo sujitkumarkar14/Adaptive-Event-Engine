@@ -30,6 +30,7 @@
 - **One-shot verify:** `npm run verify` or `./scripts/verify.sh` (lint, coverage, build, E2E, functions)
 - **Bundle snapshot:** `npm run perf:report`
 - **Local perf artifact:** `npm run bench:perf` writes **`artifacts/perf-summary.json`** (synthetic micro-benchmarks; see **`PERFORMANCE.md`**)
+- **Concurrency snapshot:** `npm run bench:concurrency` writes **`artifacts/concurrency-summary.json`** (simulated parallel waves; see **`PERFORMANCE.md`**)
 
 ## Demo flows (optional screenshots)
 
@@ -56,6 +57,25 @@ The implementation leans **operations + attendee guidance** (staff tools + atten
 | Demo role override (`localStorage`, Chaos Controller) | Dev/test only | Dev/test only | Dev/test only |
 
 Production enforcement: **Firestore rules** + **`updateRoutingPolicyLive`** checks Firebase Auth **custom claims** (`role`: `staff` | `admin`). Demo overrides are **not** a security boundary.
+
+## Failure handling
+
+| Situation | Expected behavior |
+|-----------|-------------------|
+| **Network loss** | Firestore **persistent local cache** keeps last subscribed reads available; UI exposes offline / sync state where implemented (`Navigation` footer). |
+| **Invalid API payload** | Cloud Functions reject with **Zod** validation; clients see safe error messages (no raw stack traces). |
+| **Unauthorized access** | **RBAC** + Firestore rules block writes; protected routes redirect or show **Unauthorized** per `RoleRoute` / `ProtectedRoute`. |
+| **Rate abuse** | HTTP endpoints apply **per-IP sliding-window** limits (see **`SECURITY.md`**). |
+| **Backend or callable errors** | Booking and dashboard paths surface user-facing errors; resilience copy references cached state where relevant. |
+
+## System guarantees
+
+| Guarantee | How it is enforced |
+|-----------|---------------------|
+| **No direct client writes to live routing policy** | `routingPolicy/live` updates go through **`updateRoutingPolicyLive`** (callable) + rules; not arbitrary browser writes. |
+| **Slot reservations are consistency-checked server-side** | `reserveEntrySlot` uses transactional logic in Cloud Functions (Spanner when enabled). |
+| **Emergency messaging can take over global UI** | Global emergency / evac flows set high-visibility shell state and assertive alerts (see orchestration + dashboard). |
+| **Accessibility affordances stay available** | Skip link, semantic regions, live regions, and automated **axe** regressions on key surfaces; manual checks in **`ACCESSIBILITY.md`**. |
 
 ## Architecture (split path)
 

@@ -17,6 +17,17 @@
 3. **Reroute / alerts:** When `role="alert"` banners appear (e.g. staff reroute), screen readers should receive assertive announcements; do not rely on color alone (copy + icons).
 4. **Staff tools:** Policy toggles and chaos/demo controls should keep focus order logical (top → form → primary action).
 
+## Automated validation signals
+
+- **Keyboard-only login:** `src/__tests__/a11y.keyboard-full-flow.spec.tsx` tabs through the login form without pointer input.
+- **Focus after assertive reroute alert:** `src/__tests__/a11y.focus-management.spec.tsx` checks that Tab reaches the SOS control after a reroute `alert` is present.
+- **Screen reader–oriented flows:** Prefer testing with VoiceOver / NVDA on staging; this repo does not ship a screen-reader harness beyond **axe** + semantic HTML.
+
+## Contrast
+
+- Design tokens use Material-style surfaces and on-surface colors; **axe** runs on selected screens in CI.
+- For **WCAG 2.1 AA** contrast certification, run a dedicated audit (e.g. browser contrast checker on primary text/button pairs) — not claimed as certified here.
+
 ## Suggested manual checks
 
 - Tab through login → onboarding → booking → dashboard; focus must be visible.

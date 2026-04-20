@@ -19,9 +19,9 @@ jobs:
       - name: Lint
         run: npm run lint
       - name: Unit tests
-        run: npm test
+        run: npm test -- --reporter=dot
       - name: Coverage
-        run: npm run test:coverage
+        run: npm run test:coverage -- --reporter=dot
       - name: Production build
         run: npm run build
       - name: Install Playwright (Chromium)
