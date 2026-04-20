@@ -26,11 +26,13 @@ export const Concierge = () => {
     setLoading(true);
     setAnswer('');
     try {
-      const translated = await translateAlertText(
-        query.trim(),
-        state.preferredContentLanguage as AlertLang
-      );
+      const draft = `Venue assistant (demo): “${query.trim()}”. For live gate pressure, routing, and emergencies, use the Dashboard. This screen only runs Cloud Translation — there is no LLM chat in this build.`;
+      const translated = await translateAlertText(draft, state.preferredContentLanguage as AlertLang);
       setAnswer(translated);
+    } catch {
+      setAnswer(
+        'Could not reach translation. Check network and the translateAlert callable. Your question was recorded locally only.'
+      );
     } finally {
       setLoading(false);
     }

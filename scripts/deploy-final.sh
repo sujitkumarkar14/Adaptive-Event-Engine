@@ -40,7 +40,7 @@ COMMIT_REF="$(git -C "${ROOT}" rev-parse --short HEAD 2>/dev/null || echo manual
 gcloud builds submit "${ROOT}" \
   --project "${PROJECT_ID}" \
   --config "${ROOT}/cloudbuild.yaml" \
-  --substitutions="COMMIT_SHA=${COMMIT_REF}"
+  --substitutions="_COMMIT_SHA=${COMMIT_REF}"
 
 echo ""
 echo "Done. Audit trail: broadcastEmergency logs deployment=EMULATOR_MODE|PRODUCTION_MODE (emulator vs deployed runtime)."

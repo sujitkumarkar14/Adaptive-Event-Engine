@@ -19,6 +19,7 @@ export function getHttpsCallableUserMessage(error: unknown): string {
       case 'functions/deadline-exceeded':
         return 'Service is temporarily unavailable. Try again shortly.';
       case 'functions/internal':
+        return 'Booking could not be completed right now. Please try again in a few minutes or pick another time slot.';
       case 'functions/unknown':
       default:
         return 'Something went wrong. Please try again.';
@@ -43,7 +44,7 @@ export function getLoginAuthErrorMessage(error: unknown): string {
     }
     switch (code) {
       case 'auth/operation-not-allowed':
-        return 'Email/password sign-in is disabled for this Firebase project. Enable it in Firebase Console → Authentication → Sign-in method.';
+        return 'This sign-in method is disabled. In Firebase Console → Authentication → Sign-in method, enable Email/Password for this project.';
       case 'auth/unauthorized-domain':
         return 'This origin is not allowed. Add localhost (and your port) under Firebase Console → Authentication → Settings → Authorized domains.';
       case 'auth/invalid-api-key':

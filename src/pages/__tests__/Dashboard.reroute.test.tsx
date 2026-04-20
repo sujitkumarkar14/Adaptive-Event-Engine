@@ -25,6 +25,7 @@ vi.mock('../../services/routing', () => ({
 
 vi.mock('../../services/bleProximity', () => ({
   detectBeaconProximity: vi.fn(),
+  getWebBluetoothBlockReason: vi.fn(() => null),
 }));
 
 vi.mock('../../services/gateMatrix', () => ({

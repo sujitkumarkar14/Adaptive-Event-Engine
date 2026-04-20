@@ -9,11 +9,9 @@ describe('detectBeaconProximity', () => {
     vi.restoreAllMocks();
   });
 
-  it('warns and returns early when Web Bluetooth is unavailable', async () => {
+  it('throws when Web Bluetooth is unavailable', async () => {
     (navigator as unknown as { bluetooth?: unknown }).bluetooth = undefined;
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    await detectBeaconProximity(() => {});
-    expect(warn).toHaveBeenCalled();
+    await expect(detectBeaconProximity(() => {})).rejects.toThrow(/Web Bluetooth is not available/i);
   });
 
   it('invokes onDetected when a device is returned', async () => {
@@ -28,13 +26,13 @@ describe('detectBeaconProximity', () => {
     info.mockRestore();
   });
 
-  it('logs error when requestDevice rejects', async () => {
+  it('rejects when requestDevice rejects', async () => {
     const requestDevice = vi.fn().mockRejectedValue(new Error('User cancelled'));
     (navigator as unknown as { bluetooth?: { requestDevice: typeof requestDevice } }).bluetooth = {
       requestDevice,
     };
     const err = vi.spyOn(console, 'error').mockImplementation(() => {});
-    await detectBeaconProximity(() => {});
+    await expect(detectBeaconProximity(() => {})).rejects.toThrow();
     expect(err).toHaveBeenCalled();
   });
 });

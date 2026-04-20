@@ -1,14 +1,15 @@
+# User-defined substitution keys must match ^_[A-Z0-9_]+$
 substitutions:
-  COMMIT_SHA: 'manual'
+  _COMMIT_SHA: 'manual'
 
 steps:
 # 1. Build the Unprivileged React Nginx Container
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'asia-south1-docker.pkg.dev/$PROJECT_ID/adaptive-repo/adaptive-entry-edge:$COMMIT_SHA', '.']
+  args: ['build', '-t', 'asia-south1-docker.pkg.dev/$PROJECT_ID/adaptive-repo/adaptive-entry-edge:$_COMMIT_SHA', '.']
 
 # 2. Push image to Google Artifact Registry
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'asia-south1-docker.pkg.dev/$PROJECT_ID/adaptive-repo/adaptive-entry-edge:$COMMIT_SHA']
+  args: ['push', 'asia-south1-docker.pkg.dev/$PROJECT_ID/adaptive-repo/adaptive-entry-edge:$_COMMIT_SHA']
 
 # 3. Declarative Deploy directly to Cloud Run
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -18,7 +19,7 @@ steps:
   - 'deploy'
   - 'adaptive-entry-frontend'
   - '--image'
-  - 'asia-south1-docker.pkg.dev/$PROJECT_ID/adaptive-repo/adaptive-entry-edge:$COMMIT_SHA'
+  - 'asia-south1-docker.pkg.dev/$PROJECT_ID/adaptive-repo/adaptive-entry-edge:$_COMMIT_SHA'
   - '--region'
   - 'asia-south1'
   - '--port'
@@ -29,4 +30,4 @@ steps:
   - '1'
 
 images:
-- 'asia-south1-docker.pkg.dev/$PROJECT_ID/adaptive-repo/adaptive-entry-edge:$COMMIT_SHA'
+- 'asia-south1-docker.pkg.dev/$PROJECT_ID/adaptive-repo/adaptive-entry-edge:$_COMMIT_SHA'

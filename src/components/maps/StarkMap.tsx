@@ -108,7 +108,7 @@ export const StarkMap = ({
         role="img"
         aria-label={label}
       >
-        No path geometry yet
+        Walking route preview will appear when a path is available from the venue navigation service.
       </div>
     );
   }

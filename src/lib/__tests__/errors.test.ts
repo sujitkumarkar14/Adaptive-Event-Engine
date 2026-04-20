@@ -10,7 +10,9 @@ describe('getHttpsCallableUserMessage', () => {
     expect(
       getHttpsCallableUserMessage(new FirebaseError('functions/resource-exhausted', 'x'))
     ).toMatch(/slot|time/i);
-    expect(getHttpsCallableUserMessage(new FirebaseError('functions/internal', 'secret'))).not.toContain('secret');
+    const internalMsg = getHttpsCallableUserMessage(new FirebaseError('functions/internal', 'secret'));
+    expect(internalMsg).not.toContain('secret');
+    expect(internalMsg).not.toMatch(/spanner|Spanner|\.sql|gateLogistics/i);
   });
 
   it('returns generic copy for unknown errors', () => {

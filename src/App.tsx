@@ -7,6 +7,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { RoleRoute } from './components/RoleRoute';
 import { useAppOrchestration } from './hooks/useAppOrchestration';
 import { AppErrorBoundary } from './components/AppErrorBoundary';
+import { PageErrorBoundary } from './components/PageErrorBoundary';
 import { TtsFallbackNotice } from './components/TtsFallbackNotice';
 
 const Login = React.lazy(() => import('./pages/Login'));
@@ -129,7 +130,9 @@ function AppShell() {
               path="/vouchers"
               element={
                 <ProtectedRoute>
-                  <Vouchers />
+                  <PageErrorBoundary>
+                    <Vouchers />
+                  </PageErrorBoundary>
                 </ProtectedRoute>
               }
             />
@@ -137,7 +140,9 @@ function AppShell() {
               path="/concierge"
               element={
                 <ProtectedRoute>
-                  <Concierge />
+                  <PageErrorBoundary>
+                    <Concierge />
+                  </PageErrorBoundary>
                 </ProtectedRoute>
               }
             />

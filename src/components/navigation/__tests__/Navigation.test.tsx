@@ -15,12 +15,12 @@ vi.mock('../../../contexts/AuthContext', async (importOriginal) => {
   };
 });
 
-describe('Navigation (role-based)', () => {
+describe('Navigation', () => {
   beforeEach(() => {
     mockUseAuth.mockReset();
   });
 
-  it('hides command and staff ops links for attendee role', () => {
+  it('hides staff and command links for attendee role', () => {
     mockUseAuth.mockReturnValue({
       hasRole: buildHasRole('user'),
     });
@@ -33,6 +33,7 @@ describe('Navigation (role-based)', () => {
     expect(document.querySelector('a[href="/command/traffic"]')).not.toBeInTheDocument();
     expect(document.querySelector('a[href="/staff"]')).not.toBeInTheDocument();
     expect(document.querySelector('a[href="/dashboard"]')).toBeInTheDocument();
+    expect(document.querySelector('a[href="/concierge"]')).toBeInTheDocument();
   });
 
   it('shows staff ops and command links for staff role', () => {
@@ -49,7 +50,7 @@ describe('Navigation (role-based)', () => {
     expect(document.querySelector('a[href="/staff"]')).toHaveAttribute('href', '/staff');
   });
 
-  it('BottomNav shows only attendee destinations for user', () => {
+  it('BottomNav lists attendee destinations only for user', () => {
     mockUseAuth.mockReturnValue({
       hasRole: buildHasRole('user'),
     });
@@ -66,7 +67,7 @@ describe('Navigation (role-based)', () => {
     expect(nav.querySelector('a[href="/dashboard"]')).toHaveAttribute('href', '/dashboard');
   });
 
-  it('BottomNav shows staff shortcuts for staff role', () => {
+  it('BottomNav includes ops for staff', () => {
     mockUseAuth.mockReturnValue({
       hasRole: buildHasRole('staff'),
     });

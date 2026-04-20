@@ -4,12 +4,10 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { Login } from '../pages/Login';
 
-const mockSignInAnonymously = vi.fn().mockResolvedValue(undefined);
 const mockSignInWithEmail = vi.fn().mockResolvedValue(undefined);
 const mockCreateUser = vi.fn().mockResolvedValue(undefined);
 
 vi.mock('firebase/auth', () => ({
-  signInAnonymously: (...args: unknown[]) => mockSignInAnonymously(...args),
   signInWithEmailAndPassword: (...args: unknown[]) => mockSignInWithEmail(...args),
   createUserWithEmailAndPassword: (...args: unknown[]) => mockCreateUser(...args),
 }));
@@ -32,13 +30,13 @@ describe('a11y: keyboard-only login flow', () => {
     );
 
     await user.tab();
-    expect(screen.getByRole('button', { name: /Continue as guest/i })).toHaveFocus();
-
-    await user.tab();
     expect(screen.getByRole('textbox', { name: /email/i })).toHaveFocus();
 
     await user.tab();
     expect(screen.getByLabelText(/^Password$/i)).toHaveFocus();
+
+    await user.tab();
+    expect(screen.getByLabelText(/Confirm password/i)).toHaveFocus();
 
     await user.tab();
     expect(screen.getByRole('button', { name: /^Sign In$/i })).toHaveFocus();

@@ -6,6 +6,10 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    /** Stable unit tests: routing tests expect local mock geometry; local `.env` may set `VITE_USE_ROUTING_MOCK=false` for prod builds. */
+    env: {
+      VITE_USE_ROUTING_MOCK: 'true',
+    },
     setupFiles: './src/__tests__/setup.ts',
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     coverage: {

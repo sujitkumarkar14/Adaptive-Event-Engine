@@ -21,7 +21,7 @@ describe('StarkMap', () => {
 
   it('shows a no-geometry fallback when polyline is null', () => {
     render(<StarkMap encodedPolyline={null} />);
-    expect(screen.getByText(/no path geometry yet/i)).toBeInTheDocument();
+    expect(screen.getByText(/walking route preview will appear/i)).toBeInTheDocument();
   });
 
   it('renders restricted + holding overlays when priority clearance is active', () => {

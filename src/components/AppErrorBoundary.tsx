@@ -26,9 +26,9 @@ export class AppErrorBoundary extends Component<Props, State> {
           aria-live="assertive"
           className="min-h-screen flex flex-col items-center justify-center p-8 bg-surface text-on-surface border-4 border-error"
         >
-          <h1 className="text-2xl font-black uppercase tracking-widest mb-4">Something went wrong</h1>
+          <h1 className="text-2xl font-black uppercase tracking-widest mb-4">We couldn&apos;t load the app</h1>
           <p className="text-on-surface-variant font-bold text-sm max-w-md text-center mb-6">
-            Please refresh the page or try again. If the problem continues, contact venue support.
+            Refresh the page to continue. If this keeps happening, try again later or contact venue support.
           </p>
           <button
             type="button"

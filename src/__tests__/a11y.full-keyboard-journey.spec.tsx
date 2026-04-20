@@ -7,10 +7,7 @@ import { Onboarding } from '../pages/Onboarding';
 import { EntryProvider } from '../store/entryStore';
 import { Booking } from '../pages/Booking';
 
-const mockSignInAnonymously = vi.fn().mockResolvedValue(undefined);
-
 vi.mock('firebase/auth', () => ({
-  signInAnonymously: (...args: unknown[]) => mockSignInAnonymously(...args),
   signInWithEmailAndPassword: vi.fn().mockResolvedValue(undefined),
   createUserWithEmailAndPassword: vi.fn().mockResolvedValue(undefined),
 }));
@@ -37,8 +34,6 @@ describe('a11y: full keyboard journey (segmented)', () => {
       </MemoryRouter>
     );
     await user.tab();
-    expect(screen.getByRole('button', { name: /Continue as guest/i })).toHaveFocus();
-    await user.tab();
     expect(screen.getByRole('textbox', { name: /email/i })).toHaveFocus();
   });
 
@@ -51,7 +46,7 @@ describe('a11y: full keyboard journey (segmented)', () => {
         </EntryProvider>
       </MemoryRouter>
     );
-    const metro = screen.getByRole('button', { name: /subwayMetro/i });
+    const metro = screen.getByRole('radio', { name: /metro/i });
     metro.focus();
     expect(metro).toHaveFocus();
     await user.keyboard('{Enter}');

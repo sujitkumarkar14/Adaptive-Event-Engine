@@ -1,18 +1,24 @@
 import React, { useState } from 'react';
-import {
-  signInAnonymously,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-} from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../lib/firebase';
 import { StarkButton, StarkInput } from '../components/common/StarkComponents';
 import { getLoginAuthErrorMessage } from '../lib/errors';
 
+function isValidEmail(s: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim());
+}
+
+/** Minimum bar: 8+ chars with at least one letter and one digit (client-side hint; Firebase enforces server-side). */
+function isStrongEnoughPassword(s: string): boolean {
+  return s.length >= 8 && /[A-Za-z]/.test(s) && /\d/.test(s);
+}
+
 export const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,23 +44,14 @@ export const Login = () => {
     setError(msg);
   };
 
-  const handleAnonymous = async () => {
-    setError(null);
-    setBusy(true);
-    try {
-      await signInAnonymously(auth);
-      goOnboarding();
-    } catch (e: unknown) {
-      setAuthError(e);
-    } finally {
-      setBusy(false);
-    }
-  };
-
   const handleEmailSignIn = async () => {
     setError(null);
     if (!email.trim() || !password) {
       setError('Email and password are required.');
+      return;
+    }
+    if (!isValidEmail(email)) {
+      setError('Enter a valid email address.');
       return;
     }
     setBusy(true);
@@ -70,8 +67,20 @@ export const Login = () => {
 
   const handleRegister = async () => {
     setError(null);
-    if (!email.trim() || !password) {
-      setError('Email and password are required.');
+    if (!email.trim() || !password || !confirmPassword) {
+      setError('Email, password, and confirm password are required to create an account.');
+      return;
+    }
+    if (!isValidEmail(email)) {
+      setError('Enter a valid email address.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+    if (!isStrongEnoughPassword(password)) {
+      setError('Use at least 8 characters including both letters and numbers.');
       return;
     }
     setBusy(true);
@@ -94,21 +103,15 @@ export const Login = () => {
         Identity Gate
       </h1>
       <p className="text-on-surface-variant font-bold text-xs tracking-widest uppercase mb-10">
-        Required for secured booking and Spanner transactions
+        Secure access to booking, your event pass, and venue updates
       </p>
 
-      <div className="border-2 border-outline bg-surface-container-lowest p-6 mb-8">
-        <StarkButton
-          fullWidth
-          disabled={busy}
-          onClick={handleAnonymous}
-          className="mb-6"
-          aria-label="Continue as guest with anonymous sign-in"
-        >
-          Continue as Guest
-        </StarkButton>
-
-        <div className="border-t border-outline-variant pt-6 space-y-4">
+      <form
+        className="border-2 border-outline bg-surface-container-lowest p-6 mb-8"
+        onSubmit={(e) => e.preventDefault()}
+        noValidate
+      >
+        <div className="space-y-4">
           <StarkInput
             label="Email"
             type="email"
@@ -116,6 +119,8 @@ export const Login = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={busy}
+            aria-invalid={!!error}
+            aria-describedby={error ? 'login-error' : undefined}
           />
           <StarkInput
             label="Password"
@@ -124,20 +129,36 @@ export const Login = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={busy}
+            aria-invalid={!!error}
+            aria-describedby={error ? 'login-error' : undefined}
           />
+          <StarkInput
+            label="Confirm password (new accounts only)"
+            type="password"
+            autoComplete="new-password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            disabled={busy}
+            aria-invalid={!!error}
+            aria-describedby={error ? 'login-error login-password-hint' : 'login-password-hint'}
+          />
+          <p id="login-password-hint" className="text-[10px] font-bold text-outline uppercase tracking-wider -mt-2">
+            Required when creating an account — at least 8 characters with letters and numbers.
+          </p>
           <div className="flex flex-col gap-3">
-            <StarkButton fullWidth disabled={busy} onClick={handleEmailSignIn}>
+            <StarkButton fullWidth disabled={busy} onClick={handleEmailSignIn} type="button">
               Sign In
             </StarkButton>
-            <StarkButton variant="secondary" fullWidth disabled={busy} onClick={handleRegister}>
+            <StarkButton variant="secondary" fullWidth disabled={busy} onClick={handleRegister} type="button">
               Create Account
             </StarkButton>
           </div>
         </div>
-      </div>
+      </form>
 
       {error && (
         <div
+          id="login-error"
           role="alert"
           aria-live="assertive"
           className="border-2 border-error bg-error-container text-on-error-container font-bold text-sm leading-relaxed normal-case tracking-normal p-4"

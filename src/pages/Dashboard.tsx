@@ -4,7 +4,7 @@ import { getValue } from 'firebase/remote-config';
 import { StarkCard, StarkButton } from '../components/common/StarkComponents';
 import { useEntryStore } from '../store/entryStore';
 import { ChaosController } from '../components/admin/ChaosController';
-import { detectBeaconProximity } from '../services/bleProximity';
+import { detectBeaconProximity, getWebBluetoothBlockReason } from '../services/bleProximity';
 import { calculateOptimalPath } from '../services/routing';
 import { ConcourseCopilotCard } from '../components/concourse/ConcourseCopilotCard';
 import { RewardUnlockedCard } from './Vouchers';
@@ -43,6 +43,7 @@ export const Dashboard = () => {
   const { state, dispatch } = useEntryStore();
   const { role, user } = useAuth();
   const [bleBusy, setBleBusy] = useState(false);
+  const [bleScanError, setBleScanError] = useState<string | null>(null);
   const [routingPolicy, setRoutingPolicy] = useState<RoutingPolicy | null>(null);
   const [rcRerouteActive, setRcRerouteActive] = useState(false);
   const [routeLayers, setRouteLayers] = useState<StarkRouteLayer[]>([]);
@@ -56,6 +57,7 @@ export const Dashboard = () => {
   const [sosConfirmation, setSosConfirmation] = useState<string | null>(null);
   const [exitOptimizationBusy, setExitOptimizationBusy] = useState(false);
   const [exitRouteLayer, setExitRouteLayer] = useState<StarkRouteLayer | null>(null);
+  const [exitOptimizationMessage, setExitOptimizationMessage] = useState<string | null>(null);
   const [pendingVoucherCode, setPendingVoucherCode] = useState<string | null>(null);
   const [gateWaitMins, setGateWaitMins] = useState<number | null>(null);
   const sosSubmittedRef = useRef(false);
@@ -84,6 +86,15 @@ export const Dashboard = () => {
       unsub();
       unsubEvac();
     };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (window.location.hash === '#priority-assistance') {
+      window.requestAnimationFrame(() => {
+        document.getElementById('priority-assistance')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
   }, []);
 
   useEffect(() => {
@@ -281,8 +292,8 @@ export const Dashboard = () => {
     }
   };
 
-  const triggerOfflineSim = () => {
-    dispatch({ type: 'SET_NETWORK_STATUS', payload: false });
+  const toggleOfflineSim = () => {
+    dispatch({ type: 'SET_NETWORK_STATUS', payload: !state.isOnline });
   };
 
   const gateLabel =
@@ -301,11 +312,19 @@ export const Dashboard = () => {
         : 'text-secondary';
 
   const startBleScan = async () => {
+    setBleScanError(null);
+    const blocked = getWebBluetoothBlockReason();
+    if (blocked) {
+      setBleScanError(blocked);
+      return;
+    }
     setBleBusy(true);
     try {
       await detectBeaconProximity((deviceId) => {
         dispatch({ type: 'DETECT_BLE_BEACON', payload: deviceId });
       });
+    } catch (e: unknown) {
+      setBleScanError(e instanceof Error ? e.message : 'Bluetooth scan failed or was cancelled.');
     } finally {
       setBleBusy(false);
     }
@@ -338,6 +357,7 @@ export const Dashboard = () => {
 
   const handleExitOptimization = async () => {
     setExitOptimizationBusy(true);
+    setExitOptimizationMessage(null);
     try {
       const stepFree = state.accessibility.stepFree || state.stepFreeRequired;
       const res = await calculateOptimalPath({
@@ -354,9 +374,16 @@ export const Dashboard = () => {
           variant: 'exit',
           smartAccent: true,
         });
+        setExitOptimizationMessage(null);
       } else {
         setExitRouteLayer(null);
+        setExitOptimizationMessage(
+          'Exit walking route could not be drawn right now. Try again shortly, or follow venue signage to parking.'
+        );
       }
+    } catch {
+      setExitRouteLayer(null);
+      setExitOptimizationMessage('Exit route service is temporarily unavailable. Please try again.');
     } finally {
       setExitOptimizationBusy(false);
     }
@@ -415,7 +442,11 @@ export const Dashboard = () => {
         </div>
       ) : null}
 
-      <div className="border-4 border-black bg-surface p-4">
+      <div
+        className="border-4 border-black bg-surface p-4 scroll-mt-24"
+        id="priority-assistance"
+        tabIndex={-1}
+      >
         <h2 className="text-xs font-black uppercase tracking-widest text-on-surface-variant mb-3">
           Priority assistance
         </h2>
@@ -449,6 +480,16 @@ export const Dashboard = () => {
         onExitOptimization={handleExitOptimization}
         exitOptimizationBusy={exitOptimizationBusy}
       />
+
+      {exitOptimizationMessage ? (
+        <div
+          role="status"
+          aria-live="polite"
+          className="border-2 border-outline bg-surface-container-highest p-4 text-sm font-bold text-on-surface normal-case tracking-normal"
+        >
+          {exitOptimizationMessage}
+        </div>
+      ) : null}
 
       {role !== 'staff' && role !== 'admin' && gateWaitMins !== null ? (
         <div
@@ -487,6 +528,11 @@ export const Dashboard = () => {
           <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">
             {state.bleBeaconActive ? `Linked: ${state.currentLocalGate ?? 'device'}` : 'No beacon lock'}
           </p>
+          {bleScanError ? (
+            <p role="alert" className="text-xs font-bold text-error uppercase tracking-wider border-2 border-error p-2">
+              {bleScanError}
+            </p>
+          ) : null}
           <StarkButton
             variant="secondary"
             onClick={startBleScan}
@@ -548,7 +594,10 @@ export const Dashboard = () => {
               variant="tertiary"
               className="mt-4 uppercase tracking-widest text-xs"
               type="button"
-              onClick={() => setExitRouteLayer(null)}
+              onClick={() => {
+                setExitRouteLayer(null);
+                setExitOptimizationMessage(null);
+              }}
             >
               Clear exit preview
             </StarkButton>
@@ -613,8 +662,14 @@ export const Dashboard = () => {
             </>
           ) : (
             <>
-              <StarkCard title="Gate Pressure" subtitle="Hot path Firestore">
+              <StarkCard title="Gate Pressure" subtitle="Live venue signal">
                 <span className={`text-2xl font-black ${pressureTone}`}>{pressureLabel}</span>
+                {state.gatePressurePercent == null && (
+                  <p className="mt-3 text-[10px] font-bold uppercase tracking-widest text-outline leading-snug max-w-md">
+                    Live congestion data isn&apos;t available for this gate yet. It will appear when the venue feed is
+                    active.
+                  </p>
+                )}
               </StarkCard>
               <StarkCard title="ETA" subtitle="Walking">
                 <span className="text-2xl font-black text-secondary" aria-live="polite">
@@ -634,10 +689,16 @@ export const Dashboard = () => {
           <StarkButton
             variant="secondary"
             fullWidth
-            onClick={triggerOfflineSim}
+            onClick={toggleOfflineSim}
             className={!state.isOnline ? 'bg-error text-white border-error' : ''}
+            aria-pressed={!state.isOnline}
+            title={
+              state.isOnline
+                ? 'Simulate losing network (tests offline UI)'
+                : 'Restore online status (same as Force Sync intent)'
+            }
           >
-            {state.isOnline ? 'Simulate Drop' : 'Drop Active'}
+            {state.isOnline ? 'Simulate Drop' : 'End drop — restore live'}
           </StarkButton>
           <StarkButton fullWidth onClick={handleManualRefresh} icon="sync">
             Force Sync

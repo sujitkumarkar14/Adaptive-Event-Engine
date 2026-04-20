@@ -58,9 +58,14 @@ export const ConcourseCopilotCard = ({
       })
       .catch(() => {
         if (cancelled) return;
-        setErr('Concourse data unavailable offline.');
+        const offline = typeof navigator !== 'undefined' && !navigator.onLine;
+        setErr(
+          offline
+            ? 'Venue tips need a network connection. Reconnect to load nearby places.'
+            : 'Venue tips are temporarily unavailable. Follow section signage; we’ll retry when the service responds.'
+        );
         setTip(
-          'Smart tip: Use section signage for the nearest restroom — concierge will refresh when back online.'
+          'Smart tip: Use section signage for the nearest restroom — full concierge tips return when Places responds.'
         );
       })
       .finally(() => {
@@ -127,8 +132,10 @@ export const ConcourseCopilotCard = ({
         className="mt-4 text-sm font-bold text-on-surface uppercase tracking-widest leading-relaxed"
       >
         {loading ? 'Loading venue intelligence…' : null}
-        {!loading && err ? <span className="text-error">{err}</span> : null}
-        {!loading && !err && (displayTip ?? tip) ? <span>{displayTip ?? tip}</span> : null}
+        {!loading && err ? <span className="text-error block mb-2">{err}</span> : null}
+        {!loading && (displayTip ?? tip) ? (
+          <span className={err ? 'text-on-surface' : undefined}>{displayTip ?? tip}</span>
+        ) : null}
       </div>
 
       {onExitOptimization ? (

@@ -29,30 +29,79 @@ export const Onboarding = () => {
 
       {/* Transport Mode Segmented Control */}
       <div className="mb-10">
-        <label className="font-['Inter'] font-bold uppercase tracking-widest text-xs text-outline mb-4 block">
+        <span id="transport-mode-label" className="font-['Inter'] font-bold uppercase tracking-widest text-xs text-outline mb-4 block">
           Transport Mode
-        </label>
-        <div className="grid grid-cols-3 border-2 border-outline-variant">
-          <button 
+        </span>
+        <div
+          className="grid grid-cols-3 border-2 border-outline-variant"
+          role="radiogroup"
+          aria-labelledby="transport-mode-label"
+        >
+          <button
+            type="button"
+            role="radio"
+            aria-checked={state.transportMode === 'Car'}
             onClick={() => handleTransportSelect('Car')}
-            className={`py-4 flex flex-col items-center gap-2 border-r-2 border-outline-variant transition-colors ${state.transportMode === 'Car' ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface hover:bg-surface-container-low'}`}
+            className={`py-4 flex flex-col items-center gap-2 border-r-2 border-outline-variant transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary ${
+              state.transportMode === 'Car'
+                ? 'bg-primary-container text-on-primary-container font-bold'
+                : 'text-on-surface hover:bg-surface-container-low'
+            }`}
           >
-            <span className={`material-symbols-outlined normal-case ${state.transportMode === 'Car' ? 'text-white' : ''}`} style={{fontVariationSettings: "'FILL' 0"}}>directions_car</span>
-            <span className={`text-[10px] tracking-widest uppercase ${state.transportMode === 'Car' ? 'text-white' : ''}`}>Car</span>
+            <span
+              className={`material-symbols-outlined normal-case ${state.transportMode === 'Car' ? 'text-white' : ''}`}
+              style={{ fontVariationSettings: "'FILL' 0" }}
+              aria-hidden
+            >
+              directions_car
+            </span>
+            <span className={`text-[10px] tracking-widest uppercase ${state.transportMode === 'Car' ? 'text-white' : ''}`}>
+              Car
+            </span>
           </button>
-          <button 
+          <button
+            type="button"
+            role="radio"
+            aria-checked={state.transportMode === 'Metro'}
             onClick={() => handleTransportSelect('Metro')}
-            className={`py-4 flex flex-col items-center gap-2 border-r-2 border-outline-variant transition-colors ${state.transportMode === 'Metro' ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface hover:bg-surface-container-low'}`}
+            className={`py-4 flex flex-col items-center gap-2 border-r-2 border-outline-variant transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary ${
+              state.transportMode === 'Metro'
+                ? 'bg-primary-container text-on-primary-container font-bold'
+                : 'text-on-surface hover:bg-surface-container-low'
+            }`}
           >
-            <span className={`material-symbols-outlined normal-case ${state.transportMode === 'Metro' ? 'text-white' : ''}`} style={{fontVariationSettings: "'FILL' 0"}}>subway</span>
-            <span className={`text-[10px] tracking-widest uppercase ${state.transportMode === 'Metro' ? 'text-white' : ''}`}>Metro</span>
+            <span
+              className={`material-symbols-outlined normal-case ${state.transportMode === 'Metro' ? 'text-white' : ''}`}
+              style={{ fontVariationSettings: "'FILL' 0" }}
+              aria-hidden
+            >
+              subway
+            </span>
+            <span className={`text-[10px] tracking-widest uppercase ${state.transportMode === 'Metro' ? 'text-white' : ''}`}>
+              Metro
+            </span>
           </button>
-          <button 
+          <button
+            type="button"
+            role="radio"
+            aria-checked={state.transportMode === 'Shuttle'}
             onClick={() => handleTransportSelect('Shuttle')}
-            className={`py-4 flex flex-col items-center gap-2 transition-colors ${state.transportMode === 'Shuttle' ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface hover:bg-surface-container-low'}`}
+            className={`py-4 flex flex-col items-center gap-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary ${
+              state.transportMode === 'Shuttle'
+                ? 'bg-primary-container text-on-primary-container font-bold'
+                : 'text-on-surface hover:bg-surface-container-low'
+            }`}
           >
-            <span className={`material-symbols-outlined normal-case ${state.transportMode === 'Shuttle' ? 'text-white' : ''}`} style={{fontVariationSettings: "'FILL' 0"}}>airport_shuttle</span>
-            <span className={`text-[10px] tracking-widest uppercase ${state.transportMode === 'Shuttle' ? 'text-white' : ''}`}>Shuttle</span>
+            <span
+              className={`material-symbols-outlined normal-case ${state.transportMode === 'Shuttle' ? 'text-white' : ''}`}
+              style={{ fontVariationSettings: "'FILL' 0" }}
+              aria-hidden
+            >
+              airport_shuttle
+            </span>
+            <span className={`text-[10px] tracking-widest uppercase ${state.transportMode === 'Shuttle' ? 'text-white' : ''}`}>
+              Shuttle
+            </span>
           </button>
         </div>
       </div>
@@ -63,47 +112,79 @@ export const Onboarding = () => {
           Accessibility Preferences
         </label>
         
-        {/* Preference Item 1 */}
-        <div 
+        <button
+          type="button"
+          role="switch"
+          aria-checked={state.accessibility.stepFree}
           onClick={() => toggleAccessibility('stepFree')}
-          className={`cursor-pointer flex items-center justify-between p-5 border-l-4 transition-colors ${state.accessibility.stepFree ? 'bg-surface-container-lowest border-primary-container text-on-surface' : 'bg-surface-container-lowest border-outline-variant text-on-surface'}`}
+          className={`w-full cursor-pointer flex items-center justify-between p-5 border-l-4 transition-colors text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+            state.accessibility.stepFree
+              ? 'bg-surface-container-lowest border-primary-container text-on-surface'
+              : 'bg-surface-container-lowest border-outline-variant text-on-surface'
+          }`}
         >
-          <div className="flex flex-col">
+          <div className="flex flex-col pr-2">
             <span className="font-bold text-sm uppercase tracking-tight">Step-free access</span>
             <span className="text-xs text-on-surface-variant">Prioritize elevators and ramps</span>
           </div>
-          <div className={`w-12 h-6 relative flex items-center px-1 transition-colors ${state.accessibility.stepFree ? 'bg-primary-container justify-end' : 'bg-outline-variant justify-start'}`}>
-            <div className="w-4 h-4 bg-white"></div>
+          <span className="sr-only">{state.accessibility.stepFree ? 'On' : 'Off'}</span>
+          <div
+            className={`w-12 h-6 shrink-0 relative flex items-center px-1 transition-colors ${state.accessibility.stepFree ? 'bg-primary-container justify-end' : 'bg-outline-variant justify-start'}`}
+            aria-hidden
+          >
+            <div className="w-4 h-4 bg-white" />
           </div>
-        </div>
+        </button>
 
-        {/* Preference Item 2 */}
-        <div 
+        <button
+          type="button"
+          role="switch"
+          aria-checked={state.accessibility.lowSensory}
           onClick={() => toggleAccessibility('lowSensory')}
-          className={`cursor-pointer flex items-center justify-between p-5 border-l-4 transition-colors ${state.accessibility.lowSensory ? 'bg-surface-container-lowest border-primary-container text-on-surface' : 'bg-surface-container-lowest border-outline-variant text-on-surface'}`}
+          className={`w-full cursor-pointer flex items-center justify-between p-5 border-l-4 transition-colors text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+            state.accessibility.lowSensory
+              ? 'bg-surface-container-lowest border-primary-container text-on-surface'
+              : 'bg-surface-container-lowest border-outline-variant text-on-surface'
+          }`}
         >
-          <div className="flex flex-col">
+          <div className="flex flex-col pr-2">
             <span className="font-bold text-sm uppercase tracking-tight">Low-sensory environments</span>
             <span className="text-xs text-on-surface-variant">Routes with reduced noise and light</span>
           </div>
-          <div className={`w-12 h-6 relative flex items-center px-1 transition-colors ${state.accessibility.lowSensory ? 'bg-primary-container justify-end' : 'bg-outline-variant justify-start'}`}>
-            <div className="w-4 h-4 bg-white"></div>
+          <span className="sr-only">{state.accessibility.lowSensory ? 'On' : 'Off'}</span>
+          <div
+            className={`w-12 h-6 shrink-0 relative flex items-center px-1 transition-colors ${state.accessibility.lowSensory ? 'bg-primary-container justify-end' : 'bg-outline-variant justify-start'}`}
+            aria-hidden
+          >
+            <div className="w-4 h-4 bg-white" />
           </div>
-        </div>
+        </button>
 
-        {/* Preference Item 3 - High Contrast active example */}
-        <div 
+        <button
+          type="button"
+          role="switch"
+          aria-checked={state.accessibility.visualAid}
           onClick={() => toggleAccessibility('visualAid')}
-          className={`cursor-pointer flex items-center justify-between p-5 border-l-4 transition-colors ${state.accessibility.visualAid ? 'bg-inverse-surface border-primary-container text-inverse-on-surface' : 'bg-surface-container-lowest border-outline-variant text-on-surface'}`}
+          className={`w-full cursor-pointer flex items-center justify-between p-5 border-l-4 transition-colors text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+            state.accessibility.visualAid
+              ? 'bg-inverse-surface border-primary-container text-inverse-on-surface'
+              : 'bg-surface-container-lowest border-outline-variant text-on-surface'
+          }`}
         >
-          <div className="flex flex-col">
+          <div className="flex flex-col pr-2">
             <span className="font-bold text-sm uppercase tracking-tight">Visual aid support</span>
-            <span className={`text-xs ${state.accessibility.visualAid ? 'text-inverse-on-surface opacity-80' : 'text-on-surface-variant'}`}>High-contrast UI and audio cues</span>
+            <span className={`text-xs ${state.accessibility.visualAid ? 'text-inverse-on-surface opacity-80' : 'text-on-surface-variant'}`}>
+              High-contrast UI and audio cues
+            </span>
           </div>
-          <div className={`w-12 h-6 relative flex items-center px-1 transition-colors ${state.accessibility.visualAid ? 'bg-primary-container justify-end' : 'bg-outline-variant justify-start'}`}>
-            <div className="w-4 h-4 bg-white"></div>
+          <span className="sr-only">{state.accessibility.visualAid ? 'On' : 'Off'}</span>
+          <div
+            className={`w-12 h-6 shrink-0 relative flex items-center px-1 transition-colors ${state.accessibility.visualAid ? 'bg-primary-container justify-end' : 'bg-outline-variant justify-start'}`}
+            aria-hidden
+          >
+            <div className="w-4 h-4 bg-white" />
           </div>
-        </div>
+        </button>
       </div>
 
       {/* Visual Anchor Image */}
@@ -127,11 +208,12 @@ export const Onboarding = () => {
         >
           Initialize System
         </StarkButton>
-        <button 
+        <button
+          type="button"
           onClick={() => navigate('/dashboard')}
-          className="w-full py-4 text-outline font-bold uppercase tracking-widest text-[10px] mt-2 block text-center"
+          className="w-full py-4 text-outline font-bold uppercase tracking-widest text-[10px] mt-2 block text-center focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
-            Skip configuration
+          Skip configuration
         </button>
       </div>
     </section>

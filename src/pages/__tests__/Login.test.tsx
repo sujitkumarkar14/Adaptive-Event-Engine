@@ -1,14 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { Login } from '../Login';
 
-const mockSignInAnonymously = vi.fn().mockResolvedValue(undefined);
 const mockSignInWithEmail = vi.fn().mockResolvedValue(undefined);
 const mockCreateUser = vi.fn().mockResolvedValue(undefined);
 
 vi.mock('firebase/auth', () => ({
-  signInAnonymously: (...args: unknown[]) => mockSignInAnonymously(...args),
   signInWithEmailAndPassword: (...args: unknown[]) => mockSignInWithEmail(...args),
   createUserWithEmailAndPassword: (...args: unknown[]) => mockCreateUser(...args),
 }));
@@ -31,14 +29,13 @@ describe('Login', () => {
     expect(screen.getByRole('heading', { name: /Identity Gate/i })).toBeInTheDocument();
   });
 
-  it('guest sign-in calls anonymous auth', async () => {
+  it('does not offer guest sign-in (email/password only)', () => {
     render(
       <MemoryRouter>
         <Login />
       </MemoryRouter>
     );
-    fireEvent.click(screen.getByRole('button', { name: /Continue as guest/i }));
-    await waitFor(() => expect(mockSignInAnonymously).toHaveBeenCalled());
+    expect(screen.queryByRole('button', { name: /Continue as guest/i })).not.toBeInTheDocument();
   });
 
   it('shows validation when email sign-in with empty fields', () => {

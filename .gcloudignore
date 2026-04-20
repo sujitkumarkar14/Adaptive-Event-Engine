@@ -1,0 +1,20 @@
+# Used by `gcloud builds submit` instead of `.gitignore` when present.
+# Keep this list minimal so `.env` (with VITE_* for the client build) can be uploaded from your machine.
+# Do not commit real secrets; CI should use Secret Manager + substitutions instead.
+
+.gcloudignore
+.git
+.github
+node_modules
+functions/node_modules
+coverage
+dist
+.firebase
+dist-ssr
+playwright-report
+test-results
+e2e/.auth
+functions/lib
+stitch_adaptive_event_entry_system
+artifacts
+*.log

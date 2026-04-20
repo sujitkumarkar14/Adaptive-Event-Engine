@@ -14,7 +14,7 @@ describe('Onboarding', () => {
       </MemoryRouter>
     );
     expect(screen.getByText(/Travel/i)).toBeInTheDocument();
-    const carBtn = screen.getByRole('button', { name: /directions_carCar/i });
+    const carBtn = screen.getByRole('radio', { name: /car/i });
     fireEvent.click(carBtn);
     expect(carBtn).toHaveClass(/bg-primary-container/);
   });
@@ -27,9 +27,9 @@ describe('Onboarding', () => {
         </EntryProvider>
       </MemoryRouter>
     );
-    fireEvent.click(screen.getByText(/Step-free access/i));
-    fireEvent.click(screen.getByText(/Low-sensory environments/i));
-    fireEvent.click(screen.getByText(/Visual aid support/i));
+    fireEvent.click(screen.getByRole('switch', { name: /step-free access/i }));
+    fireEvent.click(screen.getByRole('switch', { name: /low-sensory environments/i }));
+    fireEvent.click(screen.getByRole('switch', { name: /visual aid support/i }));
   });
 
   it('shows Initialize System and skip configuration', () => {
