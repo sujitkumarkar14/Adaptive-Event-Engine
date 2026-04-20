@@ -74,8 +74,7 @@ export const SideNavBar = () => {
               }`}
             >
               <span
-                className="material-symbols-outlined normal-case shrink-0"
-                style={{ fontVariationSettings: `'FILL' ${isActive ? 1 : 0}` }}
+                className={`material-symbols-outlined normal-case shrink-0 ${isActive ? 'material-symbol-fill-1' : ''}`}
               >
                 {item.icon}
               </span>
@@ -114,8 +113,7 @@ export const BottomNav = () => {
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 left-0 w-full bg-surface border-t-[1px] border-outline-variant flex flex-nowrap h-16 z-50 overflow-x-auto overflow-y-hidden overscroll-x-contain [scrollbar-width:thin]"
-      style={{ WebkitOverflowScrolling: 'touch' }}
+      className="md:hidden fixed bottom-0 left-0 w-full bg-surface border-t-[1px] border-outline-variant flex flex-nowrap h-16 z-50 overflow-x-auto overflow-y-hidden overscroll-x-contain [scrollbar-width:thin] [-webkit-overflow-scrolling:touch]"
       aria-label="Primary mobile navigation"
     >
       <div aria-live="polite" role="status" className="sr-only">
@@ -133,8 +131,7 @@ export const BottomNav = () => {
             }`}
           >
             <span
-              className="material-symbols-outlined normal-case text-[22px]"
-              style={{ fontVariationSettings: `'FILL' ${isActive ? 1 : 0}` }}
+              className={`material-symbols-outlined normal-case text-[22px] ${isActive ? 'material-symbol-fill-1' : ''}`}
             >
               {item.icon}
             </span>

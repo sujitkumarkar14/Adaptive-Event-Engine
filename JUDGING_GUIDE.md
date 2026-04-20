@@ -42,7 +42,7 @@
 
 "Performance is optimized via intelligent code-splitting and asset caching, achieving a First Contentful Paint (FCP) of 0.7s."
 
-*Measurement note:* run Lighthouse on the production hosting build (`npm run build` + `firebase serve` or deployed URL). `index.html` carries semantic SEO meta; **Firebase Hosting** applies **`Content-Security-Policy`**, **`Strict-Transport-Security`** (incl. `preload` where appropriate), **`X-Frame-Options`**, **`Referrer-Policy`**, and long-cache headers for **`/assets/**`**. A full **Trusted Types** policy is not enabled in-document (React + Vite HMR conflict in dev); CSP remains the primary XSS boundary for the shipped shell.
+*Measurement note:* run Lighthouse on the production hosting build (`npm run build` + `firebase serve` or deployed URL). `index.html` carries semantic SEO meta; **Firebase Hosting** applies **`Content-Security-Policy`** (strict `style-src` without `'unsafe-inline'` on the shipped build), **`Strict-Transport-Security`** (incl. `preload` where appropriate), **`Cross-Origin-Opener-Policy`**, **`Cross-Origin-Resource-Policy`**, **`X-Frame-Options`**, **`Referrer-Policy`**, and long-cache headers for **`/assets/**`**. A full **Trusted Types** policy is not enabled in-document (React + Vite HMR conflict in dev); CSP remains the primary XSS boundary for the shipped shell.
 
 ---
 

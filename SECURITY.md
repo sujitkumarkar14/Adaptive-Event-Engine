@@ -30,6 +30,11 @@ Operational rotation, App Check rollout, and incident steps: **`SECURITY_RUNBOOK
 
 - Invalid JSON bodies return `400` with **sanitized** error detail length (`sanitizeHttpErrorDetail`).
 
+## Browser shell (Firebase Hosting / static)
+
+- **Content-Security-Policy** does not use `style-src 'unsafe-inline'` — styles come from the built CSS bundle and the Google Fonts stylesheet (`https://fonts.googleapis.com`). Icon “filled” state uses the `.material-symbol-fill-1` class; **StarkMap** animation lives in `src/index.css` instead of an inline `<style>` inside SVG.
+- **`Cross-Origin-Opener-Policy: same-origin`** and **`Cross-Origin-Resource-Policy: same-origin`** are sent with hosting responses (`firebase.json`, `nginx.conf`). Sign-in is email/password and anonymous only today; if you add OAuth **popup** flows later, evaluate **`same-origin-allow-popups`** for COOP so the provider window can complete handoff to Firebase.
+
 ## Environments
 
 - **Development:** local Vite, optional emulators, mock keys only in emulator paths.

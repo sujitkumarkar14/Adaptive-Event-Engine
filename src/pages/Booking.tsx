@@ -339,8 +339,7 @@ export const Booking = () => {
                 <span className="text-[10px] font-bold uppercase tracking-widest">{slot.status}</span>
                 {selectedSlot === slot.id && (
                   <span
-                    className="material-symbols-outlined normal-case text-primary-container"
-                    style={{ fontVariationSettings: "'FILL' 1" }}
+                    className="material-symbols-outlined material-symbol-fill-1 normal-case text-primary-container"
                     aria-hidden
                   >
                     check_circle

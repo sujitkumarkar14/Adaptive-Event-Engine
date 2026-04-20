@@ -201,7 +201,6 @@ export const Onboarding = () => {
             >
               <span
                 className={`material-symbols-outlined normal-case ${state.transportMode === mode ? 'text-white' : ''}`}
-                style={{ fontVariationSettings: "'FILL' 0" }}
                 aria-hidden
               >
                 {icon}

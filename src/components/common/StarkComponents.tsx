@@ -44,11 +44,7 @@ export const StarkButton: React.FC<StarkButtonProps> = ({
     >
       {children}
       {icon && (
-        <span
-          className="material-symbols-outlined normal-case text-lg"
-          style={{ fontVariationSettings: "'FILL' 0" }}
-          aria-hidden
-        >
+        <span className="material-symbols-outlined normal-case text-lg" aria-hidden>
           {icon}
         </span>
       )}

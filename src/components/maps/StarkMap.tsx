@@ -125,8 +125,7 @@ export const StarkMap = ({
 
   return (
     <div
-      className="border-2 border-black overflow-hidden"
-      style={{ borderRadius: 0 }}
+      className="rounded-none border-2 border-black overflow-hidden"
       role="img"
       aria-label={label}
     >
@@ -137,19 +136,6 @@ export const StarkMap = ({
         aria-hidden={false}
       >
         <title>{label}</title>
-        <defs>
-          <style>
-            {`
-              @keyframes stark-pulse {
-                0%, 100% { stroke-opacity: 1; }
-                50% { stroke-opacity: 0.35; }
-              }
-              .stark-emergency-pulse {
-                animation: stark-pulse 1.1s ease-in-out infinite;
-              }
-            `}
-          </style>
-        </defs>
         <rect width="100" height="100" fill={bg} />
 
         {smartRerouteVisual ? (

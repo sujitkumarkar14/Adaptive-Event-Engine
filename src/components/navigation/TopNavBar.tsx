@@ -76,7 +76,7 @@ export const TopNavBar = () => {
               className="h-9 w-9 border border-outline-variant object-cover"
             />
           ) : (
-            <span className="material-symbols-outlined text-[28px]" style={{ fontVariationSettings: "'FILL' 0" }} aria-hidden>
+            <span className="material-symbols-outlined text-[28px]" aria-hidden>
               account_circle
             </span>
           )}
@@ -94,7 +94,7 @@ export const TopNavBar = () => {
             setSettingsOpen((o) => !o);
           }}
         >
-          <span className="material-symbols-outlined text-[28px]" style={{ fontVariationSettings: "'FILL' 0" }} aria-hidden>
+          <span className="material-symbols-outlined text-[28px]" aria-hidden>
             settings
           </span>
         </button>
