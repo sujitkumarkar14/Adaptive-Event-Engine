@@ -34,6 +34,13 @@ Indicative numbers (not SLAs) are in `README.md` — Firestore snapshot latency,
 - **Output:** **`artifacts/concurrency-summary.json`** — includes **`avg_response_ms`** / **`p95_response_ms`** for two synthetic waves (`mock_booking_resolve`, `mock_reroute_eval`).
 - This is **not** stadium-scale load testing; it is a **repeatable local signal** for parallel work and throughput-shaped metrics. For real load, use k6/GCP tests in your deployment environment.
 
+## Scale simulation artifact (illustrative)
+
+- **Script:** `npm run bench:scale` runs `scripts/write-scale-simulation.mjs` and writes **`artifacts/scale-simulation.json`**.
+- **Fields:** `simulated_users`, `concurrent_requests`, `avg_latency_ms`, `p95_latency_ms`, `failure_rate` — **illustrative**; optionally derived from `concurrency-summary.json` when present.
+- **Env:** `SCALE_SIM_USERS`, `SCALE_CONCURRENT` override defaults (**500** / **120**).
+- This is **not** a production SLO or load-test result — it documents a **scale-shaped** checked-in snapshot for reviewers.
+
 ## Load / scale
 
 This repo does **not** include load-test harnesses or stadium-scale benchmarks. Add k6, Artillery, or GCP load tests in your deployment project if required.

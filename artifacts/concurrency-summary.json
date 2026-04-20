@@ -1,18 +1,18 @@
 {
-  "generatedAt": "2026-04-20T05:44:57.179Z",
+  "generatedAt": "2026-04-20T05:54:33.684Z",
   "environment": "local-node",
   "note": "Simulated Promise.all fan-out; not Cloud Functions or Firestore latency.",
   "booking_wave": {
     "label": "mock_booking_resolve",
     "concurrent_requests": 50,
-    "avg_response_ms": 0.004,
-    "p95_response_ms": 0.003,
+    "avg_response_ms": 0.006,
+    "p95_response_ms": 0.004,
     "failures": 0
   },
   "reroute_wave": {
     "label": "mock_reroute_eval",
     "concurrent_requests": 50,
-    "avg_response_ms": 0.001,
+    "avg_response_ms": 0.002,
     "p95_response_ms": 0.002,
     "failures": 0
   }

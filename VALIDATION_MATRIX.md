@@ -14,7 +14,10 @@ Maps product and engineering expectations to **files, tests, and automation** in
 | **Accessibility (automated)** | `vitest-axe` in `src/__tests__/a11y.*.spec.tsx`, `pages/__tests__/*a11y*` | `npm test` |
 | **Performance artifact (local)** | `artifacts/perf-summary.json`, `scripts/write-perf-summary.mjs` | `npm run bench:perf` |
 | **Concurrency snapshot (simulated)** | `artifacts/concurrency-summary.json`, `scripts/benchmark-concurrency.mjs` | `npm run bench:concurrency` |
-| **Deep E2E shells** | `e2e/high-congestion-reroute.spec.ts`, `e2e/emergency-during-booking.spec.ts`, `e2e/offline-recovery-flow.spec.ts`, semantic `e2e/crowd-movement-reroute.spec.ts`, etc. | `npm run build && npm run test:e2e` |
+| **Scale simulation (illustrative)** | `artifacts/scale-simulation.json`, `scripts/write-scale-simulation.mjs` | `npm run bench:scale` |
+| **Resilience / retries** | `RESILIENCE.md`, `functions/src/retry.ts`, `functions/src/__tests__/retry-logic.test.ts` | `cd functions && npm test` |
+| **Booking capacity logic** | `functions/src/bookingCapacity.ts`, `functions/src/__tests__/booking-capacity-logic.test.ts` | `cd functions && npm test` |
+| **Deep E2E shells** | `e2e/multi-user-state-consistency.spec.ts`, `e2e/rapid-reroute-updates.spec.ts`, `e2e/concurrent-booking-conflict.spec.ts`, `e2e/backend-failure-recovery.spec.ts`, `e2e/offline-then-reconnect-sync.spec.ts`, plus semantic `e2e/crowd-movement-consistency.spec.ts`, etc. | `npm run build && npm run test:e2e` |
 | **Security docs** | `SECURITY.md`, `FUNCTIONS.md` | Manual review |
 | **End-to-end verify** | `scripts/verify.sh` | `npm run verify` |
 

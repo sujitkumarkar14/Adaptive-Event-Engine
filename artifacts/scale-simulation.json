@@ -1,0 +1,10 @@
+{
+  "generatedAt": "2026-04-20T05:54:33.754Z",
+  "environment": "local-node",
+  "note": "Illustrative scale-shaped snapshot; not measured stadium or Cloud Functions traffic.",
+  "simulated_users": 500,
+  "concurrent_requests": 120,
+  "avg_latency_ms": 106,
+  "p95_latency_ms": 190,
+  "failure_rate": "0%"
+}

@@ -17,7 +17,14 @@
 3. **Reroute / alerts:** When `role="alert"` banners appear (e.g. staff reroute), screen readers should receive assertive announcements; do not rely on color alone (copy + icons).
 4. **Staff tools:** Policy toggles and chaos/demo controls should keep focus order logical (top → form → primary action).
 
-## Automated validation signals
+## Accessibility validation coverage
+
+- **Keyboard-only navigation** — verified in segments for login, onboarding, and booking (`src/__tests__/a11y.full-keyboard-journey.spec.tsx`) plus full login tab order (`a11y.keyboard-full-flow.spec.tsx`).
+- **Dynamic updates** — reroute `alert` uses **`aria-live="assertive"`** and **`aria-atomic="true"`** (`a11y.dynamic-content-announcement.spec.tsx`).
+- **Focus management** — SOS focus after reroute alert (`a11y.focus-management.spec.tsx`); focus return after a simple dialog (`a11y.focus-recovery.spec.tsx`).
+- **Reduced motion** — `prefers-reduced-motion` in `src/index.css` (see Implemented above).
+
+### Automated validation signals (detail)
 
 - **Keyboard-only login:** `src/__tests__/a11y.keyboard-full-flow.spec.tsx` tabs through the login form without pointer input.
 - **Focus after assertive reroute alert:** `src/__tests__/a11y.focus-management.spec.tsx` checks that Tab reaches the SOS control after a reroute `alert` is present.

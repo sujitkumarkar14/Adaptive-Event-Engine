@@ -330,3 +330,45 @@ Neutral summary of work landed after the punch list above; use this as a handoff
 - [ ] Wire **staging** (or emulator) E2E with real anonymous/email sign-in for dashboard + booking + emergency overlay in one run.
 - [ ] Optional **load test** (k6) against Functions HTTP in a dedicated env.
 - [ ] Optional **WCAG** contrast audit artifact if you need formal AA sign-off.
+
+---
+
+## Second batch — resilience, concurrency proof, and deeper tests (repo)
+
+Handoff for the follow-on work: stress-style E2E shells, Functions helpers, a11y depth, and **`RESILIENCE.md`**.
+
+### Cloud Functions
+
+- **`functions/src/retry.ts`** — `withRetry()` with exponential backoff; tests in **`functions/src/__tests__/retry-logic.test.ts`**.
+- **`functions/src/bookingCapacity.ts`** — `isSlotAvailable` / `reservationOutcome` aligned with Spanner capacity checks in `reserveEntrySlot`; tests in **`functions/src/__tests__/booking-capacity-logic.test.ts`**.
+- **`FUNCTIONS.md`** — documents the above.
+
+### Playwright E2E
+
+- **`e2e/multi-user-state-consistency.spec.ts`** — parallel contexts; same Identity Gate copy for dashboard/staff (auth gate consistency).
+- **`e2e/rapid-reroute-updates.spec.ts`** — fast navigation churn; last route wins.
+- **`e2e/concurrent-booking-conflict.spec.ts`** — parallel `/booking` clients; same gate; points to Functions capacity tests for server truth.
+- **`e2e/backend-failure-recovery.spec.ts`** — `fetch` forced to reject; login shell stays coherent.
+- **`e2e/offline-then-reconnect-sync.spec.ts`** — offline/online + reload on login shell.
+- **Semantic:** **`e2e/crowd-movement-consistency.spec.ts`**, **`e2e/waiting-time-capacity-enforcement.spec.ts`**, **`e2e/real-time-coordination-under-load.spec.ts`**.
+
+### Vitest (accessibility)
+
+- **`src/__tests__/a11y.full-keyboard-journey.spec.tsx`** — login / onboarding / booking keyboard segments.
+- **`src/__tests__/a11y.dynamic-content-announcement.spec.tsx`** — reroute `alert` uses `aria-live="assertive"` + `aria-atomic="true"`.
+- **`src/__tests__/a11y.focus-recovery.spec.tsx`** — focus returns to trigger after closing a small dialog.
+
+### Docs and artifacts
+
+- **`RESILIENCE.md`** — retries, booking capacity story, offline/cache, routing/emergency notes, what CI does not simulate.
+- **`README.md`** — **System resilience** section; doc index entry for **`RESILIENCE.md`**; **`npm run bench:scale`**.
+- **`PERFORMANCE.md`** — scale simulation artifact (`artifacts/scale-simulation.json`).
+- **`scripts/write-scale-simulation.mjs`**, **`npm run bench:scale`** — illustrative scale-shaped JSON (optionally informed by `concurrency-summary.json`).
+- **`ACCESSIBILITY.md`** — **Accessibility validation coverage** section.
+- **`VALIDATION_MATRIX.md`**, **`TESTING.md`** — rows for resilience, capacity logic, new E2E paths.
+
+### Limits (unchanged)
+
+- End-to-end **multi-client Firestore** reroute consistency and **live slot contention** still need staging + authenticated sessions or emulators; repo proves **shells** + **pure/Functions unit** logic where possible.
+
+*Last updated: appended second batch (resilience + stress E2E + Functions retry/capacity + a11y depth + scale artifact); earlier “Latest batch” section remains the prior milestone.*

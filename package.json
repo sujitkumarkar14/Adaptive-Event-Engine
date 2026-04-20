@@ -10,6 +10,7 @@
     "verify": "bash scripts/verify.sh",
     "bench:perf": "node scripts/write-perf-summary.mjs",
     "bench:concurrency": "node scripts/benchmark-concurrency.mjs",
+    "bench:scale": "node scripts/write-scale-simulation.mjs",
     "perf:report": "bash scripts/perf-report.sh",
     "preview": "vite preview",
     "test": "vitest run",

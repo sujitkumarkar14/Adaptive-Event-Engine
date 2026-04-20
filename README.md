@@ -17,6 +17,7 @@
 | **`DECISIONS.md`** | Lightweight ADRs |
 | **`FUNCTIONS.md`** | Server/client function catalog |
 | **`VALIDATION_MATRIX.md`** | Requirements traceability → tests / CI / artifacts |
+| **`RESILIENCE.md`** | Retries, offline, capacity, failure modes |
 
 ## Engineering quality controls
 
@@ -31,6 +32,7 @@
 - **Bundle snapshot:** `npm run perf:report`
 - **Local perf artifact:** `npm run bench:perf` writes **`artifacts/perf-summary.json`** (synthetic micro-benchmarks; see **`PERFORMANCE.md`**)
 - **Concurrency snapshot:** `npm run bench:concurrency` writes **`artifacts/concurrency-summary.json`** (simulated parallel waves; see **`PERFORMANCE.md`**)
+- **Scale-shaped snapshot:** `npm run bench:scale` writes **`artifacts/scale-simulation.json`** (illustrative; see **`PERFORMANCE.md`**)
 
 ## Demo flows (optional screenshots)
 
@@ -76,6 +78,16 @@ Production enforcement: **Firestore rules** + **`updateRoutingPolicyLive`** chec
 | **Slot reservations are consistency-checked server-side** | `reserveEntrySlot` uses transactional logic in Cloud Functions (Spanner when enabled). |
 | **Emergency messaging can take over global UI** | Global emergency / evac flows set high-visibility shell state and assertive alerts (see orchestration + dashboard). |
 | **Accessibility affordances stay available** | Skip link, semantic regions, live regions, and automated **axe** regressions on key surfaces; manual checks in **`ACCESSIBILITY.md`**. |
+
+## System resilience
+
+- Handles **partial connectivity loss** with cached Firestore reads and explicit sync/offline status where wired.
+- Maintains **coherent local UI state** during short outages; **reconnect** reuses the shell (`online` / `offline` listeners).
+- **Slot reservations** rely on **server transactions** (`reserveEntrySlot`) — clients do not silently duplicate capacity.
+- **Routing policy updates** go through **callables**; subscribers see **latest snapshot** from Firestore listeners (not stale client-only writes).
+- **Rate limits** and **validation** reduce abuse and bad payloads before work hits Spanner or broadcast paths.
+
+Details: **`RESILIENCE.md`**.
 
 ## Architecture (split path)
 

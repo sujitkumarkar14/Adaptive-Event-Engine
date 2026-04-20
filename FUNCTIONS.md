@@ -37,6 +37,8 @@ This document catalogs the strictly typed, interoperable functions defining the 
 *   **`onRoutingPolicyRerouteNotify`:** When `routingPolicy/live.gateRerouteActive` flips on, sends FCM to topic `smart_reroute` (staff or auto).
 *   **`updateRoutingPolicyLive`:** Callable merge into `routingPolicy/live` (staff/admin claims in production; Firestore rules block direct client writes). Role gate: `functions/src/routingPolicyAuth.ts`. Client: `src/services/staffRoutingPolicy.ts`.
 *   **HTTP `400` bodies:** Error detail strings are length-limited via `sanitizeHttpErrorDetail` before JSON response.
+*   **`withRetry` (`functions/src/retry.ts`):** Generic async retry with exponential backoff for transient errors (optional adoption in callables/clients). Tests: `functions/src/__tests__/retry-logic.test.ts`.
+*   **`isSlotAvailable` / `reservationOutcome` (`functions/src/bookingCapacity.ts`):** Pure helpers aligned with Spanner capacity checks in `reserveEntrySlot`. Tests: `functions/src/__tests__/booking-capacity-logic.test.ts`.
 
 ### C. Sensors & Proximity
 *   **`detectBeaconProximity(callback)`:`(`src/services/bleProximity.ts`)`**
